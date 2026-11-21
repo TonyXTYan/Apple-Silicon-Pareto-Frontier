@@ -3,7 +3,7 @@ __pycache__/
 explorer/tests/shots/
 explorer/data.json
 explorer/data[2-9].json
-explorer/data1[0-5].json
+explorer/data1[0-6].json
 .DS_Store
 explorer/tests/*.png
 /c?.png

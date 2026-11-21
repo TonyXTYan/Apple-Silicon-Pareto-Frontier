@@ -24,7 +24,7 @@ async def main():
         for st,n,lines in (('hpl',nh,0),('julia-sgemm',20,10),('arxiv-sgemm',8,4),('julia-dgemm',3,0),('',31+nh,14)):
             await pg.select_option('#lset',st); await pg.wait_for_timeout(250)
             r=await pg.evaluate("""()=>({n:S.pts.length,sets:[...new Set(S.pts.map(p=>p.r.set||p.r.w))],pe:S.pts.filter(p=>p.r.w==='blas').every(p=>p.r.pe&&p.r.plo&&/No wall power was metered/.test(p.r.note)),
-              vend:S.pts.some(p=>p.r.w==='hpl'&&p.r.gen===0),solid:S.pts.filter(p=>p.r.w==='hpl'&&!p.r.est).every(p=>kindOf(p.r)==='solid'),
+              vend:S.pts.some(p=>p.r.w==='hpl'&&p.r.gen===0),solid:S.pts.filter(p=>p.r.w==='hpl'&&!p.r.est&&!p.r.sys).every(p=>kindOf(p.r)==='solid'),
               lines:document.querySelectorAll('#chart path[style*="stroke-width:1.4"]').length,abs:!axisRel(),
               bad:S.pts.filter(p=>{const v=relOf(p.r);return v&&(v.b.w!==p.r.w||v.b.set!==p.r.set||v.b.lib!==p.r.lib)}).length,rel:S.pts.filter(p=>relOf(p.r)).length,
               ring:document.querySelectorAll('#chart .baseline-ring').length,x:document.querySelector('#chart .axt').textContent})""")
