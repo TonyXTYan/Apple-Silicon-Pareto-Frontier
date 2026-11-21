@@ -570,7 +570,8 @@ const sameMachine=(a,b)=>a&&b&&a.chip===b.chip&&a.dev===b.dev&&(a.model||'')===(
 const WS5=['cpu-all','cpu-one','hpl','bl-cpu','gpu','bl-gpu','llm'],WSHAPE={'cpu-all':'laptop','cpu-one':'fanless','hpl':'desktop','gpu':'diamond','llm':'down','bl-cpu':'plus','bl-gpu':'cross'},DER=new Map();
 const DEFBASE={chip:'M4',dev:'Mac mini'},TABBASE={chip:'M4 Max',dev:'MacBook Pro 14'};
 /* the page opens on LLM with no baseline; the first time another tab is shown, the M4 Max MacBook Pro 14 becomes the baseline, unless the user has already chosen one (or cleared it) */
-function autoBase(){if(S.w==='llm'||(S.w==='cpu-all'&&!S.autoBased)||S.userBase||S.autoBased||S.base)return;S.autoBased=true;S.base=Object.assign({},TABBASE);S.preview=null;DER.clear()}
+/* tabs never set a baseline on their own: the baseline (or none) the user picked carries across every tab and link */
+function autoBase(){}
 const vk=r=>{const o=r.o||r,w=r.ow||r.w;return w==='llm'?o.model:w==='gpu'?o.game:w==='bl-cpu'||w==='bl-gpu'?o.scene:w==='blas'?o.set+'|'+o.lib:isCpu(w)?o.bm:undefined}, tsub=()=>S.w==='gpu'?S.lgame||undefined:isCpu(S.w)?S.lbm:S.w==='blender'?S.lscene||undefined:S.w==='llm'&&S.lmod&&S.lmod!=='other'&&!S.lmod.startsWith('set:')?S.lmod:undefined;
 /* a tab can pool several workloads (Blender: CPU and GPU); r.w stays the workload */
 const tabWs=k=>WL[k||S.w].pool||[k||S.w], inTab=r=>!!r&&tabWs().includes(r.w);

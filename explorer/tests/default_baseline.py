@@ -1,5 +1,5 @@
 """Estimated M4 Max MacBook Pro 14 and the default baseline: the page opens on CPU, all cores with no baseline and the frontier
-drawn; the first switch to another tab (not LLM) sets the M4 Max MacBook Pro 14 as baseline unless the user has chosen one (menu, matrix row, readout, Clear);
+drawn; no tab or link sets a baseline on its own, and a baseline the user picks (menu, matrix row, readout, Clear) carries across every tab;
 the 14-inch rows are estimates (speed borrowed, power capped at the adapter envelope) that serve as their own baseline on the
 CPU and Gaming tabs, the chip's best row elsewhere, and show the ENERGY STAR figures."""
 import asyncio, os, pathlib
@@ -24,8 +24,12 @@ async def main():
         for r in rows:
             if not (r['pe'] and r['q']!='A' and r['brw']=='MacBook Pro 16' and r['p']<=97 and r['lo']<r['p']<=r['hi'] and r['es']): errs.append('14-inch row flags or power '+str(r))
         if not await pg.evaluate("[...document.querySelectorAll('#base option')].some(o=>o.value==='M4 Max|MacBook Pro 14')"): errs.append('M4 Max MacBook Pro 14 not in the baseline menu')
-        await pg.click('.tab[data-w="gpu"]'); await pg.wait_for_timeout(300)
-        await pg.click('.tab[data-w="cpu-all"]'); await pg.wait_for_timeout(300)
+        # no tab sets a baseline on its own: visiting every tab (and coming back) keeps "no baseline"
+        for tab in await pg.evaluate("[...document.querySelectorAll('.tab')].map(t=>t.dataset.w)")+['cpu-all']:
+            await pg.click(f'.tab[data-w="{tab}"]'); await pg.wait_for_timeout(200)
+            if await pg.evaluate(B)!='null': errs.append(tab+': a baseline appeared on its own')
+        # a baseline the user picks carries across every tab
+        await pg.select_option('#base','M4 Max|MacBook Pro 14'); await pg.wait_for_timeout(1000)
         r=await pg.evaluate("({b:"+B+",tb:tabBase(curBase()).map(r=>r.dev),ring:document.querySelectorAll('#chart .baseline-ring').length,k:G.k,lab:document.getElementById('basel').textContent,sel:document.getElementById('base').value})"); print('cpu-all after first switch',r)
         if r['b']!='{"chip":"M4 Max","dev":"MacBook Pro 14"}' or r['tb']!=['MacBook Pro 14'] or r['ring']!=1 or r['k']==1 or r['lab']!='Relative to' or r['sel']!='M4 Max|MacBook Pro 14': errs.append('default baseline not applied on cpu-all')
         # hover the baseline point: ENERGY STAR in the tooltip
@@ -41,14 +45,14 @@ async def main():
             if not r['rel']: errs.append(tab+': no ratios')
         # a user's own choice (None) wins over the default
         pg2=await page(); await pg2.select_option('#base',''); await pg2.click('.tab[data-w="cpu-one"]'); await pg2.wait_for_timeout(250)
-        if await pg2.evaluate(B)!='null': errs.append('default baseline overrode the user choosing None')
+        if await pg2.evaluate(B)!='null': errs.append('a baseline appeared after the user chose None')
         pg3=await page(); await pg3.evaluate("document.querySelector('#matrix tbody tr[tabindex]').click()"); await pg3.wait_for_timeout(200)
         chosen=await pg3.evaluate(B); await pg3.click('.tab[data-w="gpu"]'); await pg3.wait_for_timeout(250)
-        if await pg3.evaluate(B)!=chosen: errs.append('default baseline overrode a matrix choice')
-        pg4=await page(); await pg4.click('.tab[data-w="gpu"]'); await pg4.click('#mclear'); await pg4.click('.tab[data-w="blender"]'); await pg4.wait_for_timeout(250)
+        if await pg3.evaluate(B)!=chosen: errs.append('a matrix choice did not carry to another tab')
+        pg4=await page(); await pg4.click('.tab[data-w="gpu"]'); await pg4.select_option('#base','M4 Max|MacBook Pro 14'); await pg4.click('#mclear'); await pg4.click('.tab[data-w="blender"]'); await pg4.wait_for_timeout(250)
         if await pg4.evaluate(B)!='null': errs.append('Clear baseline should stick')
         pg5=await page('#gpu',390)
         r=await pg5.evaluate("({b:"+B+",sw:document.documentElement.scrollWidth})"); print('#gpu at 390',r)
-        if r['b']!='{"chip":"M4 Max","dev":"MacBook Pro 14"}' or r['sw']>390: errs.append('#gpu link at 390px: '+str(r))
+        if r['b']!='null' or r['sw']>390: errs.append('#gpu link at 390px should open with no baseline: '+str(r))
         print('errors',errs); await b.close()
 asyncio.run(main())
