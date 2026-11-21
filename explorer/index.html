@@ -127,6 +127,11 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .axis{stroke:var(--rule);stroke-width:1}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
+#chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
+#chart .flab{pointer-events:auto;cursor:default}
+#chart .fhov .front,#chart .fhov .flab,#chart .fhov .fleader{opacity:.12;transition:opacity .15s}
+#chart .fhov .fon{opacity:1!important}
+#chart .fhov path.fon{stroke-width:2.4}
 #chart .fring{fill:none;stroke:var(--ink);stroke-width:1.4}
 #chart .iso{stroke:var(--ink3);stroke-width:1;opacity:.28}
 #chart .isot{fill:var(--ink3);font-size:11px}
@@ -688,26 +693,40 @@ function render(){
     /* one frontier per benchmark; the same model from different sources (e.g. oMLX) shares it; estimates count unless switched off */
     for(const p of pts){if(!S.fest&&(p.r.est||p.r.pe))continue;const key=(p.r.ow||p.r.w)+'|'+String(vk(p.r)||'').replace(' (oMLX)','');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
     const FL=[];/* frontier names: placed after all lines, groups with more points first */
-    for(const g of [...grp.values()].sort((a,b)=>b.length-a.length)){if(g.length<2)continue;const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);let best=-1;const f=[];
+    for(const [gk,g] of [...grp].sort((a,b)=>b[1].length-a[1].length)){if(g.length<2)continue;const fk={'data-fk':gk};const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);let best=-1;const f=[];
       for(const p of by){if(p.r.e>best*1.0000001){f.push(p);best=p.r.e}}f.reverse();for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
-      fg.appendChild(el('path',{d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
-      if(f.length===1&&g.length<3){/* a pair with one clear winner: ring it, no corner lines */continue}
+      fg.appendChild(el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
-        const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),n:g.length,x:m.l+6,y:a.py-5,an:'start'});fg.appendChild(el('path',{d:'M'+X(x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),class:'front ftail',style:op}));
+        const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:a.py-5,an:'start',p0:a});fg.appendChild(el('path',{d:'M'+X(x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),...fk,class:'front ftail',style:op}));
         if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+' point is both fastest and most efficient, so the frontier is its corner'));continue}
-      const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*kr(p.r)]),S.ffit);if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
+      const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*kr(p.r)]),S.ffit);if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),k:gk,n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
-        if(pts2.length>1)fg.appendChild(el('path',{d:'M'+pts2.join('L'),class:'front ftail',style:op}));return pts2.length>1?pts2[pts2.length-1].split(',').map(Number):null};
+        if(pts2.length>1)fg.appendChild(el('path',{...fk,d:'M'+pts2.join('L'),class:'front ftail',style:op}));return pts2.length>1?pts2[pts2.length-1].split(',').map(Number):null};
       const a=f[0],z=f[f.length-1];const le=tail(a.r.x,x0,[a.r.x,a.r.e*kr(a.r)]);tail(z.r.x,x1,[z.r.x,z.r.e*kr(z.r)]);
-      if(grp.size>1)FL.push(le&&le[0]<=m.l+40&&le[1]>m.t+8&&le[1]<H-m.b-4?{lab:glab(a.r),n:g.length,x:m.l+6,y:le[1]-5,an:'start'}:{lab:glab(a.r),n:g.length,x:a.px-12,y:a.py+4,an:'end',fx:a});
+      if(grp.size>1)FL.push(le&&le[0]<=m.l+40&&le[1]>m.t+8&&le[1]<H-m.b-4?{lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:le[1]-5,an:'start',p0:a}:{lab:glab(a.r),k:gk,n:g.length,x:a.px-12,y:a.py+4,an:'end',fx:a});
       if(S.w!=='all'&&f.length>=2&&(grp.size===1||(grp.size<=4&&!narrow0))){const r0=f[0].r,pre=grp.size>1?glab(r0)+': ':'';const t=el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},pre+fit.label);fg.appendChild(t)}}
-    {/* name each frontier where its line meets the left axis (mostly empty space); on overlap the group with more points wins */
-      const used=[],hit=(o,b)=>o[0]<b[2]&&o[2]>b[0]&&o[1]<b[3]&&o[3]>b[1],pb=pts.map(p=>[p.px-6,p.py-6,p.px+6,p.py+6]);
-      for(const q of FL.filter(q=>q.lab).sort((a,b)=>b.n-a.n)){const t=el('text',{x:q.x,y:q.y,'text-anchor':q.an,class:'isot flab',style:'fill:var(--ink);font-size:'+(narrow0?12:11)+'px;font-style:italic;font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},q.lab);fg.appendChild(t);
-        try{let b=t.getBBox();if(q.fx&&b.x<m.l+2){t.setAttribute('x',q.fx.px+12);t.setAttribute('y',q.fx.py-10);t.setAttribute('text-anchor','start');b=t.getBBox()}
-          const bx=[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1];if(used.some(o=>hit(o,bx))||pb.some(o=>hit(o,bx))&&!q.fx){
-            /* try just below the line before giving up */ t.setAttribute('y',q.y+15);b=t.getBBox();const b2=[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1];if(used.some(o=>hit(o,b2))||pb.some(o=>hit(o,b2)))t.remove();else used.push(b2)}else used.push(bx)}catch(_){}}}}
+    {/* name every frontier. Names for lines that reach the left axis form one column there, spread evenly so none overlap, each joined
+        to its line by a short leader; the rest sit beside their first frontier point. Hovering a name highlights its frontier. */
+      const used=[],hit=(o,b)=>o[0]<b[2]&&o[2]>b[0]&&o[1]<b[3]&&o[3]>b[1],pb=pts.map(p=>[p.px-6,p.py-6,p.px+6,p.py+6]),fs=narrow0?12:11,LH=fs+2;
+      const mk=q=>{const t=el('text',{x:q.x,y:q.y,'text-anchor':q.an,class:'isot flab','data-fk':q.k,style:'fill:var(--ink);font-size:'+fs+'px;font-style:italic;font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},q.lab);fg.appendChild(t);return t};
+      const bx=t=>{const b=t.getBBox();return[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]};
+      const NMAX=narrow0?8:99,keep=new Set(FL.filter(q=>q.lab).sort((a,b)=>b.n-a.n).slice(0,NMAX));   /* phones: every line, but names only for the 8 biggest groups */
+      const L=FL.filter(q=>keep.has(q)&&q.an==='start'&&q.x<m.l+10).sort((a,b)=>a.y-b.y),R=FL.filter(q=>keep.has(q)&&!L.includes(q)).sort((a,b)=>b.n-a.n);
+      if(L.length){const top=m.t+LH,bot=H-m.b-4,ys=L.map(q=>Math.min(bot,Math.max(top,q.y)));
+        for(let i=1;i<ys.length;i++)ys[i]=Math.max(ys[i],ys[i-1]+LH);           /* push down to clear the one above */
+        if(ys[ys.length-1]>bot){ys[ys.length-1]=bot;for(let i=ys.length-2;i>=0;i--)ys[i]=Math.min(ys[i],ys[i+1]-LH)}   /* then up from the bottom */
+        L.forEach((q,i)=>{const t=mk({...q,y:ys[i],x:m.l+(Math.abs(ys[i]-q.y)>3?14:6)});try{used.push(bx(t))}catch(_){}
+          if(Math.abs(ys[i]-q.y)>3)fg.insertBefore(el('path',{d:`M${m.l},${q.y+5}L${m.l+5},${q.y+5}L${m.l+11},${ys[i]-4}`,class:'fleader','data-fk':q.k}),t)})}
+      for(const q of R){const t=mk(q);try{const fp=q.fx||q.p0,cand=[[q.x,q.y,q.an]];
+          if(fp)cand.push([fp.px-12,fp.py+4,'end'],[fp.px+12,fp.py+4,'start'],[fp.px+10,fp.py-10,'start'],[fp.px-10,fp.py-10,'end'],[fp.px+10,fp.py+16,'start'],[fp.px-10,fp.py+16,'end']);
+          const inside=b=>b[0]>=m.l&&b[2]<=W-m.r&&b[1]>=m.t&&b[3]<=H-m.b;let ok=null,first=null;
+          for(const [x,y,an] of cand){t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor',an);const b=bx(t);if(inside(b)&&!first)first=[x,y,an,b];
+            if(inside(b)&&!used.some(o=>hit(o,b))&&!pb.some(o=>hit(o,b))){ok=b;break}}
+          if(!ok&&first){t.setAttribute('x',first[0]);t.setAttribute('y',first[1]);t.setAttribute('text-anchor',first[2]);ok=first[3]}
+          if(ok)used.push(ok)}catch(_){}}
+      for(const t of fg.querySelectorAll('.flab')){const on=v=>{fg.classList.toggle('fhov',v);for(const e of fg.querySelectorAll('[data-fk]'))e.classList.toggle('fon',v&&e.dataset.fk===t.dataset.fk)};
+        t.addEventListener('mouseenter',()=>on(true));t.addEventListener('mouseleave',()=>on(false))}}}
   {const tg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(tg,under);const tr=new Map();for(const p of pts)if(p.r.grp){const key=p.r.grp;if(!tr.has(key))tr.set(key,[]);tr.get(key).push(p)}
     for(const g of tr.values()){if(g.length<2)continue;g.sort((a,b)=>a.r.ord-b.r.ord);const d='M'+g.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L');
       if(isBl(g[0].r)){tg.appendChild(el('path',{d,class:'pairl t-'+g[0].r.tier}));continue}
@@ -728,7 +747,7 @@ function render(){
 }
 function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
   const bb=e=>{try{const b=e.getBBox();return b.width?[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]:null}catch(_){return null}};
-  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt,#chart #labels text')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
+  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt,#chart #labels text,#chart .flab')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
   for(const p of list){if(n>=maxL)break;const t=shortName(p.r),tw=t.length*(G.narrow?6.6:6.3)+6;
     for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
       const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
