@@ -78,6 +78,11 @@ header.top{display:flex;flex-direction:column;gap:8px}
 .vsbase .selw:has(select:focus-visible){outline:2px solid var(--focus);outline-offset:4px}
 .vsbase .vsx{font-size:13.5px;font-weight:400;font-stretch:100%;color:var(--ink2);line-height:1.4}
 .vsmod{font-size:13.5px}
+.vsize{flex-basis:100%;gap:6px}
+.vsize .chip{padding:3px 10px}
+.vsize .chip small{color:var(--ink3);font-size:11.5px;margin-left:4px}
+.vsize .chip:disabled{opacity:.4;cursor:default}
+@media (max-width:699px){.vsize .chip small{display:none}}
 
 .plot{--surface:var(--field);margin:0;border:1px solid var(--rule);border-radius:10px;background:var(--field);overflow:hidden}
 .chartwrap{position:relative;background:var(--field);padding:6px}
@@ -303,6 +308,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
   <div class="vs">
     <label class="basesel vsbase" for="base"><span class="vsl" id="basel">Relative to</span> <span class="selw"><span class="selv" id="basev" aria-hidden="true"></span><select id="base"></select></span><span class="vsx" id="basex" hidden></span></label>
     <label class="basesel vsmod" for="lmod" id="lmodw" hidden>Model <span class="selw"><select id="lmod"><option value="">Every model and context</option><option value="Llama 2 7B Q4_0">Llama 2 7B Q4_0, every chip</option><option value="Llama 3 8B Q4_K_M">Llama 3 8B Q4_K_M, by context</option><option value="Llama 3 8B F16">Llama 3 8B F16, by context</option><option value="Llama 3 70B Q4_K_M">Llama 3 70B Q4_K_M, by context</option><option value="Llama 3 70B F16">Llama 3 70B F16, by context</option><option value="set:mlx">MLX vs GGUF, same machine</option><option value="set:cluster">Mac Studio clusters (exo vs llama.cpp RPC)</option><option value="other">Other metered runs</option></select></span></label>
+    <div class="group vsize" id="lsizew" role="group" aria-labelledby="lsl" hidden><span class="gl" id="lsl">Model size</span></div>
   </div>
 
   <figure class="plot">
@@ -444,7 +450,7 @@ const WL={
    note:'Render speed is the Blender Open Data median for the GPU configuration named in the details. Wall power is 0.45 to 0.95 times the machine\'s Cyberpunk 2077 wall power, because Cycles keeps the GPU busy while the CPU idles, unlike a game. Ultra and older-chip power comes from the model and carries its 40% error on top.'},
 };
 const TIERS=['Intel','base','Pro','Max','Ultra'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
-const S={hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
+const S={lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
   base:null,ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -474,7 +480,11 @@ function derive(){const abs=!curBase(),b=curBase(),out=[];const q=(v,d)=>v==null
       x:r.x/br.x,e:r.e/br.e,xlo:q(r.xlo,br.x),xhi:q(r.xhi,br.x),elo:q(r.elo,br.e),ehi:q(r.ehi,br.e),p:r.p/br.p,br});out.push(d)}return out}
 function pool(w){return w==='all'?derive():ALL.filter(r=>r.w===w&&(S.est||!r.est||r.pe))}
 const mshape=r=>S.w==='all'&&r.ow?WSHAPE[r.ow]:r.form;
-function visible(){return pool(S.w).filter(r=>S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||r.q==='A'||r.est)&&(S.w!=='llm'||!S.lmod||(S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):r.model===S.lmod&&r.set!=='mlx'&&r.set!=='cluster')))}
+const SIZES=[['XS',0,2,'under 2B'],['S',2,5,'2–5B'],['M',5,12,'5–12B'],['L',12,50,'12–50B'],['XL',50,150,'50–150B'],['XXL',150,500,'150–500B'],['XXXL',500,1e9,'500B and up']];
+function pcount(r){const m=/(\d+(?:\.\d+)?)\s*([BT])\b/.exec(r.model||'');return m?+m[1]*(m[2]==='T'?1000:1):null}
+function psize(r){const b=pcount(r);if(b==null)return null;const z=SIZES.find(z=>b>=z[1]&&b<z[2]);return z?z[0]:null}
+function sizeOK(r){if(S.w!=='llm')return true;const z=psize(r);return !z||S.lsize.has(z)}
+function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||r.q==='A'||r.est)&&(S.w!=='llm'||!S.lmod||(S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):r.model===S.lmod&&r.set!=='mlx'&&r.set!=='cluster')))}
 function curBase(){return S.preview||S.base}
 // baseline value for workload w (and LLM model)
 function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S.est:allowEst;let c=ALL.filter(r=>r.w===w&&r.ck===ck(b.chip)&&!r.ex&&!r.mode&&(!r.est||ae||r.pe));
@@ -707,7 +717,7 @@ $('chart').addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;
 $('chart').addEventListener('pointerleave',e=>{if(e.pointerType==='touch')return;const kp=S.kbd&&S.pts.find(q=>q.r===S.kf);S.hover=kp?kp.r:null;kp?showTip(kp,'key'):hideTip();drawFocus()});
 $('chart').addEventListener('pointerdown',e=>{S.ptype=e.pointerType},true);
 document.addEventListener('pointerdown',e=>{if(!$('wrap').contains(e.target))hideTip()});
-function viewKey(){const b=curBase();return S.w+'|'+(b?b.chip+'|'+(b.dev||''):'')+'|'+(S.lmod||'')}
+function viewKey(){const b=curBase();return S.w+'|'+(b?b.chip+'|'+(b.dev||''):'')+'|'+(S.lmod||'')+'|'+[...S.lsize].join()}
 function zoomBy(f,cx,cy){const {x0,x1,y0,y1}=G,{m,W,H}=G;const fx=cx==null?.5:(cx-m.l)/(W-m.l-m.r),fy=cy==null?.5:(H-m.b-cy)/(H-m.t-m.b);
   const lx0=Math.log(x0),lx1=Math.log(x1),ly0=Math.log(y0),ly1=Math.log(y1),px=lx0+fx*(lx1-lx0),py=ly0+fy*(ly1-ly0);
   const a=S.auto,lim=(lo,hi,alo,ahi)=>{const span=Math.min(hi-lo,(ahi-alo)*1.6);return [lo,lo+span]};
@@ -937,7 +947,7 @@ $('loo').addEventListener('pointermove',looTip);$('loo').addEventListener('point
 $('loo').addEventListener('pointerleave',()=>{$('lootip').hidden=true;const hl=$('loohl');if(hl)hl.textContent=''});
 $('looBig').addEventListener('click',()=>{S.looBig=!S.looBig;$('loofig').parentNode.classList.toggle('wide',S.looBig);$('looBig').textContent=S.looBig?'Shrink plot':'Enlarge plot';looPlot()});
 /* ---------- wiring ---------- */
-function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';const cb=curBase();
+function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();
   $('finding').textContent=S.w==='all'&&cb?'Every workload as a ratio to the '+cb.chip+(cb.dev?' '+cb.dev:'')+' on the same workload: right is faster, up is more work per joule, and each diagonal is a constant ratio of wall power. Against the last Intel MacBook Pro 16, Apple Silicon does roughly 2 to 7 times the CPU work per joule, 3 to 8 times on one thread and 5 to 11 times on LLM generation, while running from about as fast to roughly 25 times faster. Hover a point to draw lines to the same chip on its other workloads; choose None as the baseline for absolute units with one scale per workload.':w.finding;$('wnote').textContent=w.note;
   {const b=curBase();if(b){const miss=(S.w==='all'?WS5:[S.w]).filter(k=>!baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':null));if(miss.length)$('wnote').textContent+=' Not shown against '+b.chip+': '+miss.map(k=>WL[k].tab).join(', ')+', which have no reading for it. Pick an Apple baseline or None to see them.'}}
   document.querySelectorAll('.tab').forEach(t=>{const on=t.dataset.w===S.w;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;
@@ -955,6 +965,10 @@ $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
 $('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;all()});
+for(const [z,,,t] of SIZES){const b=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':z,title:t+' parameters (total, so mixture-of-experts models count all experts)'},z);b.appendChild(h('small',null,t));
+  b.addEventListener('click',()=>{if(S.lsize.has(z))S.lsize.delete(z);else S.lsize.add(z);S.pin=null;all()});$('lsizew').appendChild(b)}
+function syncSizes(){const all7=new Set(SIZES.map(z=>z[0])),keep=S.lsize;S.lsize=all7;const n={};for(const r of visible()){const z=psize(r);if(z)n[z]=(n[z]||0)+1}S.lsize=keep;
+  document.querySelectorAll('#lsizew [data-size]').forEach(b=>{const z=b.dataset.size;b.setAttribute('aria-pressed',S.lsize.has(z));b.disabled=!n[z];b.setAttribute('aria-label',z+', '+(SIZES.find(x=>x[0]===z)[3])+', '+(n[z]||0)+' points')})}
 $('ffit').addEventListener('change',e=>{S.ffit=e.target.value;if(!S.front){S.front=true;$('front').checked=true}render();readout()});
 $('est').addEventListener('change',e=>{S.est=e.target.checked;syncBaseSel();all()});
 $('st1').textContent=DATA.stitch.all;$('st2').textContent=DATA.stitch.one;

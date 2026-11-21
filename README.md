@@ -75,5 +75,5 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload and each LLM model.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
-- **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters.
+- **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters. **Model size** chips filter by total parameters: XS <2B, S 2–5B, M 5–12B, L 12–50B, XL 50–150B, XXL 150–500B, XXXL ≥500B.
 - **Palette:** colours come from the dataviz skill's validated palette. Intel is #c2418f in light mode and #b84a8c in dark; the light-mode Max green is darkened to #16a372 for 3:1 contrast on the white plot field.
