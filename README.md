@@ -1,6 +1,6 @@
 # Apple Silicon work per joule
 
-An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, gaming (Cyberpunk 2077, Baldur's Gate 3, Assassin's Creed Shadows), Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (the page opens on LLM generation with no baseline, in absolute units).
+An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, gaming (Cyberpunk 2077, Baldur's Gate 3, Assassin's Creed Shadows), Blender CPU and Blender GPU (one Blender tab, with a Scene menu) and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (the page opens on LLM generation with no baseline, in absolute units).
 
 **Live page:** https://tonyxtyan.github.io/Apple-Silicon-Pareto-Frontier/
 
@@ -15,7 +15,7 @@ explorer/
   gen_data.py          -> data.json   measured rows (Cinebench, HPL, Cyberpunk, metered LLM), reusing plot/all.py rows
   model.py             -> data2.json  hierarchical ridge model in log space, leave-one-out errors, estimates, Apple power specs, power modes
   llm.py               -> data3.json  llama.cpp thread (Llama 2 7B Q4_0, 20 chips) with estimated decode power
-  blender.py           -> data4.json  Blender Open Data 4.5 medians (CPU, Metal) with estimated power
+  blender.py           -> data4.json  Blender Open Data 4.5 medians (CPU, Metal), three-scene sum and per scene, with estimated power
   i9.py                -> data5.json  Intel i9-9880H MacBook Pro 16 (2019) baseline rows
   llm2.py              -> data6.json  XiongjieDai llama-bench sweeps (Llama 3 8B/70B, Q4_K_M/F16, tg512..8192)
   llm3.py              -> data7.json  MLX vs GGUF pairs; 4x M3 Ultra cluster (exo RDMA vs llama.cpp RPC)
@@ -45,7 +45,8 @@ Quick syntax check of the page script:
 - `x`: throughput. `e`: work per joule. `p`: wall power in W. Bounds are given by `xlo/xhi`, `elo/ehi`, `plo/phi`.
 - `est`: an estimate. Hidden unless the "Model estimates" switch is on, except rows with `pe` (speed measured, power estimated), which always show.
 - `game` (gpu rows only): `Cyberpunk 2077`, `Baldur's Gate 3` or `Assassin's Creed Shadows`. The matrix and the All view use Cyberpunk only.
-- `resc`: the score was converted from Cinebench R23 (drawn hollow). `q`: quality grade; anything below 'A' gets a "weaker measurement" ring.
+- `scene` (bl-cpu and bl-gpu rows only): `monster`, `junkshop` or `classroom`; rows without it are the three-scene sum, which is what the matrix and the All view use. Blender rows also carry `grp`/`ord` so each chip's CPU and GPU point are joined.
+- `resc`: the score was converted from Cinebench R23 (drawn hollow). `q`: quality grade; a measured row below 'A', or a speed-measured `pe` row graded 'B' or 'C' (for example a Blender median over three runs or fewer), gets a "weaker measurement" ring. Plain estimates are 'E'.
 - LLM extras:
   - `model`: model name.
   - `set`: `sweep`, `mlx` or `cluster`. These sets are kept out of the All view.
@@ -63,6 +64,7 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Blender power:**
   - CPU: 0.9–1.1 × Cinebench wall power.
   - GPU: 0.45–0.95 × Cyberpunk wall power, anchored only by Eclectic Light's ~20 W GPU reading.
+  - Scenes: per-scene medians (monster, junkshop, classroom) from the full Open Data snapshot (Blender 4.5.0, CC0, generated 2026-11-21); each scene reuses the power of the three-scene point. Their sum is within about 2% of the published three-scene median (the median of a sum is not the sum of medians). GPU points are each chip's full-core GPU (the 8-core M2 where the borrowed power is the 8-core MacBook Air). Cut-down GPU variants in Open Data (M1 7c, M1 Pro 14c, M1 Max 24c, M1 Ultra 48c, M2 Pro 16c, M2 Max 30c, M2 Ultra 60c, M3 8c, M3 Pro 14c, M3 Max 30c, M3 Ultra 60c, M4 8c, M4 Pro 16c, M4 Max 32c, M5 Pro 16c, M5 Max 32c) are left out: no machine with them has a measured or modelled power here, and the chip names on the page encode CPU, not GPU, core counts. Medians over three runs or fewer are graded 'B' (M5 Ultra and M6 on both devices, M5 Pro GPU).
 - **Clusters:**
   - exo (tensor parallel): N × 110–240 W.
   - llama.cpp RPC (layer split): one busy node plus (N−1) idle nodes.
@@ -71,11 +73,12 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 
 ## Page features
 
-- **Tabs and baseline:** one tab per workload plus All workloads. The baseline menu switches to ratios; None gives absolute units.
+- **Tabs and baseline:** one tab per workload plus All workloads; Blender CPU and GPU share one tab. The baseline menu switches to ratios; None gives absolute units.
+- **Blender tab:** CPU renders are dashed rings, GPU renders are filled, and a thin line joins each chip's pair. A **Scene** menu shows the three-scene sum (the default, as in the matrix) or one scene; a **Device** menu shows CPU, GPU or both. Frontiers are per device; baselines compare the same scene on the same device. Old `#bl-cpu` and `#bl-gpu` links open the tab on that device.
 - **All workloads with None:** stacked per-workload scales.
 - **Hover:** shows relatives and the exact power line. Click a point to pin it.
 - **Chart navigation:** zoom, pan and pinch; full screen.
-- **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload, each LLM model and each game.
+- **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload, each LLM model, each game and each Blender device.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
 - **Game menu (gaming tab):** every game, or one. Frontiers are drawn per game; with one game chosen a baseline turns the axes into ratios to that machine in the same game.

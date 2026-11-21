@@ -20,7 +20,7 @@ async def main():
         for vw in (1360,390):
             pg=await b.new_page(viewport={'width':vw,'height':1000}); pg.on('pageerror',lambda e:errs.append(str(e)))
             await pg.goto(INDEX); await pg.wait_for_timeout(600)
-            for w in await pg.evaluate("Object.keys(WL)"):
+            for w in await pg.evaluate("[...document.querySelectorAll('.tab')].map(t=>t.dataset.w)"):
                 await pg.evaluate(f"document.querySelector('.tab[data-w=\"{w}\"]').click()"); await pg.wait_for_timeout(150)
                 r=await pg.evaluate(MAIN,w); print(vw,w,'points',r['n'],'missing labels',len(r['miss']),r['miss'][:3])
                 if r['miss']: errs.append(f'{vw} {w} missing {r["miss"][:3]}')
