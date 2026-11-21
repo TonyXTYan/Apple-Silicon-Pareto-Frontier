@@ -1,0 +1,1792 @@
+{
+ "source": "Research compilation of the oMLX Community Benchmarks (omlx.ai/benchmarks/performance), scraped 2026-11-21: per chip and GPU-core bin medians of crowd-sourced runs at 1k-token context. tok_s_robust is the median of runs within 0.6x of the best run in the bin. No power was measured.",
+ "sets": [
+  {
+   "source_name": "oMLX Community Benchmarks (Performance), Llama 3.2 3B Instruct 4bit, 1k context",
+   "url": "https://omlx.ai/benchmarks/performance?model=Llama-3.2-3B&context=1024",
+   "date": "runs uploaded 2026-03-09 to 2026-11-21; scraped 2026-11-21",
+   "engine": "oMLX (MLX-based server app; built-in benchmark)",
+   "model": "Llama 3.2 3B Instruct",
+   "quant": "MLX 4bit (mlx-community conversions; model names matched: (mlx-community--|community--)?Llama-3.2-3B-Instruct(-4bit)?)",
+   "test": "oMLX benchmark: TG tok/s at 1k-token prompt context (single stream)",
+   "notes": "Crowd-sourced; each row is the median over all matching 1k-context submissions for that chip+GPU-core bin. Detail pages checked: runs with TurboQuant/MTP/SpecPrefill/DFlash or non-Nominal thermal excluded (6 excluded). tok_s = plain median; tok_s_robust = median of runs >= 0.6 x best run for that bin (drops throttled/contended low outliers; recommended). Chassis (MacBook vs desktop) not reported by oMLX. Raw per-run rows with URLs: llm_small_omlx_raw.json. ",
+   "rows": [
+    {
+     "chip": "M1",
+     "gpu_cores": 5,
+     "tok_s": 21.7,
+     "tok_s_robust": 21.7,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 19.3,
+     "tok_s_max": 24.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/gqkysoju",
+      "https://omlx.ai/benchmarks/performance/ynmd0chf"
+     ]
+    },
+    {
+     "chip": "M1",
+     "gpu_cores": 7,
+     "tok_s": 28.1,
+     "tok_s_robust": 28.1,
+     "n_robust": 8,
+     "n_runs": 8,
+     "tok_s_min": 19.9,
+     "tok_s_max": 29.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/rcpe90c5",
+      "https://omlx.ai/benchmarks/performance/n0qre3m4",
+      "https://omlx.ai/benchmarks/performance/9ef008qc"
+     ]
+    },
+    {
+     "chip": "M1",
+     "gpu_cores": 8,
+     "tok_s": 27.8,
+     "tok_s_robust": 27.8,
+     "n_robust": 9,
+     "n_runs": 9,
+     "tok_s_min": 22.0,
+     "tok_s_max": 29.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/n1p82930",
+      "https://omlx.ai/benchmarks/performance/cv93fu6v",
+      "https://omlx.ai/benchmarks/performance/8wsmyk2r"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 24,
+     "tok_s": 118.9,
+     "tok_s_robust": 118.9,
+     "n_robust": 6,
+     "n_runs": 6,
+     "tok_s_min": 114.3,
+     "tok_s_max": 127.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/airkhtdp",
+      "https://omlx.ai/benchmarks/performance/ymsz16ar",
+      "https://omlx.ai/benchmarks/performance/64of3vn8"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 32,
+     "tok_s": 125.5,
+     "tok_s_robust": 125.5,
+     "n_robust": 6,
+     "n_runs": 6,
+     "tok_s_min": 98.8,
+     "tok_s_max": 127.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/r1znhyie",
+      "https://omlx.ai/benchmarks/performance/zb0goe6g",
+      "https://omlx.ai/benchmarks/performance/2hyin3ab"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 14,
+     "tok_s": 72.5,
+     "tok_s_robust": 72.5,
+     "n_robust": 5,
+     "n_runs": 5,
+     "tok_s_min": 63.9,
+     "tok_s_max": 81.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/1tg6o6m7",
+      "https://omlx.ai/benchmarks/performance/ci67bw68",
+      "https://omlx.ai/benchmarks/performance/phd134v9"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 16,
+     "tok_s": 78.5,
+     "tok_s_robust": 78.5,
+     "n_robust": 6,
+     "n_runs": 6,
+     "tok_s_min": 73.5,
+     "tok_s_max": 83.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/0po7yw22",
+      "https://omlx.ai/benchmarks/performance/kxqkrsdj",
+      "https://omlx.ai/benchmarks/performance/mdbdd99o"
+     ]
+    },
+    {
+     "chip": "M1 Ultra",
+     "gpu_cores": 48,
+     "tok_s": 160.6,
+     "tok_s_robust": 160.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 160.6,
+     "tok_s_max": 160.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/fmbcje3y"
+     ]
+    },
+    {
+     "chip": "M1 Ultra",
+     "gpu_cores": 64,
+     "tok_s": 214.7,
+     "tok_s_robust": 214.7,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 170.1,
+     "tok_s_max": 215.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/nmwmp1pp",
+      "https://omlx.ai/benchmarks/performance/t6uapm5x",
+      "https://omlx.ai/benchmarks/performance/c63yqlc5"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 8,
+     "tok_s": 39.4,
+     "tok_s_robust": 39.4,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 39.4,
+     "tok_s_max": 39.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/jvvkr4ra"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 10,
+     "tok_s": 41.9,
+     "tok_s_robust": 42.1,
+     "n_robust": 17,
+     "n_runs": 18,
+     "tok_s_min": 17.0,
+     "tok_s_max": 44.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/to387bsw",
+      "https://omlx.ai/benchmarks/performance/rq2u8i0q",
+      "https://omlx.ai/benchmarks/performance/1plibbkt"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 38,
+     "tok_s": 127.2,
+     "tok_s_robust": 127.2,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 127.2,
+     "tok_s_max": 127.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/m48h4ww3"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 16,
+     "tok_s": 85.0,
+     "tok_s_robust": 85.0,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 80.8,
+     "tok_s_max": 89.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/h0i2tcy0",
+      "https://omlx.ai/benchmarks/performance/6zhem01q"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 19,
+     "tok_s": 88.9,
+     "tok_s_robust": 88.9,
+     "n_robust": 5,
+     "n_runs": 5,
+     "tok_s_min": 82.5,
+     "tok_s_max": 90.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/6s8y56qd",
+      "https://omlx.ai/benchmarks/performance/bwfct51b",
+      "https://omlx.ai/benchmarks/performance/ve0p2r2v"
+     ]
+    },
+    {
+     "chip": "M2 Ultra",
+     "gpu_cores": 60,
+     "tok_s": 195.3,
+     "tok_s_robust": 195.3,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 195.3,
+     "tok_s_max": 195.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ps5pgawr"
+     ]
+    },
+    {
+     "chip": "M3",
+     "gpu_cores": 10,
+     "tok_s": 29.9,
+     "tok_s_robust": 43.3,
+     "n_robust": 2,
+     "n_runs": 4,
+     "tok_s_min": 15.3,
+     "tok_s_max": 43.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/u31m7hsi",
+      "https://omlx.ai/benchmarks/performance/99wh11m3",
+      "https://omlx.ai/benchmarks/performance/mcr4sbs7"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 30,
+     "tok_s": 109.7,
+     "tok_s_robust": 109.7,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 104.7,
+     "tok_s_max": 114.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/zfubpd4g",
+      "https://omlx.ai/benchmarks/performance/8ejpnhv8"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 40,
+     "tok_s": 163.8,
+     "tok_s_robust": 163.8,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 154.3,
+     "tok_s_max": 173.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/hijlcx0l",
+      "https://omlx.ai/benchmarks/performance/c23f85xa"
+     ]
+    },
+    {
+     "chip": "M3 Pro",
+     "gpu_cores": 14,
+     "tok_s": 60.8,
+     "tok_s_robust": 60.8,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 59.7,
+     "tok_s_max": 61.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/yoit5n2i",
+      "https://omlx.ai/benchmarks/performance/vav7evmh"
+     ]
+    },
+    {
+     "chip": "M3 Pro",
+     "gpu_cores": 18,
+     "tok_s": 62.2,
+     "tok_s_robust": 62.2,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 60.1,
+     "tok_s_max": 63.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/uyi4eg4r",
+      "https://omlx.ai/benchmarks/performance/xz3ukfd0",
+      "https://omlx.ai/benchmarks/performance/fos7mfsi"
+     ]
+    },
+    {
+     "chip": "M3 Ultra",
+     "gpu_cores": 60,
+     "tok_s": 208.2,
+     "tok_s_robust": 208.2,
+     "n_robust": 4,
+     "n_runs": 4,
+     "tok_s_min": 203.0,
+     "tok_s_max": 211.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/b2lunsqd",
+      "https://omlx.ai/benchmarks/performance/thwousna",
+      "https://omlx.ai/benchmarks/performance/kkaw2q3p"
+     ]
+    },
+    {
+     "chip": "M3 Ultra",
+     "gpu_cores": 80,
+     "tok_s": 233.5,
+     "tok_s_robust": 233.5,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 206.6,
+     "tok_s_max": 260.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/3gv1ou09",
+      "https://omlx.ai/benchmarks/performance/mfw5t57j"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 8,
+     "tok_s": 48.5,
+     "tok_s_robust": 48.5,
+     "n_robust": 10,
+     "n_runs": 10,
+     "tok_s_min": 32.4,
+     "tok_s_max": 50.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/k3qntmh4",
+      "https://omlx.ai/benchmarks/performance/044om7ji",
+      "https://omlx.ai/benchmarks/performance/kpgeir8j"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 10,
+     "tok_s": 48.6,
+     "tok_s_robust": 48.7,
+     "n_robust": 42,
+     "n_runs": 45,
+     "tok_s_min": 23.5,
+     "tok_s_max": 52.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/jssnui3q",
+      "https://omlx.ai/benchmarks/performance/fy6js35w",
+      "https://omlx.ai/benchmarks/performance/xlnkzk97"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 32,
+     "tok_s": 151.1,
+     "tok_s_robust": 153.3,
+     "n_robust": 3,
+     "n_runs": 4,
+     "tok_s_min": 16.3,
+     "tok_s_max": 177.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/0dpp8g2y",
+      "https://omlx.ai/benchmarks/performance/gbnjlws0",
+      "https://omlx.ai/benchmarks/performance/44bs019l"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 40,
+     "tok_s": 186.8,
+     "tok_s_robust": 186.8,
+     "n_robust": 8,
+     "n_runs": 8,
+     "tok_s_min": 178.6,
+     "tok_s_max": 226.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/5idrtykb",
+      "https://omlx.ai/benchmarks/performance/i6546qz8",
+      "https://omlx.ai/benchmarks/performance/qulc5vyc"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 16,
+     "tok_s": 108.3,
+     "tok_s_robust": 108.3,
+     "n_robust": 7,
+     "n_runs": 7,
+     "tok_s_min": 104.7,
+     "tok_s_max": 118.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/g78hizbe",
+      "https://omlx.ai/benchmarks/performance/urcufd7l",
+      "https://omlx.ai/benchmarks/performance/qh4szzrq"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 20,
+     "tok_s": 104.5,
+     "tok_s_robust": 104.5,
+     "n_robust": 5,
+     "n_runs": 5,
+     "tok_s_min": 103.0,
+     "tok_s_max": 105.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/lp31wnyz",
+      "https://omlx.ai/benchmarks/performance/0ft41nmt",
+      "https://omlx.ai/benchmarks/performance/n35m6uhi"
+     ]
+    },
+    {
+     "chip": "M5",
+     "gpu_cores": 10,
+     "tok_s": 59.5,
+     "tok_s_robust": 60.6,
+     "n_robust": 12,
+     "n_runs": 16,
+     "tok_s_min": 29.5,
+     "tok_s_max": 66.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/sly1l9id",
+      "https://omlx.ai/benchmarks/performance/grrc3ah0",
+      "https://omlx.ai/benchmarks/performance/ab0581ln"
+     ]
+    },
+    {
+     "chip": "M5 Max",
+     "gpu_cores": 40,
+     "tok_s": 256.2,
+     "tok_s_robust": 256.5,
+     "n_robust": 9,
+     "n_runs": 10,
+     "tok_s_min": 75.8,
+     "tok_s_max": 273.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/db67vmn7",
+      "https://omlx.ai/benchmarks/performance/fl0ax3xh",
+      "https://omlx.ai/benchmarks/performance/1t0db4a5"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 16,
+     "tok_s": 151.4,
+     "tok_s_robust": 151.4,
+     "n_robust": 6,
+     "n_runs": 6,
+     "tok_s_min": 125.4,
+     "tok_s_max": 157.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/qy1m258e",
+      "https://omlx.ai/benchmarks/performance/bado29ya",
+      "https://omlx.ai/benchmarks/performance/t1xvpec3"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 20,
+     "tok_s": 127.9,
+     "tok_s_robust": 127.9,
+     "n_robust": 11,
+     "n_runs": 11,
+     "tok_s_min": 122.2,
+     "tok_s_max": 148.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/m3dq5f9h",
+      "https://omlx.ai/benchmarks/performance/wyodvbxn",
+      "https://omlx.ai/benchmarks/performance/t9req4e3"
+     ]
+    }
+   ]
+  },
+  {
+   "source_name": "oMLX Community Benchmarks (Performance), Llama 3.2 1B Instruct 4bit, 1k context",
+   "url": "https://omlx.ai/benchmarks/performance?model=Llama-3.2-1B&context=1024",
+   "date": "runs uploaded 2026-03-09 to 2026-11-03; scraped 2026-11-21",
+   "engine": "oMLX (MLX-based server app; built-in benchmark)",
+   "model": "Llama 3.2 1B Instruct",
+   "quant": "MLX 4bit (mlx-community conversions; model names matched: (mlx-community--|community--)?Llama-3.2-1B-Instruct(-4bit)?)",
+   "test": "oMLX benchmark: TG tok/s at 1k-token prompt context (single stream)",
+   "notes": "Crowd-sourced; each row is the median over all matching 1k-context submissions for that chip+GPU-core bin. Detail pages checked: runs with TurboQuant/MTP/SpecPrefill/DFlash or non-Nominal thermal excluded (1 excluded). tok_s = plain median; tok_s_robust = median of runs >= 0.6 x best run for that bin (drops throttled/contended low outliers; recommended). Chassis (MacBook vs desktop) not reported by oMLX. Raw per-run rows with URLs: llm_small_omlx_raw.json. ",
+   "rows": [
+    {
+     "chip": "M1",
+     "gpu_cores": 7,
+     "tok_s": 69.6,
+     "tok_s_robust": 69.6,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 64.9,
+     "tok_s_max": 74.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/9n7bb09o",
+      "https://omlx.ai/benchmarks/performance/202p2rqq",
+      "https://omlx.ai/benchmarks/performance/xqjpmhyx"
+     ]
+    },
+    {
+     "chip": "M1",
+     "gpu_cores": 8,
+     "tok_s": 67.7,
+     "tok_s_robust": 67.8,
+     "n_robust": 9,
+     "n_runs": 10,
+     "tok_s_min": 29.7,
+     "tok_s_max": 73.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/wmr9xlia",
+      "https://omlx.ai/benchmarks/performance/91d8d445",
+      "https://omlx.ai/benchmarks/performance/nh1r7bjx"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 24,
+     "tok_s": 245.2,
+     "tok_s_robust": 245.2,
+     "n_robust": 11,
+     "n_runs": 11,
+     "tok_s_min": 173.1,
+     "tok_s_max": 282.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/1gdm4gnf",
+      "https://omlx.ai/benchmarks/performance/szpr6q6b",
+      "https://omlx.ai/benchmarks/performance/829xi9xj"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 32,
+     "tok_s": 250.0,
+     "tok_s_robust": 250.0,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 217.6,
+     "tok_s_max": 266.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/gdelsbgr",
+      "https://omlx.ai/benchmarks/performance/f2s8bl7y",
+      "https://omlx.ai/benchmarks/performance/3p3bvyxm"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 14,
+     "tok_s": 154.2,
+     "tok_s_robust": 154.2,
+     "n_robust": 7,
+     "n_runs": 7,
+     "tok_s_min": 139.2,
+     "tok_s_max": 161.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/l1egnpz6",
+      "https://omlx.ai/benchmarks/performance/0vspvx97",
+      "https://omlx.ai/benchmarks/performance/nit3x5cx"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 16,
+     "tok_s": 160.9,
+     "tok_s_robust": 160.9,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 159.5,
+     "tok_s_max": 167.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/0093o6fj",
+      "https://omlx.ai/benchmarks/performance/d62cxpvm",
+      "https://omlx.ai/benchmarks/performance/h4dx3x27"
+     ]
+    },
+    {
+     "chip": "M1 Ultra",
+     "gpu_cores": 48,
+     "tok_s": 314.7,
+     "tok_s_robust": 314.7,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 306.8,
+     "tok_s_max": 322.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/cl18b24w",
+      "https://omlx.ai/benchmarks/performance/n026tmgi"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 8,
+     "tok_s": 95.8,
+     "tok_s_robust": 95.8,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 94.9,
+     "tok_s_max": 96.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/igpku0p3",
+      "https://omlx.ai/benchmarks/performance/za5ygr84"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 10,
+     "tok_s": 95.9,
+     "tok_s_robust": 96.8,
+     "n_robust": 6,
+     "n_runs": 7,
+     "tok_s_min": 15.6,
+     "tok_s_max": 105.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/qd3bvdn1",
+      "https://omlx.ai/benchmarks/performance/vrr6k7aa",
+      "https://omlx.ai/benchmarks/performance/8atqhb2s"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 30,
+     "tok_s": 290.1,
+     "tok_s_robust": 290.1,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 287.6,
+     "tok_s_max": 292.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/4u53fll2",
+      "https://omlx.ai/benchmarks/performance/ss77b0jq"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 38,
+     "tok_s": 296.3,
+     "tok_s_robust": 296.3,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 296.3,
+     "tok_s_max": 296.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ub14u7t3"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 16,
+     "tok_s": 178.6,
+     "tok_s_robust": 178.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 178.6,
+     "tok_s_max": 178.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/hrb0tewu"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 19,
+     "tok_s": 174.0,
+     "tok_s_robust": 174.0,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 174.0,
+     "tok_s_max": 174.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/cjpy8yqv"
+     ]
+    },
+    {
+     "chip": "M3",
+     "gpu_cores": 10,
+     "tok_s": 104.0,
+     "tok_s_robust": 104.0,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 102.4,
+     "tok_s_max": 105.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/2u6x0m3u",
+      "https://omlx.ai/benchmarks/performance/ki1cwg19"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 40,
+     "tok_s": 323.3,
+     "tok_s_robust": 323.3,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 318.8,
+     "tok_s_max": 327.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/hxvi6ys7",
+      "https://omlx.ai/benchmarks/performance/8nw93dhs"
+     ]
+    },
+    {
+     "chip": "M3 Pro",
+     "gpu_cores": 14,
+     "tok_s": 133.9,
+     "tok_s_robust": 133.9,
+     "n_robust": 4,
+     "n_runs": 4,
+     "tok_s_min": 125.3,
+     "tok_s_max": 154.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ceyr0n37",
+      "https://omlx.ai/benchmarks/performance/7u7ouxyt",
+      "https://omlx.ai/benchmarks/performance/o1ne7jak"
+     ]
+    },
+    {
+     "chip": "M3 Pro",
+     "gpu_cores": 18,
+     "tok_s": 143.1,
+     "tok_s_robust": 143.1,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 141.1,
+     "tok_s_max": 146.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/9r2gfn2a",
+      "https://omlx.ai/benchmarks/performance/tft17ux5",
+      "https://omlx.ai/benchmarks/performance/e9uxd462"
+     ]
+    },
+    {
+     "chip": "M3 Ultra",
+     "gpu_cores": 60,
+     "tok_s": 402.5,
+     "tok_s_robust": 402.5,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 398.5,
+     "tok_s_max": 406.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/9djw8y1s",
+      "https://omlx.ai/benchmarks/performance/63o63wxt"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 8,
+     "tok_s": 114.8,
+     "tok_s_robust": 114.8,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 107.5,
+     "tok_s_max": 114.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/xm68zqtu",
+      "https://omlx.ai/benchmarks/performance/bcqib73g",
+      "https://omlx.ai/benchmarks/performance/bae187si"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 10,
+     "tok_s": 112.2,
+     "tok_s_robust": 113.3,
+     "n_robust": 30,
+     "n_runs": 34,
+     "tok_s_min": 36.3,
+     "tok_s_max": 129.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/arqwkwg3",
+      "https://omlx.ai/benchmarks/performance/2las9a5j",
+      "https://omlx.ai/benchmarks/performance/rrmp2csg"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 32,
+     "tok_s": 308.0,
+     "tok_s_robust": 308.0,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 301.7,
+     "tok_s_max": 314.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/jj1f3csz",
+      "https://omlx.ai/benchmarks/performance/yli8hj6n"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 40,
+     "tok_s": 398.8,
+     "tok_s_robust": 398.8,
+     "n_robust": 14,
+     "n_runs": 14,
+     "tok_s_min": 349.0,
+     "tok_s_max": 418.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ecdarkxp",
+      "https://omlx.ai/benchmarks/performance/14k1z8au",
+      "https://omlx.ai/benchmarks/performance/zmvwce09"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 16,
+     "tok_s": 232.1,
+     "tok_s_robust": 232.1,
+     "n_robust": 7,
+     "n_runs": 7,
+     "tok_s_min": 217.0,
+     "tok_s_max": 237.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/x78s7064",
+      "https://omlx.ai/benchmarks/performance/buqywbeu",
+      "https://omlx.ai/benchmarks/performance/ghwah96o"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 20,
+     "tok_s": 230.5,
+     "tok_s_robust": 230.5,
+     "n_robust": 7,
+     "n_runs": 7,
+     "tok_s_min": 181.2,
+     "tok_s_max": 237.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/buulll7c",
+      "https://omlx.ai/benchmarks/performance/8509buqb",
+      "https://omlx.ai/benchmarks/performance/r7atutez"
+     ]
+    },
+    {
+     "chip": "M5",
+     "gpu_cores": 10,
+     "tok_s": 141.0,
+     "tok_s_robust": 141.0,
+     "n_robust": 13,
+     "n_runs": 13,
+     "tok_s_min": 108.3,
+     "tok_s_max": 158.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/fkt1da71",
+      "https://omlx.ai/benchmarks/performance/emqgj4kq",
+      "https://omlx.ai/benchmarks/performance/x9jaz5yh"
+     ]
+    },
+    {
+     "chip": "M5 Max",
+     "gpu_cores": 40,
+     "tok_s": 457.3,
+     "tok_s_robust": 457.3,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 385.2,
+     "tok_s_max": 466.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/bo8m6zad",
+      "https://omlx.ai/benchmarks/performance/dtlgyfvx",
+      "https://omlx.ai/benchmarks/performance/67di8a0b"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 16,
+     "tok_s": 365.5,
+     "tok_s_robust": 365.5,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 365.5,
+     "tok_s_max": 365.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/8d1q5m12"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 20,
+     "tok_s": 365.2,
+     "tok_s_robust": 365.2,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 364.7,
+     "tok_s_max": 367.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/qq6riewi",
+      "https://omlx.ai/benchmarks/performance/fcfgy692",
+      "https://omlx.ai/benchmarks/performance/wmycgo3t"
+     ]
+    }
+   ]
+  },
+  {
+   "source_name": "oMLX Community Benchmarks (Performance), Qwen2.5 0.5B Instruct 4bit, 1k context",
+   "url": "https://omlx.ai/benchmarks/performance?model=Qwen2.5-0.5B&context=1024",
+   "date": "runs uploaded 2026-03-10 to 2026-11-02; scraped 2026-11-21",
+   "engine": "oMLX (MLX-based server app; built-in benchmark)",
+   "model": "Qwen2.5 0.5B Instruct",
+   "quant": "MLX 4bit (mlx-community conversions; model names matched: (mlx-community--|community--)?Qwen2\\.5-0\\.5B-Instruct(-4bit|-MLX-4bit)?)",
+   "test": "oMLX benchmark: TG tok/s at 1k-token prompt context (single stream)",
+   "notes": "Crowd-sourced; each row is the median over all matching 1k-context submissions for that chip+GPU-core bin. Detail pages NOT checked (list-level data only; acceleration settings unverified). tok_s = plain median; tok_s_robust = median of runs >= 0.6 x best run for that bin (drops throttled/contended low outliers; recommended). Chassis (MacBook vs desktop) not reported by oMLX. Raw per-run rows with URLs: llm_small_omlx_raw.json. ",
+   "rows": [
+    {
+     "chip": "M1",
+     "gpu_cores": 7,
+     "tok_s": 129.4,
+     "tok_s_robust": 129.4,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 127.5,
+     "tok_s_max": 131.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ralmk9n1",
+      "https://omlx.ai/benchmarks/performance/0mm9adz5"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 24,
+     "tok_s": 234.8,
+     "tok_s_robust": 234.8,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 200.6,
+     "tok_s_max": 250.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/0j59es1o",
+      "https://omlx.ai/benchmarks/performance/f6ig3780",
+      "https://omlx.ai/benchmarks/performance/i0fjkhlj"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 32,
+     "tok_s": 236.0,
+     "tok_s_robust": 236.0,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 198.3,
+     "tok_s_max": 273.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/lwziiiwf",
+      "https://omlx.ai/benchmarks/performance/qlm6gyed"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 14,
+     "tok_s": 202.7,
+     "tok_s_robust": 202.7,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 180.0,
+     "tok_s_max": 210.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/mx8hnjue",
+      "https://omlx.ai/benchmarks/performance/4ng8c125",
+      "https://omlx.ai/benchmarks/performance/vodrwypo"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 16,
+     "tok_s": 159.8,
+     "tok_s_robust": 213.2,
+     "n_robust": 1,
+     "n_runs": 2,
+     "tok_s_min": 106.3,
+     "tok_s_max": 213.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/6v7z5e4q",
+      "https://omlx.ai/benchmarks/performance/ie50fwbl"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 10,
+     "tok_s": 188.1,
+     "tok_s_robust": 188.1,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 188.1,
+     "tok_s_max": 188.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/4dg7mxm0"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 30,
+     "tok_s": 393.8,
+     "tok_s_robust": 393.8,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 334.7,
+     "tok_s_max": 452.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/gckaq0x1",
+      "https://omlx.ai/benchmarks/performance/7r9wtipd"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 38,
+     "tok_s": 351.2,
+     "tok_s_robust": 351.2,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 351.2,
+     "tok_s_max": 351.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/u9oa8e0y"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 16,
+     "tok_s": 222.5,
+     "tok_s_robust": 222.5,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 222.5,
+     "tok_s_max": 222.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/mwifs3c1"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 19,
+     "tok_s": 270.9,
+     "tok_s_robust": 270.9,
+     "n_robust": 4,
+     "n_runs": 4,
+     "tok_s_min": 258.1,
+     "tok_s_max": 308.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/611rjv4q",
+      "https://omlx.ai/benchmarks/performance/00fetbd2",
+      "https://omlx.ai/benchmarks/performance/6xaygr6q"
+     ]
+    },
+    {
+     "chip": "M3",
+     "gpu_cores": 10,
+     "tok_s": 194.1,
+     "tok_s_robust": 194.1,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 194.1,
+     "tok_s_max": 194.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ghuflpay"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 40,
+     "tok_s": 381.0,
+     "tok_s_robust": 381.0,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 381.0,
+     "tok_s_max": 381.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/k57xhqbx"
+     ]
+    },
+    {
+     "chip": "M3 Pro",
+     "gpu_cores": 18,
+     "tok_s": 251.4,
+     "tok_s_robust": 251.4,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 251.0,
+     "tok_s_max": 256.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/7r600rdz",
+      "https://omlx.ai/benchmarks/performance/v3bu3n35",
+      "https://omlx.ai/benchmarks/performance/ehzufopx"
+     ]
+    },
+    {
+     "chip": "M3 Ultra",
+     "gpu_cores": 80,
+     "tok_s": 369.6,
+     "tok_s_robust": 369.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 369.6,
+     "tok_s_max": 369.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/865oxxp0"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 8,
+     "tok_s": 234.2,
+     "tok_s_robust": 234.2,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 234.2,
+     "tok_s_max": 234.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/zxph1vi9"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 10,
+     "tok_s": 234.4,
+     "tok_s_robust": 236.1,
+     "n_robust": 7,
+     "n_runs": 8,
+     "tok_s_min": 90.6,
+     "tok_s_max": 242.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/95refhao",
+      "https://omlx.ai/benchmarks/performance/kmlobjq0",
+      "https://omlx.ai/benchmarks/performance/chh0ulpw"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 32,
+     "tok_s": 413.1,
+     "tok_s_robust": 413.1,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 413.1,
+     "tok_s_max": 413.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/km6f1syr"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 16,
+     "tok_s": 346.5,
+     "tok_s_robust": 346.5,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 346.5,
+     "tok_s_max": 346.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/fnxqehzh"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 20,
+     "tok_s": 419.6,
+     "tok_s_robust": 419.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 419.6,
+     "tok_s_max": 419.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/f9irsk32"
+     ]
+    }
+   ]
+  },
+  {
+   "source_name": "oMLX Community Benchmarks (Performance), Qwen3 0.6B 4bit, 1k context",
+   "url": "https://omlx.ai/benchmarks/performance?model=Qwen3-0.6B&context=1024",
+   "date": "runs uploaded 2026-03-12 to 2026-11-06; scraped 2026-11-21",
+   "engine": "oMLX (MLX-based server app; built-in benchmark)",
+   "model": "Qwen3 0.6B",
+   "quant": "MLX 4bit (mlx-community conversions; model names matched: (mlx-community--|community--)?Qwen3-0\\.6B(-4bit)?)",
+   "test": "oMLX benchmark: TG tok/s at 1k-token prompt context (single stream)",
+   "notes": "Crowd-sourced; each row is the median over all matching 1k-context submissions for that chip+GPU-core bin. Detail pages NOT checked (list-level data only; acceleration settings unverified). tok_s = plain median; tok_s_robust = median of runs >= 0.6 x best run for that bin (drops throttled/contended low outliers; recommended). Chassis (MacBook vs desktop) not reported by oMLX. Raw per-run rows with URLs: llm_small_omlx_raw.json. ",
+   "rows": [
+    {
+     "chip": "M1",
+     "gpu_cores": 7,
+     "tok_s": 90.5,
+     "tok_s_robust": 90.5,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 88.4,
+     "tok_s_max": 92.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/s94302io",
+      "https://omlx.ai/benchmarks/performance/yvi20uck"
+     ]
+    },
+    {
+     "chip": "M1",
+     "gpu_cores": 8,
+     "tok_s": 98.6,
+     "tok_s_robust": 98.6,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 98.3,
+     "tok_s_max": 111.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/zjk6grua",
+      "https://omlx.ai/benchmarks/performance/w9w20eyh",
+      "https://omlx.ai/benchmarks/performance/i8hppgdu"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 14,
+     "tok_s": 171.7,
+     "tok_s_robust": 171.7,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 151.9,
+     "tok_s_max": 191.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/qom2l0yj",
+      "https://omlx.ai/benchmarks/performance/ztirbptr"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 16,
+     "tok_s": 191.6,
+     "tok_s_robust": 191.6,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 162.3,
+     "tok_s_max": 220.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/99eiv1tf",
+      "https://omlx.ai/benchmarks/performance/0x4xuvgy"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 8,
+     "tok_s": 81.0,
+     "tok_s_robust": 124.5,
+     "n_robust": 1,
+     "n_runs": 2,
+     "tok_s_min": 37.4,
+     "tok_s_max": 124.5,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/5njtuxh2",
+      "https://omlx.ai/benchmarks/performance/t23fy1l7"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 38,
+     "tok_s": 288.0,
+     "tok_s_robust": 288.0,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 288.0,
+     "tok_s_max": 288.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/u2t8yq30"
+     ]
+    },
+    {
+     "chip": "M3",
+     "gpu_cores": 10,
+     "tok_s": 147.3,
+     "tok_s_robust": 147.3,
+     "n_robust": 4,
+     "n_runs": 4,
+     "tok_s_min": 145.7,
+     "tok_s_max": 156.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/zamb7ino",
+      "https://omlx.ai/benchmarks/performance/payrihog",
+      "https://omlx.ai/benchmarks/performance/gsx3nzx9"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 40,
+     "tok_s": 351.6,
+     "tok_s_robust": 351.6,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 350.1,
+     "tok_s_max": 353.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ys04wte8",
+      "https://omlx.ai/benchmarks/performance/nurpxnkj"
+     ]
+    },
+    {
+     "chip": "M3 Pro",
+     "gpu_cores": 18,
+     "tok_s": 191.7,
+     "tok_s_robust": 191.7,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 191.7,
+     "tok_s_max": 191.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/gre92le7"
+     ]
+    },
+    {
+     "chip": "M3 Ultra",
+     "gpu_cores": 80,
+     "tok_s": 364.4,
+     "tok_s_robust": 364.4,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 362.8,
+     "tok_s_max": 366.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/1ke0tclg",
+      "https://omlx.ai/benchmarks/performance/0557q04j"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 10,
+     "tok_s": 169.2,
+     "tok_s_robust": 169.2,
+     "n_robust": 8,
+     "n_runs": 8,
+     "tok_s_min": 135.5,
+     "tok_s_max": 182.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/gzdyz4y0",
+      "https://omlx.ai/benchmarks/performance/ai87l25k",
+      "https://omlx.ai/benchmarks/performance/x0pn9y52"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 16,
+     "tok_s": 289.9,
+     "tok_s_robust": 290.5,
+     "n_robust": 7,
+     "n_runs": 9,
+     "tok_s_min": 223.1,
+     "tok_s_max": 414.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/24gbuq76",
+      "https://omlx.ai/benchmarks/performance/jmlrwah7",
+      "https://omlx.ai/benchmarks/performance/qmq3tvab"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 20,
+     "tok_s": 311.6,
+     "tok_s_robust": 311.6,
+     "n_robust": 7,
+     "n_runs": 7,
+     "tok_s_min": 286.8,
+     "tok_s_max": 435.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/v89vt7fv",
+      "https://omlx.ai/benchmarks/performance/vfodt0a0",
+      "https://omlx.ai/benchmarks/performance/vori3m2q"
+     ]
+    },
+    {
+     "chip": "M5",
+     "gpu_cores": 10,
+     "tok_s": 209.1,
+     "tok_s_robust": 209.1,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 208.9,
+     "tok_s_max": 209.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/47296tax",
+      "https://omlx.ai/benchmarks/performance/kjao1s4d"
+     ]
+    }
+   ]
+  },
+  {
+   "source_name": "oMLX Community Benchmarks (Performance), Qwen3 1.7B 4bit, 1k context",
+   "url": "https://omlx.ai/benchmarks/performance?model=Qwen3-1.7B&context=1024",
+   "date": "runs uploaded 2026-03-14 to 2026-11-12; scraped 2026-11-21",
+   "engine": "oMLX (MLX-based server app; built-in benchmark)",
+   "model": "Qwen3 1.7B",
+   "quant": "MLX 4bit (mlx-community conversions; model names matched: (mlx-community--|community--)?Qwen3-1\\.7B(-4bit|-MLX-4bit)?)",
+   "test": "oMLX benchmark: TG tok/s at 1k-token prompt context (single stream)",
+   "notes": "Crowd-sourced; each row is the median over all matching 1k-context submissions for that chip+GPU-core bin. Detail pages NOT checked (list-level data only; acceleration settings unverified). tok_s = plain median; tok_s_robust = median of runs >= 0.6 x best run for that bin (drops throttled/contended low outliers; recommended). Chassis (MacBook vs desktop) not reported by oMLX. Raw per-run rows with URLs: llm_small_omlx_raw.json. ",
+   "rows": [
+    {
+     "chip": "M1",
+     "gpu_cores": 8,
+     "tok_s": 39.6,
+     "tok_s_robust": 39.6,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 30.5,
+     "tok_s_max": 48.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/pnxysa2r",
+      "https://omlx.ai/benchmarks/performance/vn9ohjha"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 10,
+     "tok_s": 54.6,
+     "tok_s_robust": 64.1,
+     "n_robust": 3,
+     "n_runs": 5,
+     "tok_s_min": 25.8,
+     "tok_s_max": 69.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ut3hsoev",
+      "https://omlx.ai/benchmarks/performance/69e7o7jj",
+      "https://omlx.ai/benchmarks/performance/1eskd8nl"
+     ]
+    },
+    {
+     "chip": "M2 Max",
+     "gpu_cores": 30,
+     "tok_s": 188.6,
+     "tok_s_robust": 188.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 188.6,
+     "tok_s_max": 188.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/1nn7eihl"
+     ]
+    },
+    {
+     "chip": "M3",
+     "gpu_cores": 10,
+     "tok_s": 63.8,
+     "tok_s_robust": 63.8,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 54.8,
+     "tok_s_max": 72.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/w2ato9ky",
+      "https://omlx.ai/benchmarks/performance/uzu1gx2x"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 40,
+     "tok_s": 254.4,
+     "tok_s_robust": 254.4,
+     "n_robust": 4,
+     "n_runs": 4,
+     "tok_s_min": 201.1,
+     "tok_s_max": 293.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/2mm7q9sy",
+      "https://omlx.ai/benchmarks/performance/ahtfzds5",
+      "https://omlx.ai/benchmarks/performance/62xa7ujy"
+     ]
+    },
+    {
+     "chip": "M3 Ultra",
+     "gpu_cores": 80,
+     "tok_s": 272.6,
+     "tok_s_robust": 272.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 272.6,
+     "tok_s_max": 272.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/wr6514iw"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 10,
+     "tok_s": 83.8,
+     "tok_s_robust": 83.8,
+     "n_robust": 11,
+     "n_runs": 11,
+     "tok_s_min": 71.3,
+     "tok_s_max": 89.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/slx22xmq",
+      "https://omlx.ai/benchmarks/performance/89j1tvci",
+      "https://omlx.ai/benchmarks/performance/24axtgt5"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 32,
+     "tok_s": 226.4,
+     "tok_s_robust": 226.4,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 226.4,
+     "tok_s_max": 226.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/1tllk82j"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 40,
+     "tok_s": 262.8,
+     "tok_s_robust": 262.8,
+     "n_robust": 5,
+     "n_runs": 5,
+     "tok_s_min": 260.8,
+     "tok_s_max": 299.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/eawjc9i0",
+      "https://omlx.ai/benchmarks/performance/i9caxg0y",
+      "https://omlx.ai/benchmarks/performance/8p6qbqzj"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 16,
+     "tok_s": 167.7,
+     "tok_s_robust": 167.7,
+     "n_robust": 7,
+     "n_runs": 7,
+     "tok_s_min": 161.9,
+     "tok_s_max": 170.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/580achxc",
+      "https://omlx.ai/benchmarks/performance/jqe43odd",
+      "https://omlx.ai/benchmarks/performance/v54tdkew"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 20,
+     "tok_s": 172.3,
+     "tok_s_robust": 172.3,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 172.3,
+     "tok_s_max": 172.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/gka11rdm"
+     ]
+    },
+    {
+     "chip": "M5",
+     "gpu_cores": 10,
+     "tok_s": 100.9,
+     "tok_s_robust": 100.9,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 100.9,
+     "tok_s_max": 100.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/emhy13yi"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 16,
+     "tok_s": 241.4,
+     "tok_s_robust": 241.4,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 241.4,
+     "tok_s_max": 241.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/qw4z13rt"
+     ]
+    }
+   ]
+  },
+  {
+   "source_name": "oMLX Community Benchmarks (Performance), Qwen2.5 3B Instruct 4bit, 1k context",
+   "url": "https://omlx.ai/benchmarks/performance?model=Qwen2.5-3B&context=1024",
+   "date": "runs uploaded 2026-07-01 to 2026-11-05; scraped 2026-11-21",
+   "engine": "oMLX (MLX-based server app; built-in benchmark)",
+   "model": "Qwen2.5 3B Instruct",
+   "quant": "MLX 4bit (mlx-community conversions; model names matched: (mlx-community--|community--|mlx-community:)?Qwen2\\.5-3B-Instruct(-4bit)?)",
+   "test": "oMLX benchmark: TG tok/s at 1k-token prompt context (single stream)",
+   "notes": "Crowd-sourced; each row is the median over all matching 1k-context submissions for that chip+GPU-core bin. Detail pages NOT checked (list-level data only; acceleration settings unverified). tok_s = plain median; tok_s_robust = median of runs >= 0.6 x best run for that bin (drops throttled/contended low outliers; recommended). Chassis (MacBook vs desktop) not reported by oMLX. Raw per-run rows with URLs: llm_small_omlx_raw.json. ",
+   "rows": [
+    {
+     "chip": "M1",
+     "gpu_cores": 7,
+     "tok_s": 25.6,
+     "tok_s_robust": 25.6,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 25.6,
+     "tok_s_max": 25.6,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/a4tuuska"
+     ]
+    },
+    {
+     "chip": "M1",
+     "gpu_cores": 8,
+     "tok_s": 29.7,
+     "tok_s_robust": 29.7,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 29.7,
+     "tok_s_max": 29.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/3hp3k5f6"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 24,
+     "tok_s": 89.4,
+     "tok_s_robust": 89.4,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 72.8,
+     "tok_s_max": 106.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/r149dm15",
+      "https://omlx.ai/benchmarks/performance/r6lw764n"
+     ]
+    },
+    {
+     "chip": "M1 Max",
+     "gpu_cores": 32,
+     "tok_s": 121.0,
+     "tok_s_robust": 121.0,
+     "n_robust": 4,
+     "n_runs": 4,
+     "tok_s_min": 104.0,
+     "tok_s_max": 122.3,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/f713bf5x",
+      "https://omlx.ai/benchmarks/performance/5kmamlee",
+      "https://omlx.ai/benchmarks/performance/lne69yit"
+     ]
+    },
+    {
+     "chip": "M1 Pro",
+     "gpu_cores": 14,
+     "tok_s": 75.5,
+     "tok_s_robust": 75.5,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 75.3,
+     "tok_s_max": 75.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/9r5wte6k",
+      "https://omlx.ai/benchmarks/performance/kchy4bx6"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 8,
+     "tok_s": 44.0,
+     "tok_s_robust": 44.0,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 44.0,
+     "tok_s_max": 44.0,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/axdm623u"
+     ]
+    },
+    {
+     "chip": "M2",
+     "gpu_cores": 10,
+     "tok_s": 45.2,
+     "tok_s_robust": 45.2,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 45.2,
+     "tok_s_max": 45.2,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/mzf2ea7g"
+     ]
+    },
+    {
+     "chip": "M2 Pro",
+     "gpu_cores": 16,
+     "tok_s": 83.9,
+     "tok_s_robust": 83.9,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 83.9,
+     "tok_s_max": 83.9,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/2bdddx9f"
+     ]
+    },
+    {
+     "chip": "M3",
+     "gpu_cores": 10,
+     "tok_s": 46.3,
+     "tok_s_robust": 46.3,
+     "n_robust": 3,
+     "n_runs": 3,
+     "tok_s_min": 44.9,
+     "tok_s_max": 46.7,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/b2fsjb6g",
+      "https://omlx.ai/benchmarks/performance/807k1a4q",
+      "https://omlx.ai/benchmarks/performance/kj6kvx9c"
+     ]
+    },
+    {
+     "chip": "M3 Max",
+     "gpu_cores": 40,
+     "tok_s": 135.4,
+     "tok_s_robust": 135.4,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 135.4,
+     "tok_s_max": 135.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/ftrw6hox"
+     ]
+    },
+    {
+     "chip": "M4",
+     "gpu_cores": 10,
+     "tok_s": 50.3,
+     "tok_s_robust": 50.3,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 50.2,
+     "tok_s_max": 50.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/eextmpng",
+      "https://omlx.ai/benchmarks/performance/inyffjyn"
+     ]
+    },
+    {
+     "chip": "M4 Max",
+     "gpu_cores": 40,
+     "tok_s": 172.4,
+     "tok_s_robust": 172.4,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 172.4,
+     "tok_s_max": 172.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/7g7axtqj"
+     ]
+    },
+    {
+     "chip": "M4 Pro",
+     "gpu_cores": 16,
+     "tok_s": 111.4,
+     "tok_s_robust": 111.4,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 111.4,
+     "tok_s_max": 111.4,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/nwc8ajss"
+     ]
+    },
+    {
+     "chip": "M5",
+     "gpu_cores": 10,
+     "tok_s": 65.9,
+     "tok_s_robust": 65.9,
+     "n_robust": 2,
+     "n_runs": 2,
+     "tok_s_min": 65.7,
+     "tok_s_max": 66.1,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/qww7mpx1",
+      "https://omlx.ai/benchmarks/performance/bc3tmudk"
+     ]
+    },
+    {
+     "chip": "M5 Pro",
+     "gpu_cores": 16,
+     "tok_s": 126.8,
+     "tok_s_robust": 126.8,
+     "n_robust": 1,
+     "n_runs": 1,
+     "tok_s_min": 126.8,
+     "tok_s_max": 126.8,
+     "example_urls": [
+      "https://omlx.ai/benchmarks/performance/8bes47pu"
+     ]
+    }
+   ]
+  }
+ ]
+}

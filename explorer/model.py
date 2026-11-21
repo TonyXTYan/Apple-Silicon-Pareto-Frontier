@@ -48,10 +48,12 @@ for col,nm in ((0,'e'),(1,'x')):
     sig={w:float(np.sqrt(np.mean(np.square(v)))) if v else None for w,v in res.items()}
     out[nm]=dict(th=th,cov=cov,sig=sig,loo=loo,n={w:len(v) for w,v in res.items()})
     print(nm,'LOO rms (log) by workload:',{w:round(s,3) for w,s in sig.items()},'n=',out[nm]['n'])
-# Apple official wall power (idle, max) by chip and machine
-APPLE={('M5 Max','Mac Studio'):(7,200),('M5 Ultra','Mac Studio'):(9,385),('M4 Max','Mac Studio'):(6,145),('M3 Ultra','Mac Studio'):(9,270),
- ('M2 Max','Mac Studio'):(9,145),('M2 Ultra','Mac Studio'):(10,295),('M1 Max','Mac Studio'):(11,115),('M1 Ultra','Mac Studio'):(13,215),
- ('M4','Mac mini'):(4,65),('M4 Pro','Mac mini'):(5,140),('M2','Mac mini'):(7,50),('M2 Pro','Mac mini'):(7,100),('M1','Mac mini'):(7,39)}
+# Apple's published power figures (apple_power.json). Desktops: support-page idle and maximum wall power, whose maximum is
+# a floor on work per joule below; sleep and off from the environmental report. Laptops: environmental-report idle with the
+# display on, sleep and off (115 V), adapter and battery. A laptop's adapter is not a cap (the battery can add to it), so
+# laptops are shown only, never used as a bound.
+AP=json.load(open('apple_power.json'))['machines']
+APPLE={(ckey(m['chip']),m['dev']):(m['idle_w'],m['max_w']) for m in AP if m['kind']=='desktop'}
 # published throughputs without wall power, used in place of the model's throughput
 KNOWNX={('M3 Ultra','cpu-all'):(3062,3028,3082,'Cinebench 2024 multi-core 3,028 to 3,082 across XDA, Ars Technica and PC Watch reviews'),
         ('M3 Ultra','cpu-one'):(145,141,150,'Cinebench 2024 single-core 141 to 150 across reviews'),
@@ -90,7 +92,37 @@ for m,x,(lo,hi) in MODES:
 for r in modes: print(r['dev'],r['e'],r['elo'],r['ehi'],r['p'])
 D['est']=est+modes
 D['loo']={k:out[k]['loo'] for k in ('e','x')}; D['loosig']={k:out[k]['sig'] for k in ('e','x')}
-D['apple']=[dict(chip=c,dev=d,idle=a,max=b) for (c,d),(a,b) in APPLE.items()]
+def apple_entries():
+    out=[]; S2=D['sources']
+    def per(u):
+        stem=u.rsplit('/',1)[1].replace('.pdf',''); k='per_'+stem
+        t,dt=stem.split('_PER_'); S2.setdefault(k,dict(name='Apple, '+t.replace('_',' ')+' Product Environmental Report ('+re.sub(r'([A-Za-z])(\d)',r'\1 \2',dt)+')',url=u)); return k
+    def specs(u):
+        k='specs_'+u.rsplit('/',1)[1]; S2.setdefault(k,dict(name='Apple, technical specifications (support article '+u.rsplit('/',1)[1]+')',url=u)); return k
+    for m in AP:
+        n=m.get('notes',''); notes=[]
+        if m['kind']=='desktop':
+            e=dict(chip=ckey(m['chip']),dev=m['dev'],kind='desktop',idle=m['idle_w'],max=m['max_w'],src='apple_mini' if m['dev']=='Mac mini' else 'apple_studio')
+            if m.get('max_definition')=='CPU Max': e['cpumax']=1; notes.append('Apple\'s maximum for this Mac mini is "CPU Max", a CPU-only load, so a combined CPU and GPU load can exceed it.')
+            if m.get('sleep_w') is not None: e.update(sleep=m['sleep_w'],off=m['off_w'])
+            if m.get('url_per'): e['per']=per(m['url_per'])
+            if m['chip'].endswith('c') and 'Pro' in m['chip']: notes.append('Apple gives one M4 Pro Mac mini figure (64 GB, 8 TB) without a core count, and none per power mode.')
+            if 'identical to the Jan 2023 M2 table' in n: notes.append('The M4 Mac mini environmental report repeats the M2 Mac mini table exactly, so its sleep and off figures are not an independent measurement.')
+        elif 'energy_star' in m:
+            es=m['energy_star']; e=dict(chip=m['chip'],dev=m['dev'],kind='laptop',es=dict(short=es['short_idle_w'],long=es['long_idle_w'],sleep=es['sleep_w'],off=es['off_w']),adapter=m['adapter_w'],battery=m['battery_wh'],
+                src='energystar_a3185',specs=specs(m['url_specs'])); S2['energystar_a3185']=dict(name='ENERGY STAR certification, MacBook Pro 14-inch (M4 Max), A3185',url=m['url_power']); notes.append(m['notes'])
+        else:
+            e=dict(chip=m['chip'],dev=m['dev'],kind='laptop',idle_on=m['idle_display_on_w'],sleep=m['sleep_w'],off=m['off_w'],adapter=m['adapter_w'],battery=m['battery_wh'],src=per(m['url_power']),specs=specs(m['url_specs']))
+            if m.get('match','').startswith('proxy'): e['proxy']='M3 Pro table'; notes.append('The October 2023 report has idle tables only for the 14-inch M3 and M3 Pro, so the M3 Pro table stands in for the M3 Max.')
+            if 'identical to the 2023' in n: notes.append('Apple\'s '+m['chip'].split(' 1')[0]+' table repeats its 2023 '+m['chip'].split(' 1')[0].replace('M4','M3')+' table exactly, so it is not an independent measurement.')
+            cov=re.search(r'covering ([^;]+?);',n)
+            if cov: notes.append('One table covers '+cov.group(1)+'.')
+            v=m.get('v230')
+            if v: notes.append(f"At 230 V Apple lists idle {v['idle_display_on']:g} W, sleep {v['sleep']:g} W and off {v['off']:g} W.")
+        if notes: e['note']=' '.join(notes)
+        out.append(e)
+    return out
+D['apple']=apple_entries()
 D['sources'].update({
  'model':dict(name='Estimate from the fitted model on this page',url='#method'),
  'modes':dict(name='Digital Trends scores; Notebookcheck and Eclectic Light package power',url='https://digitaltrends.com/computing/m4-pro-low-power-mode-change'),

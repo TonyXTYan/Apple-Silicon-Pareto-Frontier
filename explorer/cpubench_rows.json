@@ -1,0 +1,759 @@
+{
+ "source": "Research compilation (cpubench.json, 2026-11-21): Notebookcheck Geekbench 6.7, Geekbench 5.5 and Cinebench 2026 scores for the review units whose Cinebench wall power is on this page. No wall power was published for any of these runs. Left out: Geekbench Browser per-model averages (version unverified, values from search summaries), Cinebench R20 (the R23 engine, already on the page converted) and Blender 3.3 (three machines).",
+ "sets": [
+  {
+   "name": "Geekbench 6.7 single-core (Notebookcheck, per review unit)",
+   "metric": "Geekbench 6.7 score",
+   "higher_is_better": true,
+   "url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html",
+   "date": "2025-2026 reviews",
+   "threads": "single",
+   "has_wall_power": false,
+   "rows": [
+    {
+     "chip": "M2",
+     "device": "Mac mini",
+     "value": 2650,
+     "wall_w": null,
+     "notes": "NBC unit: Mac Mini M2",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-review-Smaller-faster-and-louder.918832.0.html"
+    },
+    {
+     "chip": "M2 Max",
+     "device": "Mac Studio",
+     "value": 2692,
+     "wall_w": null,
+     "notes": "NBC unit: Mac Studio 2023 M2 Max",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-review-Smaller-faster-and-louder.918832.0.html"
+    },
+    {
+     "chip": "M3",
+     "device": "MacBook Pro 14",
+     "value": 3099,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2023 M3",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M3",
+     "device": "MacBook Air 13",
+     "value": 3054,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 13 M3 8C GPU (same unit as page CB2024 601/141)",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    },
+    {
+     "chip": "M3 Pro 11c",
+     "device": "MacBook Pro 14",
+     "value": 3113,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2023 M3 Pro (11-core)",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Pro 12c",
+     "device": "MacBook Pro 16",
+     "value": 3138,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 2023 M3 Pro (12-core)",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Max",
+     "device": "MacBook Pro 14",
+     "value": 3157,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2023 M3 Max 16-core",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "MacBook Air 13",
+     "value": 3820,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 13 M4 Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "MacBook Air 15",
+     "value": 3655,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 15 M4",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "MacBook Pro 14",
+     "value": 3673,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2024 M4",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "Mac mini",
+     "value": 3838,
+     "wall_w": null,
+     "notes": "NBC: Mac Mini M4",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-review-Smaller-faster-and-louder.918832.0.html"
+    },
+    {
+     "chip": "M4 Pro 12c",
+     "device": "Mac mini",
+     "value": 3928,
+     "wall_w": null,
+     "notes": "NBC: Mac Mini M4 Pro 12-core",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-Pro-review-The-compact-and-frugal-desktop-PC-with-top-performance-and-expensive-upgrades.946883.0.html"
+    },
+    {
+     "chip": "M4 Pro 12c",
+     "device": "MacBook Pro 14",
+     "value": 3844,
+     "wall_w": null,
+     "notes": "NBC lists two M4 Pro Entry units (3844/20458 and 3837/20385); first one paired with CB2024 1435 by listing order (assumption)",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4 Pro 14c",
+     "device": "MacBook Pro 14",
+     "value": 3927,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2024 M4 Pro 14-core",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4 Pro 14c",
+     "device": "MacBook Pro 16",
+     "value": 3836,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 2024 M4 Pro 14-core (M6 article shows 22544 multi for the 14 in)",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4 Max",
+     "device": "MacBook Pro 16",
+     "value": 3880,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 M4 Max 16-core",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M5",
+     "device": "MacBook Pro 14",
+     "value": 4326,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5",
+     "device": "MacBook Air 15",
+     "value": 4195,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Pro",
+     "device": "MacBook Pro 16",
+     "value": 4295,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 14",
+     "value": 4322,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 16",
+     "value": 4335,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M6",
+     "device": "Mac mini",
+     "value": 4698,
+     "wall_w": null,
+     "notes": "NBC (Geekbench 6.7)",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    }
+   ]
+  },
+  {
+   "name": "Geekbench 6.7 multi-core (Notebookcheck, per review unit)",
+   "metric": "Geekbench 6.7 score",
+   "higher_is_better": true,
+   "url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html",
+   "date": "2025-2026 reviews",
+   "threads": "multi",
+   "has_wall_power": false,
+   "rows": [
+    {
+     "chip": "M2",
+     "device": "Mac mini",
+     "value": 10034,
+     "wall_w": null,
+     "notes": "NBC unit: Mac Mini M2",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-review-Smaller-faster-and-louder.918832.0.html"
+    },
+    {
+     "chip": "M2 Max",
+     "device": "Mac Studio",
+     "value": 14863,
+     "wall_w": null,
+     "notes": "NBC unit: Mac Studio 2023 M2 Max",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-review-Smaller-faster-and-louder.918832.0.html"
+    },
+    {
+     "chip": "M3",
+     "device": "MacBook Pro 14",
+     "value": 11966,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2023 M3",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M3",
+     "device": "MacBook Air 13",
+     "value": 11992,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 13 M3 8C GPU (same unit as page CB2024 601/141)",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    },
+    {
+     "chip": "M3 Pro 11c",
+     "device": "MacBook Pro 14",
+     "value": 14412,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2023 M3 Pro (11-core)",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Pro 12c",
+     "device": "MacBook Pro 16",
+     "value": 15480,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 2023 M3 Pro (12-core)",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Max",
+     "device": "MacBook Pro 14",
+     "value": 21264,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2023 M3 Max 16-core",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "MacBook Air 13",
+     "value": 14903,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 13 M4 Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "MacBook Air 15",
+     "value": 14901,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 15 M4",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "MacBook Pro 14",
+     "value": 15128,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2024 M4",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4",
+     "device": "Mac mini",
+     "value": 15072,
+     "wall_w": null,
+     "notes": "NBC: Mac Mini M4",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-review-Smaller-faster-and-louder.918832.0.html"
+    },
+    {
+     "chip": "M4 Pro 12c",
+     "device": "Mac mini",
+     "value": 20617,
+     "wall_w": null,
+     "notes": "NBC: Mac Mini M4 Pro 12-core",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Mini-M4-Pro-review-The-compact-and-frugal-desktop-PC-with-top-performance-and-expensive-upgrades.946883.0.html"
+    },
+    {
+     "chip": "M4 Pro 12c",
+     "device": "MacBook Pro 14",
+     "value": 20458,
+     "wall_w": null,
+     "notes": "NBC lists two M4 Pro Entry units (3844/20458 and 3837/20385); first one paired with CB2024 1435 by listing order (assumption)",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4 Pro 14c",
+     "device": "MacBook Pro 14",
+     "value": 22544,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 14 2024 M4 Pro 14-core",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4 Pro 14c",
+     "device": "MacBook Pro 16",
+     "value": 22509,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 2024 M4 Pro 14-core (M6 article shows 22544 multi for the 14 in)",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M4 Max",
+     "device": "MacBook Pro 16",
+     "value": 25760,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 M4 Max 16-core",
+     "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html"
+    },
+    {
+     "chip": "M5",
+     "device": "MacBook Pro 14",
+     "value": 18054,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5",
+     "device": "MacBook Air 15",
+     "value": 16995,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Pro",
+     "device": "MacBook Pro 16",
+     "value": 28436,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 14",
+     "value": 29415,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 16",
+     "value": 29256,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M6",
+     "device": "Mac mini",
+     "value": 21302,
+     "wall_w": null,
+     "notes": "NBC (Geekbench 6.7)",
+     "source_url": "https://www.notebookcheck.net/Apple-M6-SoC-Analysis-Apple-s-2-nm-chip-crushes-AMD-Intel-Qualcomm.1404057.0.html"
+    }
+   ]
+  },
+  {
+   "name": "Geekbench 5.5 single-core (Notebookcheck, per review unit)",
+   "metric": "Geekbench 5.5 score",
+   "higher_is_better": true,
+   "url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html",
+   "date": "2022-2023 reviews",
+   "threads": "single",
+   "has_wall_power": false,
+   "rows": [
+    {
+     "chip": "M1",
+     "device": "MacBook Air 13",
+     "value": 1727,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 2020 M1 Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "MacBook Air 13 (8-core GPU)",
+     "value": 1914,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air M2 Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "MacBook Air 13 (10-core GPU)",
+     "value": 1925,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air M2 10C GPU",
+     "source_url": "https://www.notebookcheck.net/Apple-M2-Pro-and-M2-Max-analysis-GPU-is-more-efficient-the-CPU-not-always.699140.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "MacBook Pro 13",
+     "value": 1937,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M1 Pro",
+     "device": "MacBook Pro 16",
+     "value": 1768,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 2021 M1 Pro",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2 Pro 10c",
+     "device": "MacBook Pro 14",
+     "value": 1926,
+     "wall_w": null,
+     "notes": "NBC: 2023 M2 Pro Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2 Pro 12c",
+     "device": "MacBook Pro 14",
+     "value": 1961,
+     "wall_w": null,
+     "notes": "NBC: 2023 M2 Pro",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2 Max",
+     "device": "MacBook Pro 16",
+     "value": 1978,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M2-Pro-and-M2-Max-analysis-GPU-is-more-efficient-the-CPU-not-always.699140.0.html"
+    },
+    {
+     "chip": "M3",
+     "device": "MacBook Pro 14",
+     "value": 2342,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M3 Pro 11c",
+     "device": "MacBook Pro 14",
+     "value": 2331,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Pro 12c",
+     "device": "MacBook Pro 16",
+     "value": 2327,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Max",
+     "device": "MacBook Pro 14",
+     "value": 2318,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Max",
+     "device": "MacBook Pro 16",
+     "value": 2331,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M1 Max",
+     "device": "Mac Studio",
+     "value": 1795,
+     "wall_w": null,
+     "notes": "NBC: Mac Studio 2022 M1 Max",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Studio-2023-review-The-M2-Max-also-impresses-in-a-desktop-device.752807.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "Mac mini",
+     "value": 1953,
+     "wall_w": null,
+     "notes": "NBC: Mac Mini M2",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Studio-2023-review-The-M2-Max-also-impresses-in-a-desktop-device.752807.0.html"
+    },
+    {
+     "chip": "M2 Max",
+     "device": "Mac Studio",
+     "value": 1967,
+     "wall_w": null,
+     "notes": "NBC: Mac Studio 2023 M2 Max",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Studio-2023-review-The-M2-Max-also-impresses-in-a-desktop-device.752807.0.html"
+    }
+   ]
+  },
+  {
+   "name": "Geekbench 5.5 multi-core (Notebookcheck, per review unit)",
+   "metric": "Geekbench 5.5 score",
+   "higher_is_better": true,
+   "url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html",
+   "date": "2022-2023 reviews",
+   "threads": "multi",
+   "has_wall_power": false,
+   "rows": [
+    {
+     "chip": "M1",
+     "device": "MacBook Air 13",
+     "value": 7578,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air 2020 M1 Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "MacBook Air 13 (8-core GPU)",
+     "value": 8951,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air M2 Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "MacBook Air 13 (10-core GPU)",
+     "value": 8991,
+     "wall_w": null,
+     "notes": "NBC: MacBook Air M2 10C GPU",
+     "source_url": "https://www.notebookcheck.net/Apple-M2-Pro-and-M2-Max-analysis-GPU-is-more-efficient-the-CPU-not-always.699140.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "MacBook Pro 13",
+     "value": 8962,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M1 Pro",
+     "device": "MacBook Pro 16",
+     "value": 12499,
+     "wall_w": null,
+     "notes": "NBC: MacBook Pro 16 2021 M1 Pro",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2 Pro 10c",
+     "device": "MacBook Pro 14",
+     "value": 12189,
+     "wall_w": null,
+     "notes": "NBC: 2023 M2 Pro Entry",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2 Pro 12c",
+     "device": "MacBook Pro 14",
+     "value": 14859,
+     "wall_w": null,
+     "notes": "NBC: 2023 M2 Pro",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M2 Max",
+     "device": "MacBook Pro 16",
+     "value": 15348,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M2-Pro-and-M2-Max-analysis-GPU-is-more-efficient-the-CPU-not-always.699140.0.html"
+    },
+    {
+     "chip": "M3",
+     "device": "MacBook Pro 14",
+     "value": 10774,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-SoC-analyzed-Increased-performance-and-improved-efficiency.766789.0.html"
+    },
+    {
+     "chip": "M3 Pro 11c",
+     "device": "MacBook Pro 14",
+     "value": 13312,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Pro 12c",
+     "device": "MacBook Pro 16",
+     "value": 15298,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Max",
+     "device": "MacBook Pro 14",
+     "value": 23059,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M3 Max",
+     "device": "MacBook Pro 16",
+     "value": 22816,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M3-Pro-M3-Max-analysis-Apple-has-significantly-upgraded-its-Max-CPU.782974.0.html"
+    },
+    {
+     "chip": "M1 Max",
+     "device": "Mac Studio",
+     "value": 12697,
+     "wall_w": null,
+     "notes": "NBC: Mac Studio 2022 M1 Max",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Studio-2023-review-The-M2-Max-also-impresses-in-a-desktop-device.752807.0.html"
+    },
+    {
+     "chip": "M2",
+     "device": "Mac mini",
+     "value": 8994,
+     "wall_w": null,
+     "notes": "NBC: Mac Mini M2",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Studio-2023-review-The-M2-Max-also-impresses-in-a-desktop-device.752807.0.html"
+    },
+    {
+     "chip": "M2 Max",
+     "device": "Mac Studio",
+     "value": 15444,
+     "wall_w": null,
+     "notes": "NBC: Mac Studio 2023 M2 Max",
+     "source_url": "https://www.notebookcheck.net/Apple-Mac-Studio-2023-review-The-M2-Max-also-impresses-in-a-desktop-device.752807.0.html"
+    }
+   ]
+  },
+  {
+   "name": "Cinebench 2026 single (Notebookcheck)",
+   "metric": "Cinebench 2026 points",
+   "higher_is_better": true,
+   "url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html",
+   "date": "2026",
+   "threads": "single",
+   "has_wall_power": false,
+   "rows": [
+    {
+     "chip": "M5",
+     "device": "MacBook Air 15",
+     "value": 732,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Pro",
+     "device": "MacBook Pro 16",
+     "value": 738,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 14",
+     "value": 739,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 16",
+     "value": 736,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M4 Pro 12c",
+     "device": "MacBook Pro 14",
+     "value": 644,
+     "wall_w": null,
+     "notes": "NBC: M4 Pro Entry 12-core",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    }
+   ]
+  },
+  {
+   "name": "Cinebench 2026 multi (Notebookcheck)",
+   "metric": "Cinebench 2026 points",
+   "higher_is_better": true,
+   "url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html",
+   "date": "2026",
+   "threads": "multi",
+   "has_wall_power": false,
+   "rows": [
+    {
+     "chip": "M5",
+     "device": "MacBook Air 15",
+     "value": 3692,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Pro",
+     "device": "MacBook Pro 16",
+     "value": 9481,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 14",
+     "value": 8257,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M5 Max",
+     "device": "MacBook Pro 16",
+     "value": 9270,
+     "wall_w": null,
+     "notes": "NBC",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    },
+    {
+     "chip": "M4 Pro 12c",
+     "device": "MacBook Pro 14",
+     "value": 5159,
+     "wall_w": null,
+     "notes": "NBC: M4 Pro Entry 12-core",
+     "source_url": "https://www.notebookcheck.net/Apple-M5-Pro-M5-Max-CPU-Analysis-M5-Max-is-not-much-faster-than-the-M4-Max.1246054.0.html"
+    }
+   ]
+  }
+ ]
+}
