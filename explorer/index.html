@@ -103,6 +103,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .axt{font-size:12.5px;fill:var(--ink2)}
 #chart .lbl{font-size:11.5px;font-stretch:87.5%;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3.2px;stroke-linejoin:round}
 #chart .lbl.rel{font-weight:650}
+#chart .lbl.front{stroke-width:5px}
 #chart .grid{stroke:var(--grid);stroke-width:1}
 #chart .axis{stroke:var(--rule);stroke-width:1}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
@@ -602,14 +603,22 @@ function render(){
   svg.appendChild(el('g',{id:'labels'}));svg.appendChild(el('g',{id:'over'}));
   drawFocus();
 }
-function placeLabels(list,cls,maxL){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
+function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
   const bb=e=>{try{const b=e.getBBox();return b.width?[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]:null}catch(_){return null}};
   const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
   for(const p of list){if(n>=maxL)break;const t=shortName(p.r),tw=t.length*(G.narrow?6.6:6.3)+6;
     for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
       const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
       if(bx[0]<m.l+2||bx[2]>W-m.r+8||bx[1]<m.t-6||bx[3]>H-m.b-2)continue;if(boxes.some(b=>hit(b,bx)))continue;
-      boxes.push(bx);lg.appendChild(el('text',{x:cx,y:cy,'text-anchor':an,class:'lbl '+(cls||'')},t));n++;break}}}
+      boxes.push(bx);lg.appendChild(el('text',{x:cx,y:cy,'text-anchor':an,class:'lbl '+(cls||'')},t));n++;p._lab=1;break}
+    if(p===force&&!p._lab){/* no free spot: take the in-bounds spot that covers the fewest neighbours, and keep other labels off it */
+      let best=null;for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
+        const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
+        if(bx[0]<m.l+2||bx[2]>W-m.r+8||bx[1]<m.t-6||bx[3]>H-m.b-2)continue;const c=boxes.filter(b=>hit(b,bx)).length;if(!best||c<best.c)best={cx,cy,an,bx,c}}
+      if(!best){/* too long for any spot beside the point: slide it inside the plot, above the point or below near the top */
+        const x0=Math.max(m.l+2,Math.min(W-m.r-tw,p.px-tw/2)),cy=p.py-12-11<m.t-6?p.py+20:p.py-12;best={cx:x0,cy,an:'start',bx:[x0,cy-11,x0+tw,cy+3]}}
+      boxes.push(best.bx);lg.appendChild(el('text',{x:best.cx,y:best.cy,'text-anchor':best.an,class:'lbl front '+(cls||'')},t));n++}
+    delete p._lab}}
 function defaultLabels(){const pts=S.pts,k=G.k;const by=f=>[...pts].sort(f);
   const order=by((a,b)=>b.r.e-a.r.e),fast=by((a,b)=>b.r.x-a.r.x),slow=by((a,b)=>a.r.e-b.r.e);const pri=[];const push=p=>{if(p&&!pri.includes(p))pri.push(p)};
   const bRow=baseRow(S.w,curBase());push(pts.find(p=>p.r===bRow));push(order[0]);push(fast[0]);push(slow[0]);
@@ -643,7 +652,7 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   for(const q of rel.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-gen'}));
   for(const q of rel.tier)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-tier'}));
   ov.appendChild(el('circle',{cx:p.px,cy:p.py,r:11.5,class:'ring'}));
-  placeLabels([p,...rel.gen,...rel.tier],'rel',40);
+  placeLabels([p,...rel.gen,...rel.tier],'rel',40,p);
   kRing();declutter();
 }
 function xTick(g,x,y,t,lastR){const tx=el('text',{x,y,'text-anchor':'middle',class:'tk'},t);g.appendChild(tx);let bw=t.length*6.5;try{bw=tx.getComputedTextLength()||bw}catch(_){}
@@ -908,7 +917,7 @@ function looPlot(){const big=S.looBig,svg=$('loo'),L=DATA.loo.e,W=big?900:340,H=
         eg.appendChild(el('line',{x1,x2:x1,y1:y-cap,y2:y+cap,style:st}));eg.appendChild(el('line',{x1:x2,x2,y1:y-cap,y2:y+cap,style:st}))}}}
   for(const p of pts){p.px=X(p.a);p.py=Y(p.b);const c=el('circle',{cx:X(p.a),cy:Y(p.b),r:big?6:4,style:`fill:${col[p.w]};stroke:var(--surface);stroke-width:1`});
     svg.appendChild(c);
-    if(big&&Math.abs(Math.log(p.b/p.a))>s*1.2){const rt=X(p.a)>W*.7;const t=el('text',{x:X(p.a)+(rt?-9:9),y:Y(p.b)+4,'text-anchor':rt?'end':'start'},p.chip+', '+wn[p.w]);t.setAttribute('style','paint-order:stroke;stroke:var(--surface);stroke-width:3px;fill:var(--ink)');svg.appendChild(t)}}
+    if(big&&Math.abs(Math.log(p.b/p.a))>s*1.2){const rt=X(p.a)>W*.7;const t=el('text',{x:X(p.a)+(rt?-9:9),y:Y(p.b)+4,'text-anchor':rt?'end':'start',class:'loolbl'},p.chip+', '+wn[p.w]);t._p=p;t.setAttribute('style','paint-order:stroke;stroke:var(--surface);stroke-width:3px;fill:var(--ink)');svg.appendChild(t)}}
   svg.appendChild(el('text',{x:(m.l+W-m.r)/2,y:H-6,'text-anchor':'middle'},'Measured, relative to the M4 Mac mini'));
   svg.appendChild(el('text',{x:12,y:(m.t+H-m.b)/2,'text-anchor':'middle',transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`},'Predicted without itself'));
   let ly=m.t+10;for(const [k,lab] of [['cpu-all','CPU, all cores'],['cpu-one','CPU, one thread'],['hpl','Linear algebra'],['gpu','GPU']]){svg.appendChild(el('circle',{cx:m.l+10,cy:ly-4,r:4,style:`fill:${col[k]}`}));svg.appendChild(el('text',{x:m.l+18,y:ly},lab));ly+=15}
@@ -919,12 +928,18 @@ function looPlot(){const big=S.looBig,svg=$('loo'),L=DATA.loo.e,W=big?900:340,H=
 function looFz(){const svg=$('loo'),vb=svg.viewBox.baseVal,w=svg.getBoundingClientRect().width;if(!w||!vb||!vb.width)return;svg.style.setProperty('--lfz',Math.min(14,Math.max(7,12*vb.width/w)).toFixed(2)+'px')}
 function looTip(e){const L=S.loo;if(!L)return;const svg=L.svg,b=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal,k=vb.width/b.width;
   const x=(e.clientX-b.left)*k,y=(e.clientY-b.top)*k;let best=null,bd=(L.big?26:18)**2;for(const p of L.pts){const d=(p.px-x)**2+(p.py-y)**2;if(d<bd){bd=d;best=p}}
-  const hl=$('loohl'),tip=$('lootip');hl.textContent='';if(!best){tip.hidden=true;return}
+  const hl=$('loohl'),tip=$('lootip');hl.textContent='';const svgL=L.svg;svgL.querySelectorAll('.loolbl').forEach(t=>t.style.display='');if(!best){tip.hidden=true;return}
   const p=best,{X,Y}=L,wl=WL[p.w],sig=DATA.loosig.e[p.w],z=Math.log(p.pred/p.meas)/sig,pc=v=>(v>=1?'+':'')+Math.round((v-1)*100)+'%';
   hl.appendChild(el('line',{x1:p.px,y1:p.py,x2:p.px,y2:Y(p.a),style:'stroke:var(--ink);stroke-width:1.5'}));
   hl.appendChild(el('circle',{cx:p.px,cy:Y(p.a),r:3,style:'fill:var(--ink)'}));
   for(const q of L.pts)if(q!==p&&q.chip===p.chip)hl.appendChild(el('circle',{cx:q.px,cy:q.py,r:L.big?10:7,style:'fill:none;stroke:var(--ink2);stroke-width:1.2;stroke-dasharray:2 2'}));
   hl.appendChild(el('circle',{cx:p.px,cy:p.py,r:L.big?11:8,style:'fill:none;stroke:var(--ink);stroke-width:1.8'}));
+  {const own=[...svgL.querySelectorAll('.loolbl')].find(t=>t._p===p);let t=own;
+    if(!own){const vbw=svgL.viewBox.baseVal.width,rt=p.px>vbw*.62,r0=L.big?14:11;
+      t=el('text',{x:p.px+(rt?-r0:r0),y:p.py+4,'text-anchor':rt?'end':'start'},p.chip+', '+wl.short);t.setAttribute('style','paint-order:stroke;stroke:var(--surface);stroke-width:4px;fill:var(--ink);font-weight:600');hl.appendChild(t)}
+    let a;try{const q=t.getBBox();a=[q.x-2,q.y-1,q.x+q.width+2,q.y+q.height+1]}catch(_){}
+    if(a)svgL.querySelectorAll('.loolbl').forEach(o=>{if(o===own)return;try{const q=o.getBBox();if(q.x<a[2]&&q.x+q.width>a[0]&&q.y<a[3]&&q.y+q.height>a[1])o.style.display='none'}catch(_){}});
+    if(own)svgL.appendChild(own)}
   tip.textContent='';tip.appendChild(h('b',null,p.chip+', '+wl.tab));
   tip.appendChild(h('div',{class:'v'},pc(p.pred/p.meas)+' error'));
   const row=(a,v)=>{const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,v));tip.appendChild(d)};
@@ -944,7 +959,7 @@ function looTip(e){const L=S.loo;if(!L)return;const svg=L.svg,b=svg.getBoundingC
   const figL=fig.getBoundingClientRect().left;if(!L.big&&figL>tw+24){tip.style.left=(-tw-14)+'px';tip.style.top=Math.max(0,pty-th/2)+'px';return}
   tip.style.left=Math.max(0,Math.min(fw-tw,tx))+'px';tip.style.top=Math.max(0,ty)+'px'}
 $('loo').addEventListener('pointermove',looTip);$('loo').addEventListener('pointerdown',looTip);
-$('loo').addEventListener('pointerleave',()=>{$('lootip').hidden=true;const hl=$('loohl');if(hl)hl.textContent=''});
+$('loo').addEventListener('pointerleave',()=>{$('lootip').hidden=true;const hl=$('loohl');if(hl)hl.textContent='';$('loo').querySelectorAll('.loolbl').forEach(t=>t.style.display='')});
 $('looBig').addEventListener('click',()=>{S.looBig=!S.looBig;$('loofig').parentNode.classList.toggle('wide',S.looBig);$('looBig').textContent=S.looBig?'Shrink plot':'Enlarge plot';looPlot()});
 /* ---------- wiring ---------- */
 function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();
