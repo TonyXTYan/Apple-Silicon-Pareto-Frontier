@@ -14,7 +14,7 @@ async def main():
         if await pg.evaluate("S.w")!='llm': errs.append('default tab is not LLM')
         if await pg.evaluate("S.pts.some(p=>p.r.set==='omlxq')"): errs.append('Qwen oMLX sets leaked into the every-model view')
         await pg.select_option('#base','M4|Mac mini')
-        for v,n in (('Llama 3.2 3B 4-bit (oMLX)',18),('Llama 3.2 1B 4-bit (oMLX)',17),('set:omlxq',48)):
+        for v,n in (('Llama 3.2 3B 4-bit (oMLX)',18),('Llama 3.2 1B 4-bit (oMLX)',17),('set:omlxq',208)):
             await pg.select_option('#lmod',v); await pg.wait_for_timeout(250)
             r=await pg.evaluate("""()=>{const ll={};for(const r of ALL)if(r.w==='llm'&&r.model==='Llama 2 7B Q4_0'&&r.src==='llamacpp')ll[r.chip]=r.p;
               return {n:S.pts.length,sets:[...new Set(S.pts.map(p=>p.r.set))],pe:S.pts.every(p=>p.r.pe&&p.r.plo&&/oMLX/.test(p.r.note)&&p.r.p===ll[p.r.chip]),

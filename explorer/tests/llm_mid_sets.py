@@ -19,7 +19,7 @@ async def main():
         print('metered',m)
         if sorted(m)!=sorted([['M3 Ultra','Qwen3 32B',227,'B'],['M3 Ultra','Llama 2 13B',227,'B'],['M4 Pro','Qwen3 32B',40,'C']]): errs.append('metered mid-size rows differ')
         await pg.select_option('#base','M4|Mac mini')
-        for v,n in (('gpt-oss 20B (oMLX)',19),('Qwen3 14B (oMLX)',19),('Qwen3.5 27B (oMLX)',17),('set:omlxl',254)):
+        for v,n in (('gpt-oss 20B (oMLX)',19),('Qwen3 14B (oMLX)',19),('Qwen3.5 27B (oMLX)',17),('set:omlxl',274)):
             await pg.select_option('#lmod',v); await pg.wait_for_timeout(250)
             r=await pg.evaluate("""()=>{const ll={};for(const r of ALL)if(r.w==='llm'&&r.model==='Llama 2 7B Q4_0'&&r.src==='llamacpp')ll[r.chip]=r.p;
               const om=S.pts.filter(p=>/^omlx/.test(p.r.set||''));
