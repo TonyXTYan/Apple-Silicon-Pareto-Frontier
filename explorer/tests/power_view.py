@@ -15,7 +15,7 @@ async def main():
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox']); errs=[]
         for vw in (1360,390):
             pg=await b.new_page(viewport={'width':vw,'height':1000}); pg.on('pageerror',lambda e:errs.append(str(e)))
-            await pg.goto(INDEX); await pg.wait_for_timeout(500); await pg.evaluate("document.getElementById('front').click()")
+            await pg.goto(INDEX); await pg.wait_for_timeout(500); await pg.check('#front')
             for w in ('llm','cpu-all','blender','gpu','hpl'):
                 await pg.evaluate(f"document.querySelector('.tab[data-w=\"{w}\"]').click()"); await pg.wait_for_timeout(150)
                 if not await pg.evaluate("G.PV"): await pg.click('#pvb')

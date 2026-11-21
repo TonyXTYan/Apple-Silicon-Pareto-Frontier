@@ -15,7 +15,7 @@ async def main():
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox']); errs=[]
         for vw in (1440,390):
             pg=await b.new_page(viewport={'width':vw,'height':1000}); pg.on('pageerror',lambda e:errs.append(str(e)))
-            await pg.goto(INDEX); await pg.wait_for_timeout(500); await pg.evaluate("document.getElementById('front').click()"); await pg.wait_for_timeout(200)
+            await pg.goto(INDEX); await pg.wait_for_timeout(500); await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.check('#front'); await pg.wait_for_timeout(200)
             r=await pg.evaluate(CHECK); print(vw,r)
             if r['missingLines']: errs.append(f'{vw} missing lines {r["missingLines"][:3]}')
             if r['overlaps']: errs.append(f'{vw} {r["overlaps"]} overlapping names')

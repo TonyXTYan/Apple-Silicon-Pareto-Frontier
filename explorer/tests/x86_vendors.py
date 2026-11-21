@@ -16,7 +16,7 @@ async def main():
             cols[scheme]=await pg.evaluate("['--s-intel','--s-amd','--s-qcom','--s-nv','--s-base','--s-pro','--s-max','--s-ultra'].map(k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim())")
             if scheme=='dark': break
             print('default view',await pg.evaluate("S.w+' base='+JSON.stringify(S.base)"))
-            if await pg.evaluate("S.w!=='llm'||S.base!==null"): errs.append('default view changed')
+            if await pg.evaluate("S.w!=='cpu-all'||S.base!==null"): errs.append('default view changed')
             chips=await pg.evaluate("[...document.querySelectorAll('#tiers .chip')].map(c=>c.textContent.trim())"); print('tier chips',chips)
             if not all(v in chips for v in V): errs.append('vendor tier chips missing')
             vis=await pg.evaluate("[...new Set(S.pts.map(p=>p.r.tier))]"); print('LLM tiers shown',vis)

@@ -18,7 +18,7 @@ async def main():
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox'])
         pg=await b.new_page(viewport={'width':1360,'height':1100}); errs=[]
         pg.on('pageerror',lambda e:errs.append(str(e)))
-        await pg.goto(INDEX); await pg.wait_for_timeout(400)
+        await pg.goto(INDEX); await pg.wait_for_timeout(400); await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         if await pg.evaluate("S.w")!='llm': errs.append('default tab is not LLM')
         names=list(MODELS)
         if await pg.evaluate("names=>S.pts.some(p=>names.includes(p.r.model))",names): errs.append('new oMLX sets leaked into the every-model view')

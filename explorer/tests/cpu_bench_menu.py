@@ -12,6 +12,7 @@ async def main():
         pg=await b.new_page(viewport={'width':1360,'height':1100}); errs=[]
         pg.on('pageerror',lambda e:errs.append(str(e)))
         await pg.goto(INDEX); await pg.wait_for_timeout(400)
+        await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         if not await pg.is_hidden('#lbmw'): errs.append('benchmark menu visible on the LLM tab')
         for tab in ('cpu-all','cpu-one'):
             await pg.click(f'.tab[data-w="{tab}"]'); await pg.wait_for_timeout(250)

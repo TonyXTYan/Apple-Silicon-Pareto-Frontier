@@ -11,7 +11,7 @@ async def main():
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox'])
         pg=await b.new_page(viewport={'width':1360,'height':1100}); errs=[]
         pg.on('pageerror',lambda e:errs.append(str(e)))
-        await pg.goto(INDEX); await pg.wait_for_timeout(400)
+        await pg.goto(INDEX); await pg.wait_for_timeout(400); await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         if await pg.evaluate("S.w")!='llm': errs.append('default tab is not LLM')
         if await pg.evaluate("S.pts.some(p=>p.r.set==='omlxl')"): errs.append('other mid-size oMLX sets leaked into the every-model view')
         if not await pg.evaluate("S.pts.some(p=>p.r.set==='omlx'&&p.r.model==='gpt-oss 20B (oMLX)')"): errs.append('oMLX gpt-oss 20B missing from the every-model view')

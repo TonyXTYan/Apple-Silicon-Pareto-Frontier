@@ -24,7 +24,8 @@ async def main():
         if cols['light'][-1]==cols['dark'][-1]: errs.append('Ampere dark token not stepped')
         # defaults unchanged
         st=await pg.evaluate("S.w+' '+JSON.stringify(S.base)"); print('opens on',st)
-        if st!='llm null': errs.append('default view changed')
+        if st!='cpu-all null': errs.append('default view changed')
+        await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         # Ampere tier chip and its colour on the plot (LLM: the AmpereOne DeepSeek R1 671B run)
         chips=await pg.evaluate("[...document.querySelectorAll('#tiers .chip')].map(c=>c.textContent.trim())")
         if 'Ampere' not in chips: errs.append('Ampere tier chip missing')
