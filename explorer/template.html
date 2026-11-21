@@ -52,7 +52,12 @@ header.top{display:flex;flex-direction:column;gap:8px}
 :root[data-font="system"]{--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 :root[data-font="atkinson"]{--body:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,sans-serif;--display:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,sans-serif}
 :root[data-font="serif"]{--body:"Source Serif 4",Georgia,serif;--display:"Source Serif 4",Georgia,serif}
+:root[data-font="compact"] body,:root[data-font="compact"] #chart text,:root[data-font="compact"] button,:root[data-font="compact"] select{font-stretch:78%}
+:root[data-font="compact"] body{line-height:1.4}
+:root[data-font="mono"]{--body:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--display:"JetBrains Mono",ui-monospace,Menlo,monospace}
+:root[data-font="mono"] body{font-size:14px}
 .deck{color:var(--ink2);max-width:38em;text-wrap:pretty}
+@media (min-width:1000px){.deck{max-width:calc(100% - 296px)}}
 
 /* workload strip: one row at every width, scrolls inside itself */
 .tabs{position:relative;display:flex;flex-wrap:nowrap;gap:2px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:3px;border:1px solid var(--rule);border-radius:9px;background:var(--field)}
@@ -126,6 +131,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .iso{stroke:var(--ink3);stroke-width:1;opacity:.28}
 #chart .isot{fill:var(--ink3);font-size:11px}
 #chart g.scale.scoff{opacity:.3}
+#chart .schit{fill:transparent;pointer-events:all;cursor:default}
 #chart g.scale.scon text{fill:var(--ink);font-weight:600}
 #chart.focused .isot{opacity:.2}
 #chart .isox{stroke:var(--ink);stroke-width:1.3;stroke-dasharray:6 4}
@@ -335,7 +341,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
   <details class="pdisp" id="pdisp"><summary>Display</summary><div class="pdbox">
     <div class="pdg" role="radiogroup" aria-label="Colour theme"><span>Theme</span><button type="button" class="chip seg" role="radio" data-theme-opt="auto">Auto</button><button type="button" class="chip seg" role="radio" data-theme-opt="light">Light</button><button type="button" class="chip seg" role="radio" data-theme-opt="dark">Dark</button></div>
     <div class="pdg" role="radiogroup" aria-label="Text size"><span>Text size</span><button type="button" class="chip seg" role="radio" data-zoom="0.9">Small</button><button type="button" class="chip seg" role="radio" data-zoom="1">Medium</button><button type="button" class="chip seg" role="radio" data-zoom="1.15">Large</button><button type="button" class="chip seg" role="radio" data-zoom="1.3">Larger</button></div>
-    <div class="pdg" role="radiogroup" aria-label="Typeface"><span>Typeface</span><button type="button" class="chip seg" role="radio" data-font="archivo">Archivo</button><button type="button" class="chip seg" role="radio" data-font="system">System</button><button type="button" class="chip seg" role="radio" data-font="atkinson">Atkinson Hyperlegible</button><button type="button" class="chip seg" role="radio" data-font="serif">Serif</button></div>
+    <div class="pdg" role="radiogroup" aria-label="Typeface"><span>Typeface</span><button type="button" class="chip seg" role="radio" data-font="archivo">Archivo</button><button type="button" class="chip seg" role="radio" data-font="system">System</button><button type="button" class="chip seg" role="radio" data-font="atkinson">Atkinson Hyperlegible</button><button type="button" class="chip seg" role="radio" data-font="serif">Serif</button><button type="button" class="chip seg" role="radio" data-font="compact">Compact</button><button type="button" class="chip seg" role="radio" data-font="mono">Monospace</button></div>
   </div></details></div>
   <p class="deck">How much computing each Mac gets out of a joule taken from the wall, across eight kinds of work, with Intel, AMD, Qualcomm and NVIDIA machines for comparison. <span class="deck-more">Measured points use published whole-system power, not chip power; any chip can be the baseline.</span></p>
 </header>
@@ -351,6 +357,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     <label class="basesel vsmod" for="lset" id="lsetw" hidden>Set <span class="selw"><select id="lset"><option value="hpl">HPL, fp64 (power metered)</option><option value="julia-dgemm">fp64 DGEMM, Julia (3 chips)</option><option value="julia-sgemm">fp32 GEMM 2048³, Accelerate vs OpenBLAS (10 chips)</option><option value="arxiv-sgemm">Peak SGEMM, CPU vs GPU (M1 to M4)</option><option value="">Every set</option></select></span></label>
     <label class="basesel vsmod" for="lscene" id="lscenew" hidden>Scene <span class="selw"><select id="lscene"><option value="">All three scenes, summed</option><option value="monster">Monster</option><option value="junkshop">Junkshop</option><option value="classroom">Classroom</option></select></span></label>
     <label class="basesel vsmod" for="ldev" id="ldevw" hidden>Device <span class="selw"><select id="ldev"><option value="">CPU and GPU</option><option value="bl-cpu">CPU only</option><option value="bl-gpu">GPU only (Metal)</option></select></span></label>
+    <div class="group vsize" id="scalew" role="group" aria-labelledby="scl" hidden><span class="gl" id="scl">Scale</span></div>
     <div class="group vsize" id="lsizew" role="group" aria-labelledby="lsl" hidden><span class="gl" id="lsl">Model size</span></div>
   </div>
 
@@ -514,7 +521,7 @@ const LA={"hpl": ["The M4 Mac mini delivers 7.6 GFLOP per joule, about 132 pJ pe
 function bmText(w,i){return S.lbm===CB24?(i?w.n0:w.f0):w.bm[S.lbm][i]}
 const TIERS=['base','Pro','Max','Ultra','Intel','AMD','Qualcomm','NVIDIA'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
 const CB24='Cinebench 2024',isCpu=w=>w==='cpu-all'||w==='cpu-one',CP='Cyberpunk 2077',GAB={'Cyberpunk 2077':'CP2077',"Baldur's Gate 3":'BG3',"Assassin's Creed Shadows":'ACS'};
-const S={fest:true,hm:new Set(['rel']),lbm:CB24,lgame:'',lscene:'',ldev:'',lset:'hpl',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
+const S={allScales:false,scaleHover:null,fest:true,hm:new Set(['rel']),lbm:CB24,lgame:'',lscene:'',ldev:'',lset:'hpl',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
   base:null,ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -619,7 +626,7 @@ function render(){
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('height',H);
   $('empty').hidden=rows.length>0;S.pts=[];
   if(!rows.length){$('empty').textContent='No machines match these filters. Turn a chip tier or machine type back on.';return}
-  const AB=absAll(),AW0=AB?WS5.filter(k=>rows.some(r=>r.ow===k)):[],AW=AB&&W-(24+AW0.length*(W<560?46:62))<520?[AW0.includes(S.scaleW)?S.scaleW:AW0[0]].filter(Boolean):AW0,colW=W<560?46:62,rowH=17;
+  const AB=absAll(),AW0=AB?WS5.filter(k=>rows.some(r=>r.ow===k)):[],AW=AB&&(!S.allScales||W-(24+AW0.length*(W<560?46:62))<520)?[AW0.includes(S.scaleHover)?S.scaleHover:AW0.includes(S.scaleW)?S.scaleW:AW0[0]].filter(Boolean):AW0,colW=W<560?46:62,rowH=17;
   svg.classList.toggle('nar',W<560);
   const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=ax?ax.k:1, kr=r=>kg?kg[r.game]:k, narrow=narrow0;
   let x0=Infinity,x1=0,y0=Infinity,y1=0;
@@ -637,6 +644,8 @@ function render(){
         g.appendChild(el('line',{x1:px,x2:px,y1:yy-11,y2:yy-8,style:'stroke:var(--ink3)'}));lastR=xTick(g,px,yy+1,fmtT(v),lastR)}
       mini(g,k2,m.l-colW*AW.length+6,yy-4);if(AW.length===AW0.length)g.appendChild(el('text',{x:m.l-colW*AW.length+14,y:yy,'text-anchor':'start'},wl.short+' ('+wl.xu+')'));
       const cx=m.l-6-(AW.length-1-i)*colW;
+      {const on=()=>{S.hl={k:'ow',v:k2};drawFocus()},off=()=>{if(S.hl&&S.hl.v===k2){S.hl=null;drawFocus()}};
+        for(const [x,y,w2,h2] of [[m.l,yy-12,W-m.l-m.r,16],[cx-colW+8,m.t,colW-6,H-m.t-m.b]]){const hr=el('rect',{x,y,width:w2,height:h2,class:'schit'});hr.addEventListener('pointerenter',on);hr.addEventListener('pointerleave',off);g.appendChild(hr)}}
       for(const v of ticks(y0*xr,y1*xr)){const py=Y(v/xr);if(py<m.t+6||py>H-m.b-4)continue;if(i===0)g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:py,y2:py,class:'grid'}));
         g.appendChild(el('text',{x:cx,y:py+4,'text-anchor':'end',class:'tk'},fmtT(v)))}
       if(AW.length===AW0.length){mini(g,k2,cx-14,m.t-40);g.appendChild(el('text',{x:cx,y:m.t-22,'text-anchor':'end',style:'font-size:10.5px'},wl.hs||wl.short));g.appendChild(el('text',{x:cx,y:m.t-9,'text-anchor':'end',style:'font-size:10.5px'},wl.eu))}});
@@ -743,7 +752,7 @@ function relMode(r,mode){if(mode==='bench'){const k=bkey(r);return {gen:S.pts.fi
   return {gen:best(sg),tier:best(st).sort((a,b)=>a.r.gen-b.r.gen)}}
 function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)return;lg.textContent='';ov.textContent='';un.textContent='';
   const f=S.hover||S.pin;const p=f&&S.pts.find(q=>q.r===f);
-  for(const q of S.pts)q.g.classList.remove('dim');{const fw=(S.hover||S.pin||{}).ow;document.querySelectorAll('#chart g.scale').forEach(gs=>{gs.classList.toggle('scon',!!fw&&gs.dataset.w===fw);gs.classList.toggle('scoff',!!fw&&gs.dataset.w!==fw)})}$('chart').classList.toggle('focused',!!(S.hover||S.pin));
+  for(const q of S.pts)q.g.classList.remove('dim');{const fw=(S.hover||S.pin||{}).ow||(S.hl&&S.hl.k==='ow'&&S.hl.v);document.querySelectorAll('#chart g.scale').forEach(gs=>{gs.classList.toggle('scon',!!fw&&gs.dataset.w===fw);gs.classList.toggle('scoff',!!fw&&gs.dataset.w!==fw)})}$('chart').classList.toggle('focused',!!(S.hover||S.pin));
   if(!p&&S.hl){let n=0;for(const q of S.pts){if(q.r[S.hl.k]!==S.hl.v)q.g.classList.add('dim');else n++}}
   if(!p){defaultLabels();declutter();return}
   const {X,Y,x0,x1,y0,y1,m,W,H,k}=G,r=p.r,rel=relatives(r),keep=new Set([p,...rel.gen,...rel.tier]);
@@ -847,7 +856,7 @@ function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.
   if(r.est&&!r.mode&&!r.pe)notes.push('The bar is ±1 leave-one-out standard deviation'+(r.seen?'':', widened 1.5 times because this chip has no measurements')+(r.clip?', with the lower end clipped at throughput divided by Apple\'s rated maximum power':'')+'.');
   if(notes.length)R.appendChild(h('div',{class:'estnote'},notes.join(' ')))
 }
-function pin(r){if(r.ow&&r.ow!==S.scaleW){S.scaleW=r.ow;if(absAll()&&$('wrap').clientWidth<772){S.pin=r;render();readout();table();return}}S.pin=r;S.hover=null;hideTip();drawFocus();readout();table();live('Pinned '+name(r)+'. Details are under the chart.')}
+function pin(r){if(r.ow&&r.ow!==S.scaleW){S.scaleW=r.ow;syncScales();if(absAll()&&$('wrap').clientWidth<772){S.pin=r;render();readout();table();return}}S.pin=r;S.hover=null;hideTip();drawFocus();readout();table();live('Pinned '+name(r)+'. Details are under the chart.')}
 function live(t){const l=$('live');if(!l)return;l.textContent='';setTimeout(()=>{l.textContent=t},40)}
 function nearest(ev){const svg=$('chart'),b=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal,k=vb.width/b.width;const x=(ev.clientX-b.left)*k,y=(ev.clientY-b.top)*k;
   let best=null,bd=40*40;const {m:M,W:WW,H:HH}=G;for(const p of S.pts){if(S.zoom&&(p.px<M.l||p.px>WW-M.r||p.py<M.t||p.py>HH-M.b))continue;const d=(p.px-x)**2+(p.py-y)**2;if(d<bd){bd=d;best=p}}return best&&{p:best,cx:best.px/k+6,cy:best.py/k+6}}
@@ -1109,7 +1118,14 @@ $('loo').addEventListener('pointerleave',()=>{$('lootip').hidden=true;const hl=$
 {const mq=matchMedia('(min-width:861px)'),setLoo=()=>{S.looBig=mq.matches;looPlot()};S.looBig=mq.matches;mq.addEventListener?mq.addEventListener('change',setLoo):mq.addListener(setLoo)}
 $('looBig').addEventListener('click',()=>{S.looBig=!S.looBig;$('loofig').parentNode.classList.toggle('wide',S.looBig);$('looBig').textContent=S.looBig?'Shrink plot':'Enlarge plot';looPlot()});
 /* ---------- wiring ---------- */
-function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lgamew').hidden=S.w!=='gpu';$('lbmw').hidden=!isCpu(S.w);$('lbm').value=S.lbm;$('lscenew').hidden=$('ldevw').hidden=S.w!=='blender';$('lsetw').hidden=S.w!=='hpl';$('lset').value=S.lset;$('lscene').value=S.lscene;$('ldev').value=S.ldev;$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();
+function syncScales(){const box=$('scalew');box.hidden=!absAll();if(box.hidden)return;
+  if(!box.dataset.built){box.dataset.built=1;for(const k of WS5){const b=h('button',{type:'button',class:'chip','data-sw':k,'aria-pressed':'false'});const sv=el('svg',{width:12,height:12,viewBox:'-6 -6 12 12','aria-hidden':'true'});const s2=shape(WSHAPE[k],'',0,0,.8);s2.setAttribute('style','fill:currentColor');sv.appendChild(s2);b.appendChild(sv);b.appendChild(document.createTextNode(WL[k].short));
+      const on=()=>{S.scaleHover=k;S.hl={k:'ow',v:k};render()},off=()=>{if(S.scaleHover===k){S.scaleHover=null;S.hl=null;render()}};
+      b.addEventListener('mouseenter',on);b.addEventListener('focus',on);b.addEventListener('mouseleave',off);b.addEventListener('blur',off);
+      b.addEventListener('click',()=>{S.scaleW=k;S.scaleHover=null;S.hl=null;syncScales();render()});box.appendChild(b)}
+    const t=h('label',{class:'sw',for:'allsc'});const cb=h('input',{type:'checkbox',id:'allsc'});cb.addEventListener('change',()=>{S.allScales=cb.checked;render()});t.appendChild(cb);t.appendChild(document.createTextNode(' Show every scale'));box.appendChild(t)}
+  const cur=S.scaleW&&WS5.includes(S.scaleW)?S.scaleW:WS5[0];box.querySelectorAll('[data-sw]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sw===cur))}
+function all(){const w=WL[S.w];syncBaseSel();syncScales();$('lmodw').hidden=S.w!=='llm';$('lgamew').hidden=S.w!=='gpu';$('lbmw').hidden=!isCpu(S.w);$('lbm').value=S.lbm;$('lscenew').hidden=$('ldevw').hidden=S.w!=='blender';$('lsetw').hidden=S.w!=='hpl';$('lset').value=S.lset;$('lscene').value=S.lscene;$('ldev').value=S.ldev;$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();
   $('finding').textContent=S.w==='all'&&cb?'Every workload as a ratio to the '+cb.chip+(cb.dev?' '+cb.dev:'')+' on the same workload: right is faster, up is more work per joule, and each diagonal is a constant ratio of wall power. Against the last Intel MacBook Pro 16, Apple Silicon does roughly 2 to 7 times the CPU work per joule, 3 to 8 times on one thread and 5 to 11 times on LLM generation, while running from about as fast to roughly 25 times faster. Hover a point to draw lines to the same chip on its other workloads; choose None as the baseline for absolute units with one scale per workload.':w.finding;$('wnote').textContent=w.note;
   {const b=curBase();if(b){const miss=(S.w==='all'?WS5:S.w==='hpl'?(S.lset==='hpl'?['hpl']:S.lset?['blas']:['hpl','blas']):tabWs()).filter(k=>k==='blas'?!pool('blas').some(r=>r.ck===ck(b.chip)&&(!S.lset||r.set===S.lset)):!baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':S.w===k||WL[S.w].pool?tsub():null));if(miss.length)$('wnote').textContent+=' Not shown against '+b.chip+': '+miss.map(k=>S.w==='hpl'?(k==='hpl'?'HPL':S.lset?'this GEMM set':'the GEMM sets'):WL[k].tab).join(', ')+', which have no reading for it. Pick an Apple baseline or None to see them.'}}
   document.querySelectorAll('.tab').forEach(t=>{const on=t.dataset.w===S.w;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;
@@ -1157,7 +1173,7 @@ window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.w=
 {const sb=()=>document.documentElement.style.setProperty('--sbw',(innerWidth-document.documentElement.clientWidth)+'px');sb();addEventListener('resize',sb)}
 /* page display options: theme, text size, typeface; remembered in this browser only */
 {const R=document.documentElement,get=k=>{try{return localStorage.getItem('pd-'+k)}catch(_){return null}},put=(k,v)=>{try{localStorage.setItem('pd-'+k,v)}catch(_){}};
-  const FONTS={atkinson:'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..700&display=swap',serif:'https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap'};
+  const FONTS={atkinson:'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..700&display=swap',serif:'https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap',mono:'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400..700&display=swap'};
   const loadFont=f=>{if(FONTS[f]&&!document.querySelector('link[data-pf="'+f+'"]')){const l=document.createElement('link');l.rel='stylesheet';l.href=FONTS[f];l.dataset.pf=f;document.head.appendChild(l)}};
   const apply={theme:v=>{if(v==='light'||v==='dark')R.dataset.theme=v;else delete R.dataset.theme},
     zoom:v=>{R.style.zoom=v==='1'?'':v;R.style.setProperty('--z',v||'1')},
