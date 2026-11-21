@@ -15,6 +15,11 @@ EXCEPTIONS={}   # 'w|chip|dev' -> reason; must match blscenes_rows.json `excepti
 SUM_TOL={k:(0.03,'Apple: published three-scene median vs unscaled snapshot scene medians') for k in (
   'bl-cpu|M1|MacBook Air 13 (estimate)','bl-cpu|M1 Pro|MacBook Pro 16 (estimate)','bl-cpu|M2|Mac mini (estimate)','bl-cpu|M3|MacBook Pro 14 (estimate)',
   'bl-gpu|M2|MacBook Air 13 (8-core GPU) (estimate)')}
+async def pick(pg,box,v):
+    """choose v in a filter chip group as a user would: a single-choice row is clicked; a multi-select group is reset with Show all, then v alone is clicked ('' leaves every option on)"""
+    if await pg.locator(f'#{box} [role=radio]').count(): await pg.click(f'#{box} [data-opt="{v}"]'); return
+    if await pg.locator(f'#{box} .showall.on').count(): await pg.click(f'#{box} .showall')
+    if v!='': await pg.click(f'#{box} [data-opt="{v}"]')
 async def main():
     errs=[]
     rows_exc=json.load(open(HERE.parent/'blscenes_rows.json'))['exceptions']
@@ -55,7 +60,7 @@ async def main():
                 await pg.evaluate("S.forms.delete('server');all()"); await pg.wait_for_timeout(250)
             sets={}
             for sc in ('',)+SCENES:
-                await pg.select_option('#lscene',sc); await pg.wait_for_timeout(250)
+                await pick(pg,'lscenew',sc); await pg.wait_for_timeout(250)
                 r=await pg.evaluate("""()=>({m:S.pts.map(p=>p.r.w+'|'+p.r.chip+'|'+p.r.dev).sort(),srv:S.pts.filter(p=>p.r.form==='server').length,
                   f:Object.fromEntries(['bl-cpu','bl-gpu'].map(w=>[w,S.pts.filter(p=>p.front&&p.r.w===w).sort((a,b)=>a.r.x-b.r.x).map(p=>p.r.chip+' '+p.r.dev.replace(' (estimate)','')+' x='+p.r.x+' e='+p.r.e)]))})""")
                 sets[sc]=r['m']

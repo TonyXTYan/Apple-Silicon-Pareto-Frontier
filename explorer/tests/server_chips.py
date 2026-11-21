@@ -9,6 +9,11 @@ CHROME=os.environ.get('CHROME','/usr/bin/google-chrome')
 from playwright.async_api import async_playwright
 SPEC='SPECpower_ssj2008'
 TOK="['--s-intel','--s-amd','--s-qcom','--s-nv','--s-base','--s-pro','--s-max','--s-ultra','--s-amp'].map(k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim())"
+async def pick(pg,box,v):
+    """choose v in a filter chip group as a user would: a single-choice row is clicked; a multi-select group is reset with Show all, then v alone is clicked ('' leaves every option on)"""
+    if await pg.locator(f'#{box} [role=radio]').count(): await pg.click(f'#{box} [data-opt="{v}"]'); return
+    if await pg.locator(f'#{box} .showall.on').count(): await pg.click(f'#{box} .showall')
+    if v!='': await pg.click(f'#{box} [data-opt="{v}"]')
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox'])
@@ -65,7 +70,7 @@ async def main():
         if 'system-level' not in await pg.evaluate("document.getElementById('legend').textContent"): errs.append('legend lacks the system-level entry')
         # SPECpower: server-only Benchmark entry, rendered points, server baseline, restored on the way out
         await pg.click('.tab[data-w="cpu-all"]'); await pg.wait_for_timeout(250)
-        await pg.select_option('#lbm',SPEC); await pg.wait_for_timeout(1000)  # let the filter animation finish
+        await pick(pg,'lbmw',SPEC); await pg.wait_for_timeout(1000)  # let the filter animation finish
         r=await pg.evaluate("""()=>({n:S.pts.length,bms:[...new Set(S.pts.map(p=>p.r.bm))],forms:[...new Set(S.pts.map(p=>p.r.form))],meas:S.pts.every(p=>!p.r.est&&p.r.q==='A'),
           drawn:document.querySelectorAll('#chart g.m .mk').length,b:JSON.stringify(S.base),tb:tabBase(curBase()).map(r=>r.dev),k:G.k,x:WL[S.w].x,eu:WL[S.w].eu,
           bad:S.pts.filter(p=>{const v=relOf(p.r);return !v||v.b.bm!==p.r.bm}).length,ring:document.querySelectorAll('#chart .baseline-ring').length,
@@ -83,9 +88,9 @@ async def main():
         r=await pg.evaluate("({k:G.k,n:S.pts.length,x:document.getElementById('basex').textContent,note:document.getElementById('wnote').textContent})"); print('SPECpower vs a Mac',r['k'],r['n'],r['x'])
         if r['k']!=1 or r['n']!=26 or 'absolute' not in r['x'] or 'server baseline' not in r['note']: errs.append('SPECpower against a Mac baseline should stay absolute and say why')
         pg2=await b.new_page(viewport={'width':1360,'height':1100}); pg2.on('pageerror',lambda e:errs.append(str(e)))
-        await pg2.goto(INDEX+'#cpu-all'); await pg2.wait_for_timeout(400); await pg2.select_option('#lbm',SPEC); await pg2.wait_for_timeout(200)
+        await pg2.goto(INDEX+'#cpu-all'); await pg2.wait_for_timeout(400); await pick(pg2,'lbmw',SPEC); await pg2.wait_for_timeout(200)
         await pg2.click('.tab[data-w="cpu-one"]'); await pg2.wait_for_timeout(250)
-        r=await pg2.evaluate("({lbm:S.lbm,dis:document.querySelector('#lbm option[value=\"SPECpower_ssj2008\"]').disabled,b:JSON.stringify(S.base),n:S.pts.length})"); print('cpu-one after SPECpower',r)
+        r=await pg2.evaluate("({lbm:S.lbm,dis:document.querySelector('#lbmw [data-opt=\"SPECpower_ssj2008\"]').hidden,b:JSON.stringify(S.base),n:S.pts.length})"); print('cpu-one after SPECpower',r)
         if r['lbm']!='Cinebench 2024' or not r['dis'] or r['b']!='null' or not r['n']: errs.append('leaving SPECpower did not restore Cinebench 2024, or a baseline appeared')
         # server rows stay out of the matrix and All workloads
         rows=await pg2.evaluate("[...document.querySelectorAll('#matrix tbody tr')].map(t=>t.textContent)")
@@ -101,7 +106,7 @@ async def main():
         pg3=await b.new_page(viewport={'width':390,'height':900}); pg3.on('pageerror',lambda e:errs.append(str(e)))
         await pg3.goto(INDEX+'#hpl'); await pg3.wait_for_timeout(400)
         sw=[await pg3.evaluate("document.documentElement.scrollWidth")]
-        await pg3.click('.tab[data-w="cpu-all"]'); await pg3.select_option('#lbm',SPEC); await pg3.wait_for_timeout(300)
+        await pg3.click('.tab[data-w="cpu-all"]'); await pick(pg3,'lbmw',SPEC); await pg3.wait_for_timeout(300)
         sw.append(await pg3.evaluate("document.documentElement.scrollWidth"))
         await pg3.evaluate("document.getElementById('opts').open=true"); await pg3.wait_for_timeout(150); sw.append(await pg3.evaluate("document.documentElement.scrollWidth"))
         print('scrollWidth at 390',sw)

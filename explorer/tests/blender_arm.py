@@ -7,6 +7,11 @@ INDEX=(HERE.parent/'index.html').as_uri()
 CHROME=os.environ.get('CHROME','/usr/bin/google-chrome')
 from playwright.async_api import async_playwright
 SD='Qualcomm Snapdragon X Elite X1E-84-100'
+async def pick(pg,box,v):
+    """choose v in a filter chip group as a user would: a single-choice row is clicked; a multi-select group is reset with Show all, then v alone is clicked ('' leaves every option on)"""
+    if await pg.locator(f'#{box} [role=radio]').count(): await pg.click(f'#{box} [data-opt="{v}"]'); return
+    if await pg.locator(f'#{box} .showall.on').count(): await pg.click(f'#{box} .showall')
+    if v!='': await pg.click(f'#{box} [data-opt="{v}"]')
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox'])
@@ -15,7 +20,7 @@ async def main():
         await pg.goto(INDEX+'#blender'); await pg.wait_for_timeout(500)
         sums={}
         for sc in ('','monster','junkshop','classroom'):
-            await pg.select_option('#lscene',sc); await pg.wait_for_timeout(250)
+            await pick(pg,'lscenew',sc); await pg.wait_for_timeout(250)
             got=await pg.evaluate(f"S.pts.filter(p=>p.r.chip==={SD!r}).map(p=>[p.r.w,p.r.scene||'',p.r.q,!!p.r.est,!!p.r.pe,p.r.x,p.r.p])")
             print(sc or 'sum',got)
             if len(got)!=1 or got[0][0]!='bl-cpu' or got[0][1]!=sc: errs.append(f'{sc or "sum"}: expected one Snapdragon CPU point'); continue
@@ -32,7 +37,7 @@ async def main():
         else:
             await pg.select_option('#base',opts[0])
             for sc in ('','junkshop'):
-                await pg.select_option('#lscene',sc); await pg.wait_for_timeout(250)
+                await pick(pg,'lscenew',sc); await pg.wait_for_timeout(250)
                 r=await pg.evaluate(f"""()=>{{const v=S.pts.map(p=>[p,relOf(p.r)]);return {{cpu:v.filter(([p,x])=>x&&p.r.w==='bl-cpu').length,
                   bad:v.filter(([p,x])=>x&&(x.b.w!==p.r.w||(x.b.scene||'')!==(p.r.scene||''))).length,
                   self:v.filter(([p,x])=>p.r.chip==={SD!r}&&x&&x.b.chip==={SD!r}).length}}}}""")

@@ -41,7 +41,7 @@ async def main():
                 if q not in 'BE': errs.append(f'{m} {chip}: grade {q}')
                 if 'median of 1 run' in bench and q!='B': errs.append(f'{m} {chip}: single run not graded B')
         print({m:(v['n'],v['size']) for m,v in r['by'].items()})
-        # Model menu: the small and mid-size entries show them, and nothing else changes in those sets' every-model exclusion
+        # Collection menu: the small and mid-size entries show them, and nothing else changes in those sets' every-model exclusion
         for sv,want_models in (('set:omlxq',[m for m in names if '12B' not in m]),('set:omlxl',['Gemma 4 12B (oMLX)'])):
             await pg.select_option('#lmod',sv); await pg.wait_for_timeout(250)
             got=await pg.evaluate("names=>[...new Set(S.pts.filter(p=>names.includes(p.r.model)).map(p=>p.r.model))]",names)
