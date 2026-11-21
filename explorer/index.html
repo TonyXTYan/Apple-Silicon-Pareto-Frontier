@@ -103,7 +103,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
 #chart .fring{fill:none;stroke:var(--ink);stroke-width:1.4}
-#chart .iso{stroke:var(--ink3);stroke-width:1;stroke-dasharray:3 5;opacity:.5}
+#chart .iso{stroke:var(--ink3);stroke-width:1;opacity:.28}
 #chart .isot{fill:var(--ink3);font-size:11px}
 #chart g.scale.scoff{opacity:.3}
 #chart g.scale.scon text{fill:var(--ink);font-weight:600}
@@ -123,7 +123,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .mk.est{fill:var(--surface);stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2}
 #chart .flag{fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5}
 #chart .eb{stroke:var(--c);stroke-width:1.1;opacity:.5}
-#chart .eb.est{stroke-dasharray:3 3;opacity:.45}
+#chart .eb.est{opacity:.22}
 #chart .ring{fill:none;stroke:var(--ink);stroke-width:1.8}
 #chart g.dim{opacity:.16}
 @media (prefers-reduced-motion:no-preference){#chart g.m{transition:opacity .12s}}
@@ -869,7 +869,7 @@ function legend(){const L=$('legend');L.textContent='';const add=(node,t)=>{cons
   if(S.w.startsWith('cpu')){add(glyph('laptop','key','solid'),'Cinebench 2024');add(glyph('laptop','key','hollow'),'Cinebench R23, converted')}
   if(vis.some(r=>r.est))add(glyph('laptop','key','est'),'estimate');
   if(vis.some(r=>r.q!=='A'&&!r.est)){const s=el('svg',{width:22,height:22,viewBox:'-11 -11 22 22',class:'t-key','aria-hidden':'true'});const c=el('circle',{r:9});c.setAttribute('style','fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5');s.appendChild(c);add(s,'weaker power figure')}
-  const s=el('svg',{width:26,height:10,'aria-hidden':'true'});const l=el('line',{x1:0,x2:26,y1:5,y2:5});l.setAttribute('style','stroke:var(--ink3);stroke-dasharray:3 5');s.appendChild(l);add(s,S.w==='all'?'constant power ratio':'constant wall power')}
+  const s=el('svg',{width:26,height:10,'aria-hidden':'true'});const l=el('line',{x1:0,x2:26,y1:5,y2:5});l.setAttribute('style','stroke:var(--ink3);opacity:.5');s.appendChild(l);add(s,S.w==='all'?'constant power ratio':'constant wall power')}
 function looPlot(){const big=S.looBig,svg=$('loo'),L=DATA.loo.e,W=big?900:340,H=big?560:300,m={l:52,r:16,t:14,b:42};svg.textContent='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   looFz();
   const rel={};for(const p of L){const ref=ROWS.find(r=>r.w===p.w&&r.chip==='M4'&&r.dev==='Mac mini');rel[p.w]=ref?ref.e:1}
