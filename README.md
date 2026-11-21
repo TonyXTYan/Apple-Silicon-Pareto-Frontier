@@ -8,9 +8,9 @@ An interactive, single-file page that compares how much computing each Apple Sil
 
 ```
 explorer/
-  template.html        page: HTML + CSS + JS; the literal /*DATA*/ is replaced by data10.json
+  template.html        page: HTML + CSS + JS; the literal /*DATA*/ is replaced by data11.json
   index.html           built page (self-contained, open it directly)
-  data10.json          final data (rows = measured, est = estimates, sources, loo, apple specs)
+  data11.json          final data (rows = measured, est = estimates, sources, loo, apple specs)
   build.py             runs the whole data chain and rebuilds index.html
   gen_data.py          -> data.json   measured rows (Cinebench, HPL, Cyberpunk, metered LLM), reusing plot/all.py rows
   model.py             -> data2.json  hierarchical ridge model in log space, leave-one-out errors, estimates, Apple power specs, power modes
@@ -23,6 +23,8 @@ explorer/
   numerics.py          -> data9.json  numerical libraries: fp32 GEMM Accelerate vs OpenBLAS (Julia), CPU vs GPU SGEMM (arXiv 2502.05317), fp64 DGEMM
   x86.py               -> data10.json Intel, AMD, Qualcomm and NVIDIA comparison machines, from x86_rows.json
   x86_rows.json        the researched comparison rows used (each with its source URL and notes)
+  llm4.py              -> data11.json oMLX small-model sets (Llama 3.2 3B and 1B 4-bit, four Qwen sets), from omlx_rows.json
+  omlx_rows.json       the researched oMLX Community Benchmarks medians used (per chip and GPU-core bin, with run URLs)
   tests/*.py           Playwright smoke tests; screenshots go to tests/shots/
 plot/
   all.py               original static plot + the measured-row table used by gen_data.py
@@ -34,7 +36,7 @@ plot/
 ```
 cd explorer
 pip install -r ../requirements.txt   # numpy, matplotlib, adjustText
-python3 build.py                  # regenerates data*.json and index.html (reproduces the shipped data10.json exactly)
+python3 build.py                  # regenerates data*.json and index.html (reproduces the shipped data11.json exactly)
 pip install playwright && python3 -m playwright install chromium   # or set CHROME=/path/to/chrome
 python3 tests/i9_baseline.py      # every test prints "errors []" when the page has no JS errors
 ```
@@ -54,7 +56,7 @@ Quick syntax check of the page script:
 - `resc`: the score was converted from Cinebench R23 (drawn hollow). `q`: quality grade; a measured row below 'A', or a speed-measured `pe` row graded 'B' or 'C' (for example a Blender median over three runs or fewer), gets a "weaker measurement" ring. Plain estimates are 'E'.
 - LLM extras:
   - `model`: model name.
-  - `set`: `sweep`, `mlx` or `cluster`. These sets are kept out of the All view.
+  - `set`: `sweep`, `mlx`, `cluster`, `omlx` (oMLX Llama 3.2 3B and 1B) or `omlxq` (oMLX Qwen sets). These sets are kept out of the All view; `omlxq` is also kept out of the every-model view of the LLM tab and shown only under Other small models.
   - `grp`/`ord`: joined by lines in order.
   - `ctx`, `eng`, `nodes`.
 
@@ -75,6 +77,7 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Clusters:**
   - exo (tensor parallel): N × 110–240 W.
   - llama.cpp RPC (layer split): one busy node plus (N−1) idle nodes.
+- **Small models (llm4.py):** crowd-sourced oMLX Community Benchmarks (MLX, 1k-token context, scraped 2026-11-21), `tok_s_robust` (the median of the runs within 0.6× of the best run in a chip and GPU-core bin). Llama 3.2 3B 4-bit (18 chips) and 1B 4-bit (17 chips), plus Qwen2.5 0.5B, Qwen3 0.6B, Qwen3 1.7B and Qwen2.5 3B (4-bit, 11 to 14 chips). Qwen3 1.7B 8-bit (13 chips, 12 of them single runs), Llama 3.2 3B 8-bit and Phi-4-mini (8 chips each) are left out. Where oMLX splits a chip by GPU core count, the bin matching the chip's Llama 2 7B point (llm.py) is kept and the others are dropped (named in each point's note); where only a cut-down bin exists (M1 Ultra 48-core and M3 Ultra 60-core with 1B, M2 Ultra 60-core with 3B, the M2 8-core and M4 Max 32-core in some Qwen sets) it is kept and the note says the power estimate is for the full GPU. Power is the chip's Llama 2 7B decode-power estimate, widened by 10% (as for the XiongjieDai sweeps), so all rows are `pe`; small models stream fewer bytes per token, so efficiency is more likely understated. Speed spread is 0.04 + 0.15/√n on a log scale; bins with one or two runs are graded 'B'. Caveats: runs mix oMLX v0.2.6 to v0.7.x and macOS 15.7 to 27, oMLX does not record the chassis, and versions shift results (the M5 Pro 20-core 3B bin, kept, is slower than the 16-core bin, partly from version changes). MLX speeds are not comparable with the llama.cpp points.
 - **MLX vs GGUF:** equal power is assumed, so the efficiency ratio equals the speed ratio.
 - **Other games (gaming tab):** Notebookcheck frame rates for Baldur's Gate 3 (Ultra, TAA) and Assassin's Creed Shadows (Ultra High), 1080p, on the nine machines with a metered Cyberpunk row (AC Shadows has no M4 Pro or M4 Mac mini result). No wall power was published in these games, so each point borrows that machine's Cyberpunk wall power, with 12% added in quadrature to the log power spread and 3% for the frame rate; they are `pe` rows (speed measured, power estimated). On the M5 Air the chip drew slightly more in BG3 than in Cyberpunk. The M5 Max MacBook Pro 14 is adapter-capped (97 W), so it keeps its `ex` flag. Older M4 reviews may have used translated builds (the M4 Mac mini's Cyberpunk run was emulated; BG3 is native). Left out: Total War: Pharaoh, which is engine-limited near 50 to 56 fps from the M4 Pro to the M5 Max and so says little about the GPU; Shadow of the Tomb Raider, which has no M5, M5 Pro or M5 Max results; machines without a Cyberpunk row on the page (M4 MacBook Air 13 and MacBook Pro 14, M5 Pro MacBook Pro 14); and MetalFX or frame-generation results and Geekerwan's chip-power figures.
 
@@ -90,6 +93,6 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
 - **Set menu (Numerical libraries tab):** fp32 GEMM Accelerate vs OpenBLAS (default), CPU vs GPU peak SGEMM, fp64 DGEMM, or every set. Frontiers are per set and library; baselines compare the same set and library.
 - **Game menu (gaming tab):** every game, or one. Frontiers are drawn per game. A baseline divides each game by that machine in the same game, so the baseline sits at 1× in every game; with every game shown, frame rate stays absolute and the constant-power lines are hidden (they differ per game). Games the baseline has no reading for are dropped while it is set.
-- **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters. **Model size** chips filter by total parameters: XS <2B, S 2–5B, M 5–12B, L 12–50B, XL 50–150B, XXL 150–500B, XXXL ≥500B.
+- **LLM Model menu:** 7B all-chip set, Llama 3.2 3B and 1B 4-bit on every chip (oMLX), Other small models (oMLX Qwen sets), context sweeps, MLX vs GGUF, clusters. With one oMLX model chosen, a baseline compares the same model. **Model size** chips filter by total parameters: XS <2B, S 2–5B, M 5–12B, L 12–50B, XL 50–150B, XXL 150–500B, XXXL ≥500B.
 - **Palette:** colours come from the dataviz skill's validated palette. Intel is #c2418f in light mode and #b84a8c in dark; in light mode Pro is #e05a1a and Max is darkened to #2a925c for 3:1 contrast on the white plot field. The comparison vendors were found by a search over hues, scored with the dataviz validator's OKLab metric against the five existing colours and each other in both themes: AMD brick #943207 / brown #85552e, Qualcomm violet #430ceb / #8c0cf5, NVIDIA purple #7c0899 / pink #f525cb (light / dark). Every pair involving a new colour keeps normal-vision ΔE ≥ 15.0, protan/deutan ΔE ≥ 8.3 and tritan ΔE ≥ 6.7 (OKLab ×100), no worse than the existing Apple pairs (Intel–Max 6.8 protan/deutan, base–Max 4.0 tritan), and contrast on the plot field is ≥ 3:1 in both themes (dark AMD 3.01, dark Qualcomm 3.14). With nine colours a scatter cannot pass every all-pairs gate, so the chip-tier chips, labels and table names carry the vendor too.
 - **Comparison chips:** the chip-tier chips include Intel, AMD, Qualcomm and NVIDIA; the baseline menu lists them in one group per vendor; the matrix lists them after the Apple chips under a divider; hovering one draws lines to the other chips of the same vendor.
