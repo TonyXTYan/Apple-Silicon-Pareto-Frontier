@@ -104,6 +104,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .lbl{font-size:11.5px;font-stretch:87.5%;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3.2px;stroke-linejoin:round}
 #chart .lbl.rel{font-weight:650}
 #chart .lbl.front{stroke-width:5px}
+#chart .lbl.faint{opacity:.32}
 #chart .grid{stroke:var(--grid);stroke-width:1}
 #chart .axis{stroke:var(--rule);stroke-width:1}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
@@ -618,7 +619,7 @@ function render(){
 }
 function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
   const bb=e=>{try{const b=e.getBBox();return b.width?[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]:null}catch(_){return null}};
-  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
+  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt,#chart #labels text')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
   for(const p of list){if(n>=maxL)break;const t=shortName(p.r),tw=t.length*(G.narrow?6.6:6.3)+6;
     for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
       const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
@@ -632,11 +633,11 @@ function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;con
         const x0=Math.max(m.l+2,Math.min(W-m.r-tw,p.px-tw/2)),cy=p.py-12-11<m.t-6?p.py+20:p.py-12;best={cx:x0,cy,an:'start',bx:[x0,cy-11,x0+tw,cy+3]}}
       boxes.push(best.bx);lg.appendChild(el('text',{x:best.cx,y:best.cy,'text-anchor':best.an,class:'lbl front '+(cls||'')},t));n++}
     delete p._lab}}
-function defaultLabels(){const pts=S.pts,k=G.k;const by=f=>[...pts].sort(f);
+function defaultLabels(cls,skip){const pts=S.pts,k=G.k;const by=f=>[...pts].sort(f);
   const order=by((a,b)=>b.r.e-a.r.e),fast=by((a,b)=>b.r.x-a.r.x),slow=by((a,b)=>a.r.e-b.r.e);const pri=[];const push=p=>{if(p&&!pri.includes(p))pri.push(p)};
   const bRow=baseRow(S.w,curBase(),tsub());push(pts.find(p=>p.r===bRow));push(order[0]);push(fast[0]);push(slow[0]);
   for(let i=0;i<pts.length;i++){if(!pts[i])break;push(order[i]);push(fast[i])}
-  placeLabels(pri.filter(p=>!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&p.r.game)),'',G.narrow?9:(S.w==='all'?16:60))}
+  placeLabels(pri.filter(p=>(!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&p.r.game))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60))}
 function relatives(r){if(S.hmode!=='rel'){const sameDev=q=>devName(q)===devName(r);
     const list=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&(S.hmode==='chip'||sameDev(p.r)));return {gen:list,tier:[]}}
   if(r.ow){const same=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&p.r.ow!==r.ow);const m=new Map();for(const p of same){const k=p.r.ow+'|'+(vk(p.r)||'');const o=m.get(k);if(!o||(o.r.est&&!p.r.est)||(devName(p.r)===devName(r)&&devName(o.r)!==devName(r)))m.set(k,p)}return {gen:[...m.values()],tier:[]}}
@@ -665,7 +666,7 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   for(const q of rel.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-gen'}));
   for(const q of rel.tier)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-tier'}));
   ov.appendChild(el('circle',{cx:p.px,cy:p.py,r:11.5,class:'ring'}));
-  placeLabels([p,...rel.gen,...rel.tier],'rel',40,p);
+  placeLabels([p,...rel.gen,...rel.tier],'rel',40,p);defaultLabels('faint',keep);
   kRing();declutter();
 }
 function xTick(g,x,y,t,lastR){const tx=el('text',{x,y,'text-anchor':'middle',class:'tk'},t);g.appendChild(tx);let bw=t.length*6.5;try{bw=tx.getComputedTextLength()||bw}catch(_){}
