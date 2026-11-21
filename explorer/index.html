@@ -105,18 +105,16 @@ header.top{display:flex;flex-direction:column;gap:8px}
 .plot{--surface:var(--field);margin:0;border:1px solid var(--rule);border-radius:10px;background:var(--field);overflow:hidden}
 .chartwrap{position:relative;background:var(--field);padding:6px}
 .chartwrap.fs{position:fixed;inset:0;z-index:50;padding:10px;overflow:auto}
-.ctop{display:flex;align-items:center;gap:8px;padding:2px 2px 4px 8px}
+.ctop{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:2px 2px 4px 8px}
 .zhint{margin-right:auto;font-size:12.5px;color:var(--ink3);line-height:1.3}
 .zhint .tch{display:none}
 @media (max-width:560px){.zhint .ptr{display:none}}
 @media (hover:none) and (pointer:coarse){.zhint .ptr{display:none}.zhint .tch{display:inline}}
-.ztools{display:flex;gap:4px;flex:none;align-items:center}
-.pvsw{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;line-height:1;min-height:28px;padding:4px 9px 4px 5px;margin-right:4px;border:0;background:none;color:var(--ink2);cursor:pointer;white-space:nowrap}
-.pvsw:disabled{opacity:.45;cursor:default}
-.pvtrack{position:relative;width:30px;height:17px;border-radius:9px;background:var(--rule);transition:background .2s;flex:none}
-.pvknob{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
-.pvsw[aria-checked="true"] .pvtrack{background:var(--focus,#2a6fdb)}.pvsw[aria-checked="true"] .pvknob{transform:translateX(13px)}
-.pvsw:focus-visible{outline:2px solid var(--focus,#2a6fdb);outline-offset:2px;border-radius:6px}
+.ztools{display:flex;flex-wrap:wrap;gap:4px;flex:none;max-width:100%;align-items:center;margin-left:auto}
+#pvb{display:inline-flex;gap:0;margin-right:6px}
+#pvb .chip.seg{border-radius:0;min-height:28px;font-size:12.5px;padding:3px 10px;margin:0}
+#pvb .chip.seg:first-child{border-radius:6px 0 0 6px}#pvb .chip.seg:last-child{border-radius:0 6px 6px 0;margin-left:-1px}
+#pvb.off{opacity:.45}#pvb .chip.seg:disabled{cursor:default}
 .zb{font-size:12.5px;line-height:1;min-height:28px;min-width:30px;padding:5px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--field);color:var(--ink2);cursor:pointer}
 .zb:hover:not(:disabled){color:var(--ink);border-color:var(--ink3)} .zb:disabled{opacity:.45;cursor:default}
 #chart{display:block;width:100%;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:crosshair;border-radius:4px}
@@ -385,7 +383,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     <div class="chartwrap" id="wrap" aria-label="Chart">
       <div class="ctop">
         <p class="zhint"><span class="ptr">Scroll to zoom, drag to pan, arrow keys step through points</span><span class="tch">Tap a point for details; once zoomed, drag sideways to pan</span></p>
-        <div class="ztools" role="group" aria-label="Chart view"><button type="button" class="pvsw" id="pvb" role="switch" aria-checked="false" title="Switch between work per joule against speed (this page's default) and speed against wall power (the chart Apple usually shows: up and to the left is better). Points slide between the two."><span class="pvtrack" aria-hidden="true"><span class="pvknob"></span></span>Speed vs power</button><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
+        <div class="ztools" role="group" aria-label="Chart view"><div class="pvseg" id="pvb" role="radiogroup" aria-label="Chart axes" title="Work per joule against speed is this page's default. Speed vs power is the chart Apple usually shows: wall power across, speed up, so up and to the left is better. Points slide between the two."><button type="button" class="chip seg" role="radio" data-pv="eff" aria-checked="true">Work/J vs speed</button><button type="button" class="chip seg" role="radio" data-pv="pow" aria-checked="false">Speed vs power</button></div><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
       </div>
       <svg id="chart" tabindex="0" role="application" aria-roledescription="scatter plot" aria-labelledby="charttitle" aria-describedby="charthelp"><title id="charttitle"></title></svg>
       <div class="tip" id="tip" hidden></div>
@@ -675,7 +673,7 @@ function render(){
   if(!rows.length){$('empty').textContent='No machines match these filters. Turn a chip tier or machine type back on.';return}
   const AB=absAll(),AW0=AB?WS5.filter(k=>rows.some(r=>r.ow===k)):[],AW=AB&&(!S.allScales||W-(24+AW0.length*(W<560?46:62))<520)?[AW0.includes(S.scaleHover)?S.scaleHover:AW0.includes(S.scaleW)?S.scaleW:AW0[0]].filter(Boolean):AW0,colW=W<560?46:62,rowH=17;
   svg.classList.toggle('nar',W<560);
-  const PV=S.pv==='pow'&&!AB&&!w.combined;svg.classList.toggle('pv',PV);{const b=$('pvb');if(b){b.disabled=AB||!!w.combined;b.setAttribute('aria-checked',PV)}}
+  const PV=S.pv==='pow'&&!AB&&!w.combined;svg.classList.toggle('pv',PV);{const b=$('pvb');if(b){const off=AB||!!w.combined;b.classList.toggle('off',off);b.querySelectorAll('[data-pv]').forEach(x=>{x.disabled=off;x.setAttribute('aria-checked',(x.dataset.pv==='pow')===PV)})}}
   const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=PV?1:ax?ax.k:1, kr=r=>PV?1:kg?kg[r.game]:k, narrow=narrow0;
   /* PV: power on x, speed on y (top left is better); otherwise speed on x, work per joule on y */
   const FX=r=>PV?r.p:r.x, FY=r=>PV?r.x:r.e*kr(r), FXl=r=>PV?(r.plo||r.p):(r.xlo||r.x), FXh=r=>PV?(r.phi||r.p):(r.xhi||r.x), FYl=r=>PV?(r.xlo||r.x):(r.elo?r.elo*kr(r):FY(r)), FYh=r=>PV?(r.xhi||r.x):(r.ehi?r.ehi*kr(r):FY(r));
@@ -1234,7 +1232,7 @@ document.querySelectorAll('[data-hmode]').forEach(b=>b.addEventListener('click',
 $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()});
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
-$('pvb').addEventListener('click',()=>{S.pv=S.pv==='pow'?'eff':'pow';S.zoom=null;animRender()});
+$('pvb').querySelectorAll('[data-pv]').forEach(x=>x.addEventListener('click',()=>{const v=x.dataset.pv;if((S.pv==='pow'?'pow':'eff')===v)return;S.pv=v;S.zoom=null;animRender()}));
 $('fest').addEventListener('change',e=>{S.fest=e.target.checked;if(!S.front){S.front=true;$('front').checked=true}S.anim=true;render();readout()});
 {/* every model on its own, grouped by size, so no model hides inside a collection */
   const sel=$('lmod'),col=document.createElement('optgroup');col.label='Collections';[...sel.options].forEach(o=>col.appendChild(o));sel.appendChild(col);
