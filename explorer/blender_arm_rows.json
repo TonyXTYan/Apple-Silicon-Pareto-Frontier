@@ -1,0 +1,25 @@
+{
+ "researched": "2026-11-21",
+ "note": "Blender (Cycles) rows for Arm comparison chips. Every value below was read from the Open Data snapshot (one JSON line per run); id = position in this list, used by blender_arm.py.",
+ "rows": [
+  {"id":0,"vendor":"Qualcomm","chip":"Snapdragon X Elite X1E-84-100","w":"bl-cpu","scene":"monster","x_spm":132.64357355249484,"n":1,
+   "run":"fcd54a9f-ad76-4389-9705-52b1bf304cae","blender":"4.5.0","system":"Windows ARM64, 12 cores","device":"Snapdragon(R) X Elite - X1E84100 - Qualcomm(R) Oryon(TM) CPU",
+   "samples":67,"time_for_samples_s":30.306783,"earlier_run_4_4_0_spm":112.57838269895414,
+   "src_name":"Blender Open Data snapshot (Blender 4.5.0), run fcd54a9f","url":"https://opendata.blender.org/snapshots/opendata-latest.zip","date":"snapshot 2026-11-21"},
+  {"id":1,"vendor":"Qualcomm","chip":"Snapdragon X Elite X1E-84-100","w":"bl-cpu","scene":"junkshop","x_spm":75.14427701186278,"n":1,
+   "run":"fcd54a9f-ad76-4389-9705-52b1bf304cae","blender":"4.5.0","system":"Windows ARM64, 12 cores","device":"Snapdragon(R) X Elite - X1E84100 - Qualcomm(R) Oryon(TM) CPU",
+   "samples":39,"time_for_samples_s":31.140096,"earlier_run_4_4_0_spm":41.75946900177743,
+   "src_name":"Blender Open Data snapshot (Blender 4.5.0), run fcd54a9f","url":"https://opendata.blender.org/snapshots/opendata-latest.zip","date":"snapshot 2026-11-21"},
+  {"id":2,"vendor":"Qualcomm","chip":"Snapdragon X Elite X1E-84-100","w":"bl-cpu","scene":"classroom","x_spm":53.32765909484133,"n":1,
+   "run":"fcd54a9f-ad76-4389-9705-52b1bf304cae","blender":"4.5.0","system":"Windows ARM64, 12 cores","device":"Snapdragon(R) X Elite - X1E84100 - Qualcomm(R) Oryon(TM) CPU",
+   "samples":27,"time_for_samples_s":30.378232,"earlier_run_4_4_0_spm":52.73255545218817,
+   "src_name":"Blender Open Data snapshot (Blender 4.5.0), run fcd54a9f","url":"https://opendata.blender.org/snapshots/opendata-latest.zip","date":"snapshot 2026-11-21"}
+ ],
+ "skipped": {
+  "Ampere (Altra, Altra Max, AmpereOne)": "Open Data has no Linux-aarch64 launcher and the full 2026-11-21 snapshot holds no Ampere, Altra, Neoverse or Linux-aarch64 entry. The Ampere Blender results that exist are Phoronix Test Suite runs (pts/blender, e.g. Blender 4.1 BMW27/Classroom/Fishy Cat/Barbershop render times in seconds on an Altra Max, OpenBenchmarking result 2205062-NE-BLENDER2555 and Phoronix reviews): a fixed-sample render time of different .blend files, with no clean conversion to Open Data samples per minute, and their power is CPU sensor or IPMI averages over a whole suite, not wall power for the render. Jeff Geerling's Thelio Astra issue (sbc-reviews #53) has one BMW27 time rendered on an NVIDIA GPU with CUDA, not on the Ampere CPU; his blog posts have no Blender numbers.",
+  "Snapdragon X Elite three-scene sum": "already on the page (nv2.py, nv2_rows.json id 43); this step adds only its per-scene rows.",
+  "Snapdragon X Plus, X2 Elite, X2 Elite Extreme, X2 Plus, X1-26-100": "Open Data runs exist (Windows ARM64; the X2 chips mostly with Blender 5.1 and 5.2, not 4.5.0), but no machine with these chips has a wall-power reading on the page to borrow.",
+  "Notebookcheck Blender 3.3 Classroom CPU (seconds)": "a fixed-sample render of the classic Classroom demo in Blender 3.3, not the time-limited Open Data classroom scene in samples per minute; the page has no convention for it (cpubench.py leaves it out too).",
+  "Adreno GPU": "Cycles has no Adreno backend (CUDA, OptiX, HIP, oneAPI and Metal only), so Open Data has no Snapdragon GPU runs; the matrix already marks that cell n/a."
+ }
+}
