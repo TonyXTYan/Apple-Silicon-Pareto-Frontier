@@ -505,12 +505,14 @@ function shortName(r){if(r.ow)return shortName(r.o)+', '+WL[r.ow].short;if(r.mod
   if(r.set==='omlx'||r.set==='omlxq')return r.chip+(S.lmod===r.model?'':', '+r.model.replace(' (oMLX)','').replace('Llama 3.2 ','L3.2 ').replace(' 4-bit',''))+(S.lmod?'':' oMLX');
   if(isBl(r)&&S.w==='blender')return r.chip+(r.w==='bl-cpu'?' CPU':' GPU');
   if(r.lib)return r.chip+', '+LIBAB[r.lib];
-  if((r.game||r.bm)&&r.pe)return r.chip+' '+d+gsuf(r);if(r.est)return r.chip+' est.'+gsuf(r);return r.model?r.chip+', '+r.model.replace('Llama ','').replace('DeepSeek ',''):r.chip+' '+d+gsuf(r)}
+  if((r.game||r.bm||r.brw)&&r.pe)return r.chip+' '+d+gsuf(r)+(r.brw?' est.':'');if(r.est)return r.chip+' est.'+gsuf(r);return r.model?r.chip+', '+r.model.replace('Llama ','').replace('DeepSeek ',''):r.chip+' '+d+gsuf(r)}
 const sameMachine=(a,b)=>a&&b&&a.chip===b.chip&&a.dev===b.dev&&(a.model||'')===(b.model||'')&&(a.mode||'')===(b.mode||'')&&(a.game||'')===(b.game||'')&&(a.bm||'')===(b.bm||'')&&a.w===b.w&&(a.scene||'')===(b.scene||'')&&(a.set||'')===(b.set||'')&&(a.lib||'')===(b.lib||'');
 
 /* ---------- data selection ---------- */
 const WS5=['cpu-all','cpu-one','hpl','bl-cpu','gpu','bl-gpu','llm'],WSHAPE={'cpu-all':'laptop','cpu-one':'fanless','hpl':'desktop','gpu':'diamond','llm':'down','bl-cpu':'plus','bl-gpu':'cross'},DER=new Map();
-const DEFBASE={chip:'M4',dev:'Mac mini'};
+const DEFBASE={chip:'M4',dev:'Mac mini'},TABBASE={chip:'M4 Max',dev:'MacBook Pro 14'};
+/* the page opens on LLM with no baseline; the first time another tab is shown, the M4 Max MacBook Pro 14 becomes the baseline, unless the user has already chosen one (or cleared it) */
+function autoBase(){if(S.w==='llm'||S.userBase||S.autoBased||S.base)return;S.autoBased=true;S.base=Object.assign({},TABBASE);S.preview=null;DER.clear()}
 const vk=r=>{const o=r.o||r,w=r.ow||r.w;return w==='llm'?o.model:w==='gpu'?o.game:w==='bl-cpu'||w==='bl-gpu'?o.scene:w==='blas'?o.set+'|'+o.lib:isCpu(w)?o.bm:undefined}, tsub=()=>S.w==='gpu'?S.lgame||undefined:isCpu(S.w)?S.lbm:S.w==='blender'?S.lscene||undefined:S.w==='llm'&&S.lmod&&S.lmod!=='other'&&!S.lmod.startsWith('set:')?S.lmod:undefined;
 /* a tab can pool several workloads (Blender: CPU and GPU); r.w stays the workload */
 const tabWs=k=>WL[k||S.w].pool||[k||S.w], inTab=r=>!!r&&tabWs().includes(r.w);
@@ -541,7 +543,7 @@ function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S
   if(isCpu(w)){c=c.filter(r=>(r.bm||CB24)===(model||CB24))}
   if(w==='bl-cpu'||w==='bl-gpu'){c=c.filter(r=>(r.scene||'')===(model||''))}
   if(w==='blas'){c=c.filter(r=>r.set+'|'+r.lib===(model||'julia-sgemm|Accelerate'))}
-  if(!c.length)return null;const exact=c.filter(r=>(!r.est||((w==='gpu'||r.bm)&&r.pe))&&b.dev&&devName(r)===b.dev);if(exact.length)return exact[0];
+  if(!c.length)return null;const exact=c.filter(r=>(!r.est||((w==='gpu'||r.bm||r.brw)&&r.pe))&&b.dev&&devName(r)===b.dev);if(exact.length)return exact[0];
   const meas=c.filter(r=>!r.est);return (meas.length?meas:c).sort((a,b2)=>b2.e-a.e)[0]}
 function relOf(r){const b=baseRow(r.w,curBase(),vk(r));return b?{v:r.e/b.e,b}:null}
 function perGame(){if(S.w!=='gpu'||S.lgame)return null;const b=curBase();if(!b)return null;const g={};let any=false;
@@ -769,7 +771,7 @@ function detailRows(r){if(r.ow&&!r.br){const o=r.o,ow=WL[r.ow],out=[['Workload',
   const a=appleFor(r);if(a)out.push(['Apple',appleText(a)]);
   return out}
 function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');tip.textContent='';
-  tip.appendChild(h('b',null,name(r)+(r.pe?' (speed measured, power estimated)':r.est&&!r.mode?' (model estimate)':'')));
+  tip.appendChild(h('b',null,name(r)+(r.brw?' (speed borrowed from the '+r.brw.replace('MacBook Pro ','')+'-inch, power estimated)':r.pe?' (speed measured, power estimated)':r.est&&!r.mode?' (model estimate)':'')));
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
   for(const [a,b] of detailRows(r)){if(a==='Apple'){tip.appendChild(h('div',{class:'apl'},'Apple: '+b));continue}const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
   {const s0=SRC[r.src];if(s0)tip.appendChild(h('div',{class:'srcl'},(r.pe?'Speed: ':'Source: ')+s0.name))}
@@ -787,7 +789,8 @@ function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.
   if(!r)return;
   const head=h('div',{class:'head'});head.appendChild(h('h2',null,name(r)+(r.est&&!r.mode?' (estimate)':'')));
   const big=h('span',{class:'big'},r.ow&&!r.br?fmt(r.o.e):fmt(r.e)+(r.ow?'×':''));big.appendChild(h('small',null,r.ow&&!r.br?WL[r.ow].eu:r.ow?'baseline':w.eu));head.appendChild(big);R.appendChild(head);
-  {const s0=SRC[r.src];if(s0){const c=h('p',{class:'cite'},r.pe?'Speed from ':'Source: ');c.appendChild(h('a',{href:s0.url,target:s0.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s0.name));R.appendChild(c)}}
+  {const s0=SRC[r.src];if(s0){const c=h('p',{class:'cite'},r.brw?'Speed (measured on the '+r.brw+') from ':r.pe?'Speed from ':'Source: ');c.appendChild(h('a',{href:s0.url,target:s0.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s0.name));
+    const s1=SRC[r.psrc];if(s1){c.appendChild(document.createTextNode('; power reference: '));c.appendChild(h('a',{href:s1.url,target:'_blank',rel:'noopener'},s1.name))}R.appendChild(c)}}
   const dl=h('dl');for(const [a,bb] of detailRows(r)){const d=h('div');d.appendChild(h('dt',null,a));d.appendChild(h('dd',null,bb));dl.appendChild(d)}R.appendChild(dl);
   {const a=appleFor(r.ow?r.o:r);if(a){const c=h('p',{class:'cite apcite'},'Apple\'s figures are published specifications, not measurements under this load, from ');const ks=[a.src,a.per,a.specs].filter(k=>k&&SRC[k]);
     ks.forEach((k,i)=>{if(i)c.appendChild(document.createTextNode(i===ks.length-1?' and ':', '));c.appendChild(h('a',{href:SRC[k].url,target:'_blank',rel:'noopener'},SRC[k].name))});c.appendChild(document.createTextNode('.'+(a.note?' '+a.note:'')));R.appendChild(c)}}
@@ -798,7 +801,7 @@ function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.
   if(S.hmode!=='rel')relList(S.hmode==='bench'?'Same '+bname(r)+':':S.hmode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',rel.gen);else if(r.ow)relList('Same chip, other work:',rel.gen);else{relList(r.gen===0?'Other '+r.tier+' chips:':'Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}
   const acts=h('div',{class:'acts'});const isB=b&&ck(b.chip)===r.ck&&(!b.dev||b.dev===devName(r));
   const bb=h('button',{type:'button',class:'btn'},isB?'This is the baseline':'Use as baseline');if(isB)bb.disabled=true;
-  bb.addEventListener('click',()=>{S.base={chip:r.ck,dev:r.est&&!(r.pe&&(r.game||r.bm))?null:devName(r)};DER.clear();S.pin=null;S.preview=null;syncBaseSel();all()});acts.appendChild(bb);
+  bb.addEventListener('click',()=>{S.base={chip:r.ck,dev:r.est&&!(r.pe&&(r.game||r.bm||r.brw))?null:devName(r)};S.userBase=true;DER.clear();S.pin=null;S.preview=null;syncBaseSel();all()});acts.appendChild(bb);
   const ub=h('button',{type:'button',class:'btn ghost'},'Unpin');ub.addEventListener('click',()=>{S.pin=null;drawFocus();readout();table()});acts.appendChild(ub);R.appendChild(acts);
   const notes=[];if(r.note)notes.push(r.note);
   if(r.est&&!r.mode&&!r.pe)notes.push('The bar is ±1 leave-one-out standard deviation'+(r.seen?'':', widened 1.5 times because this chip has no measurements')+(r.clip?', with the lower end clipped at throughput divided by Apple\'s rated maximum power':'')+'.');
@@ -872,18 +875,18 @@ $('chart').addEventListener('keydown',e=>{const k=e.key;
 function chipList(){const m=new Map();for(const r of ALL){if(r.gen==null||r.mode)continue;if(r.est&&!S.est&&!ROWS.some(q=>q.ck===r.ck))continue;m.set(r.ck,r.tier)}
   const g=c=>gen(c)||99;return [...m.entries()].sort((a,b)=>g(a[0])-g(b[0])||TIERS.indexOf(a[1])-TIERS.indexOf(b[1])||(g(a[0])===99?a[0].localeCompare(b[0]):0))}
 function syncBaseSel(){const s=$('base'),isAll=S.w==='all';s.textContent='';const no=h('option',{value:''},isAll?'None (absolute units, one scale per workload)':'None (absolute units)');s.appendChild(no);
-  const ms=ROWS.filter(r=>r.gen!=null&&!r.mode);const machines=new Map();for(const r of ms){const k=r.ck+'|'+devName(r);machines.set(k,r)}
+  const ms=ROWS.concat(EST.filter(r=>r.brw)).filter(r=>r.gen!=null&&!r.mode);const machines=new Map();for(const r of ms){const k=r.ck+'|'+devName(r);if(!machines.has(k))machines.set(k,r)}
   const grpOf=([c,t])=>gen(c)?'M'+gen(c)+' generation':t+' (comparison)',groups=[...new Set(chipList().map(grpOf))];
   for(const g of groups){const og=h('optgroup',{label:g});
     for(const [c] of chipList().filter(c=>grpOf(c)===g)){og.appendChild(h('option',{value:c+'|'},c+', best machine'));
-      for(const [k,r] of machines)if(r.ck===c)og.appendChild(h('option',{value:k},c+' '+devName(r)))}s.appendChild(og)}
+      for(const [k,r] of machines)if(r.ck===c)og.appendChild(h('option',{value:k},c+' '+devName(r)+(r.brw?' (estimated)':'')))}s.appendChild(og)}
   const b=S.base;s.value=b?(ck(b.chip)+'|'+(b.dev||'')):'';if(s.value===''&&b){s.appendChild(h('option',{value:ck(b.chip)+'|'+(b.dev||'')},b.chip));s.value=ck(b.chip)+'|'+(b.dev||'')}baseTitle()}
 /* the plot title reads 'Relative to X' only where the axes really are ratios to X */
 function baseTitle(){const s=$('base'),o=s.options[s.selectedIndex],w=WL[S.w],x=$('basex');$('basev').textContent=o?o.text:'';
   const br=S.base&&tabBase(S.base).find(r=>visible().includes(r))||S.base&&tabBase(S.base)[0],rel=!!S.base&&(w.combined||!!perGame()||(!w.absAxis&&!!br));
   $('basel').textContent=rel?'Relative to':'Baseline';x.hidden=!S.base||rel;if(x.hidden)return;
   x.textContent=!br?(S.w==='llm'&&tsub()?'no reading in this model set':'no reading on this workload')+'; axes in absolute units':!visible().includes(br)?(S.w==='llm'&&S.lmod?'not in this model set':S.w==='gpu'&&S.lgame?'not in this game':isCpu(S.w)&&S.lbm!==CB24?'not in this benchmark':S.w==='blender'&&S.ldev?'not on this device':S.w==='hpl'?'not in this set':'hidden by the current filters')+'; axes in absolute units':'ringed on the plot; these axes stay in absolute units'}
-$('base').addEventListener('change',e=>{const v=e.target.value;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;all()});
+$('base').addEventListener('change',e=>{const v=e.target.value;S.userBase=true;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;all()});
 
 /* ---------- matrix ---------- */
 const MWS=['cpu-all','cpu-one','hpl','bl-cpu','gpu','bl-gpu','llm'];let MROWS=[];
@@ -896,7 +899,7 @@ function matrix(){const ae=document.activeElement,fk=ae&&ae.closest&&ae.closest(
     if(!gen(c)&&!sep){sep=true;const st=h('tr',{class:'msep'});st.appendChild(h('td',{colspan:MWS.length+1},'Comparison chips: Intel, AMD, Qualcomm and NVIDIA'));tb.appendChild(st)}
     const t=h('tr',{tabindex:0});t._k=c;const td=h('td');const s=glyph('laptop',tier,'solid');s.setAttribute('class','dot t-'+tier);td.appendChild(s);td.appendChild(document.createTextNode(c));t.appendChild(td);
     const cells=MWS.map((k,i)=>{const cell=h('td',{class:'num cell'});t.appendChild(cell);return {td:cell,r:rs[i],k}});
-    const set=()=>{S.base={chip:c,dev:null};S.preview=null;syncBaseSel();all()};
+    const set=()=>{S.base={chip:c,dev:null};S.userBase=true;S.preview=null;syncBaseSel();all()};
     const prev=()=>{if(S.noPrev||(S.preview&&S.preview.chip===c))return;S.preview={chip:c,dev:null};render();matrixFill();readout()};
     t.addEventListener('mouseenter',prev);t.addEventListener('focus',prev);
     t.addEventListener('click',set);t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();set()}});
@@ -934,7 +937,7 @@ function radios(sel,pick){const bs=[...document.querySelectorAll(sel)];const syn
 radios('[data-mshow]',b=>{S.mshow=b.dataset.mshow;matrixFill()});
 $('munc').addEventListener('change',e=>{S.munc=e.target.checked;matrixFill()});
 $('mest').addEventListener('change',e=>{S.mest=e.target.checked;matrix()});
-$('mclear').addEventListener('click',()=>{S.base=null;S.preview=null;DER.clear();syncBaseSel();all();live('Baseline cleared. Values are in absolute units.')});
+$('mclear').addEventListener('click',()=>{S.base=null;S.userBase=true;S.preview=null;DER.clear();syncBaseSel();all();live('Baseline cleared. Values are in absolute units.')});
 $('matrix').addEventListener('mouseleave',()=>{if(S.preview&&!$('matrix').contains(document.activeElement)){S.preview=null;render();matrixFill();readout()}});
 $('matrix').addEventListener('focusout',e=>{if(S.preview&&!(e.relatedTarget&&$('matrix').contains(e.relatedTarget))&&!$('matrix').matches(':hover')){S.preview=null;render();matrixFill();readout()}});
 document.querySelectorAll('.tablewrap').forEach(w=>{w.addEventListener('scroll',()=>w.classList.toggle('end',w.scrollLeft+w.clientWidth>=w.scrollWidth-2),{passive:true});if(window.ResizeObserver)new ResizeObserver(overflow).observe(w)});
@@ -1067,7 +1070,7 @@ function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lg
   if(S.pin&&(!inTab(S.pin)||(!S.est&&S.pin.est&&!S.pin.pe)))S.pin=null;render();readout();table();legend();matrix()}
 for(const k in WL){if(WL[k].notab)continue;const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k,id:'tab-'+k,'aria-controls':'panel'});
   b.addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tab')],i=ts.indexOf(b);const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i-1+ts.length)%ts.length:e.key==='Home'?0:e.key==='End'?ts.length-1:null;if(j==null)return;e.preventDefault();ts[j].focus();ts[j].click()});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
-  b.addEventListener('click',()=>{S.w=k;S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
+  b.addEventListener('click',()=>{S.w=k;autoBase();S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
 for(const t of TIERS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph('laptop',t,'solid'));b.appendChild(document.createTextNode(t==='base'?'Base':t));
   b.addEventListener('click',()=>{S.tiers.has(t)?S.tiers.delete(t):S.tiers.add(t);b.setAttribute('aria-pressed',S.tiers.has(t));hideTip();render();table();legend()});$('tiers').appendChild(b)}
 for(const [f,t] of FORMS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph(f,'key','solid'));b.appendChild(document.createTextNode(t));
@@ -1093,8 +1096,8 @@ $('est').addEventListener('change',e=>{S.est=e.target.checked;syncBaseSel();all(
 $('st1').textContent=DATA.stitch.all;$('st2').textContent=DATA.stitch.one;
 /* old links to the separate Blender tabs open the Blender tab on that device; #blas (the old Numerical libraries tab) opens Linear algebra on its default GEMM set */
 function fromHash(){const k=location.hash.slice(1);if(k==='blas'){S.lset='julia-sgemm';return 'hpl'}if(k==='hpl')S.lset='hpl';if(WL[k]&&WL[k].notab){S.ldev=k;return 'blender'}return WL[k]?k:null}
-window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.w=k;all()}});
-{const k=fromHash();if(k)S.w=k}
+window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.w=k;autoBase();all()}});
+{const k=fromHash();if(k){S.w=k;autoBase()}}
 {const mq=matchMedia('(min-width:1000px)');if(mq.matches)$('opts').open=true;const f=e=>{if(e.matches)$('opts').open=true};mq.addEventListener?mq.addEventListener('change',f):mq.addListener(f)}
 syncBaseSel();looPlot();all();
 if(window.ResizeObserver){new ResizeObserver(()=>{hideTip();render()}).observe($('wrap'));new ResizeObserver(looFz).observe($('loofig'))}else window.addEventListener('resize',render);
