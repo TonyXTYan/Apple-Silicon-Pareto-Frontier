@@ -362,6 +362,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     </div>
     <div class="rg"><span class="gl">Efficiency frontier</span>
       <label class="sw" for="front" title="Joins, with straight segments, the points that no other point beats on both speed and work per joule. Dashed ends continue it past the slowest and fastest frontier points with the chosen fit to the frontier points, anchored at each end point. Uses central values."><input type="checkbox" id="front"> Draw frontier</label>
+      <label class="sw sub" for="fest" title="Estimated points: model estimates, and points whose speed is measured but whose wall power is estimated. Off: the frontier uses only points with measured wall power."><input type="checkbox" id="fest" checked> Include estimated points</label>
       <label class="basesel sub" for="ffit">Ends <span class="selw"><select id="ffit"><option value="pow">power-law fit</option><option value="exp" selected>exponential fit</option><option value="log">logarithmic fit</option><option value="lin">linear fit</option></select></span></label>
     </div>
     <div class="rg">
@@ -493,7 +494,7 @@ const WL={
 function bmText(w,i){return S.lbm===CB24?(i?w.n0:w.f0):w.bm[S.lbm][i]}
 const TIERS=['base','Pro','Max','Ultra','Intel','AMD','Qualcomm','NVIDIA'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
 const CB24='Cinebench 2024',isCpu=w=>w==='cpu-all'||w==='cpu-one',CP='Cyberpunk 2077',GAB={'Cyberpunk 2077':'CP2077',"Baldur's Gate 3":'BG3',"Assassin's Creed Shadows":'ACS'};
-const S={hm:new Set(['rel']),lbm:CB24,lgame:'',lscene:'',ldev:'',lset:'julia-sgemm',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
+const S={fest:true,hm:new Set(['rel']),lbm:CB24,lgame:'',lscene:'',ldev:'',lset:'julia-sgemm',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
   base:null,ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -641,12 +642,14 @@ function render(){
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(r.x),py:Y(r.e*kr(r))}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();let fi=0;
-    for(const p of pts){const key=(p.r.ow||p.r.w)+'|'+(vk(p.r)||'');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
+    /* one frontier per benchmark; the same model from different sources (e.g. oMLX) shares it; estimates count unless switched off */
+    for(const p of pts){if(!S.fest&&(p.r.est||p.r.pe))continue;const key=(p.r.ow||p.r.w)+'|'+String(vk(p.r)||'').replace(' (oMLX)','');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
     const FL=[];/* frontier names: placed after all lines, groups with more points first */
-    for(const g of [...grp.values()].sort((a,b)=>b.length-a.length)){if(g.length<3)continue;const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);let best=-1;const f=[];
+    for(const g of [...grp.values()].sort((a,b)=>b.length-a.length)){if(g.length<2)continue;const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);let best=-1;const f=[];
       for(const p of by){if(p.r.e>best*1.0000001){f.push(p);best=p.r.e}}f.reverse();for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
       fg.appendChild(el('path',{d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
+      if(f.length===1&&g.length<3){/* a pair with one clear winner: ring it, no corner lines */continue}
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
         const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),n:g.length,x:m.l+6,y:a.py-5,an:'start'});fg.appendChild(el('path',{d:'M'+X(x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),class:'front ftail',style:op}));
         if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+' point is both fastest and most efficient, so the frontier is its corner'));continue}
@@ -1089,6 +1092,7 @@ document.querySelectorAll('[data-hmode]').forEach(b=>b.addEventListener('click',
 $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()});
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
+$('fest').addEventListener('change',e=>{S.fest=e.target.checked;if(!S.front){S.front=true;$('front').checked=true}render();readout()});
 $('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;all()});
 $('lgame').addEventListener('change',e=>{S.lgame=e.target.value;S.pin=null;all()});
 $('lbm').addEventListener('change',e=>{S.lbm=e.target.value;S.pin=null;all()});
