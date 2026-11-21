@@ -1,6 +1,6 @@
 # Apple Silicon work per joule
 
-An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, Cyberpunk GPU, Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (by default the 2019 Intel i9 MacBook Pro 16).
+An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, Cyberpunk GPU, Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (by default the M4 Max MacBook Pro 16).
 
 **Live page:** https://tonyxtyan.github.io/Apple-Silicon-Pareto-Frontier/
 
@@ -72,7 +72,7 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **All workloads with None:** stacked per-workload scales.
 - **Hover:** shows relatives and the exact power line. Click a point to pin it.
 - **Chart navigation:** zoom, pan and pinch; full screen.
-- **Efficiency frontier:** straight Pareto segments with fitted ends (power law, exponential, log or linear). It is drawn separately for each workload and each LLM model.
+- **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload and each LLM model.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
 - **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters.

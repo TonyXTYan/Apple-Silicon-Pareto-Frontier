@@ -329,7 +329,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     </div>
     <div class="rg"><span class="gl">Efficiency frontier</span>
       <label class="sw" for="front" title="Joins, with straight segments, the points that no other point beats on both speed and work per joule. Dashed ends continue it past the slowest and fastest frontier points with the chosen fit to the frontier points, anchored at each end point. Uses central values."><input type="checkbox" id="front"> Draw frontier</label>
-      <label class="basesel sub" for="ffit">Ends <span class="selw"><select id="ffit"><option value="pow">power-law fit</option><option value="exp">exponential fit</option><option value="log">logarithmic fit</option><option value="lin">linear fit</option></select></span></label>
+      <label class="basesel sub" for="ffit">Ends <span class="selw"><select id="ffit"><option value="pow">power-law fit</option><option value="exp" selected>exponential fit</option><option value="log">logarithmic fit</option><option value="lin">linear fit</option></select></span></label>
     </div>
     <div class="rg">
       <div class="group" role="radiogroup" aria-labelledby="hml" style="width:100%"><span class="gl" id="hml">Hover highlights</span>
@@ -438,7 +438,7 @@ const WL={
 };
 const TIERS=['Intel','base','Pro','Max','Ultra'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
 const S={hmode:'rel',mshow:'both',munc:true,mest:true,w:'all',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
-  base:{chip:'Intel i9-9880H',dev:'MacBook Pro 16 (2019)'},preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
+  base:{chip:'M4 Max',dev:'MacBook Pro 16'},ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
 function h(n,a,t){const e=document.createElement(n);if(a)for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
