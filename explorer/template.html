@@ -281,7 +281,7 @@ details .inner{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
 #table tbody tr:hover td:first-child,#table tbody tr.on td:first-child{background:linear-gradient(to left,var(--rule) 1px,var(--panel) 1px)}
 td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
 .pill{font-size:12px;border:1px dashed var(--ink3);border-radius:999px;padding:0 6px;margin-left:6px;color:var(--ink2);white-space:nowrap}
-.method{display:grid;grid-template-columns:minmax(0,520px) 340px;gap:18px 48px;align-items:start}
+.method{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:18px 48px;align-items:start}
 @media (max-width:860px){.method{grid-template-columns:minmax(0,1fr)}}
 .method.wide{grid-template-columns:minmax(0,1fr)}
 #loofig{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
@@ -419,7 +419,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
       <div class="tip" id="lootip" hidden></div>
       <svg id="loo" viewBox="0 0 340 300" role="img" aria-label="Leave-one-out predictions of work per joule against measured values"></svg>
       <figcaption class="note" style="font-size:12.5px">Leave-one-out check: each dot is a measured chip and workload predicted without itself. Points on the diagonal are perfect predictions, and the band is ±1 standard deviation for CPU work. Vertical bars are each workload's leave-one-out standard deviation (log scale); horizontal bars are the measured power range (1st percentile to maximum), averaged over the machines with that chip, so they overstate the error of the mean. HPL reports no range. Bars follow the Error bars switch. Hover a dot for its details.</figcaption>
-      <button type="button" class="btn ghost" id="looBig">Enlarge plot</button>
+      <button type="button" class="btn ghost" id="looBig" hidden>Enlarge plot</button>
     </figure>
   </div>
 </section>
@@ -1069,6 +1069,7 @@ function looTip(e){const L=S.loo;if(!L)return;const svg=L.svg,b=svg.getBoundingC
   tip.style.left=Math.max(0,Math.min(fw-tw,tx))+'px';tip.style.top=Math.max(0,ty)+'px'}
 $('loo').addEventListener('pointermove',looTip);$('loo').addEventListener('pointerdown',looTip);
 $('loo').addEventListener('pointerleave',()=>{$('lootip').hidden=true;const hl=$('loohl');if(hl)hl.textContent='';$('loo').querySelectorAll('.loolbl').forEach(t=>t.style.display='')});
+{const mq=matchMedia('(min-width:861px)'),setLoo=()=>{S.looBig=mq.matches;looPlot()};S.looBig=mq.matches;mq.addEventListener?mq.addEventListener('change',setLoo):mq.addListener(setLoo)}
 $('looBig').addEventListener('click',()=>{S.looBig=!S.looBig;$('loofig').parentNode.classList.toggle('wide',S.looBig);$('looBig').textContent=S.looBig?'Shrink plot':'Enlarge plot';looPlot()});
 /* ---------- wiring ---------- */
 function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lgamew').hidden=S.w!=='gpu';$('lbmw').hidden=!isCpu(S.w);$('lbm').value=S.lbm;$('lscenew').hidden=$('ldevw').hidden=S.w!=='blender';$('lsetw').hidden=S.w!=='blas';$('lset').value=S.lset;$('lscene').value=S.lscene;$('ldev').value=S.ldev;$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();

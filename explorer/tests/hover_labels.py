@@ -26,7 +26,7 @@ async def main():
                 if r['miss']: errs.append(f'{vw} {w} missing {r["miss"][:3]}')
             for big in (False,True):
                 if big and vw<700: continue
-                if big: await pg.click('#looBig'); await pg.wait_for_timeout(200)
+                await pg.evaluate(f"S.looBig={'true' if big else 'false'};looPlot()"); await pg.wait_for_timeout(200)  # the plot is large by default on wide screens
                 r=await pg.evaluate(LOO); print(vw,'loo big' if big else 'loo','points',r['n'],'missing',r['miss'],'overlaps',r['overlap'])
                 if r['miss'] or r['overlap']: errs.append(f'loo {vw} {big} {r}')
         print('errors',errs); await b.close()

@@ -96,7 +96,7 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Chart navigation:** zoom, pan and pinch; full screen.
 - **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload, each LLM model, each game and each Blender device.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
-- **Leave-one-out plot:** shows both error bars and can be enlarged.
+- **Leave-one-out plot:** shows both error bars; drawn large beside the method notes on wide screens, compact on phones.
 - **Set menu (Numerical libraries tab):** fp32 GEMM Accelerate vs OpenBLAS (default), CPU vs GPU peak SGEMM, fp64 DGEMM, or every set. Frontiers are per set and library; baselines compare the same set and library.
 - **Benchmark menu (CPU tabs):** Cinebench 2024 (default, power measured), Geekbench 6 or Cinebench 2026. There is no every-benchmark view, because scores are on different scales. Axis titles, finding and note follow the benchmark; a baseline divides by the baseline machine in the same benchmark; the matrix and All workloads stay on Cinebench 2024.
 - **Game menu (gaming tab):** every game, or one. Frontiers are drawn per game. A baseline divides each game by that machine in the same game, so the baseline sits at 1× in every game; with every game shown, frame rate stays absolute and the constant-power lines are hidden (they differ per game). Games the baseline has no reading for are dropped while it is set.

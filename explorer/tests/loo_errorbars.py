@@ -12,7 +12,7 @@ async def main():
         pg.on('pageerror',lambda e:errs.append(str(e)))
         await pg.goto(''+INDEX+''); await pg.wait_for_timeout(500)
         await pg.evaluate("document.querySelectorAll('details').forEach(d=>d.open=true)")
-        await pg.click('#looBig'); await pg.wait_for_timeout(300)
+        print('large by default', await pg.evaluate('S.looBig'))  # no Enlarge button any more
         await pg.locator('#loo').scroll_into_view_if_needed()
         pos=await pg.evaluate("""()=>{const L=S.loo,p=L.pts.find(p=>p.chip==='M4'&&p.w==='cpu-all')||L.pts[0];const b=L.svg.getBoundingClientRect(),k=b.width/L.svg.viewBox.baseVal.width;return [b.left+p.px*k,b.top+p.py*k]}""")
         await pg.mouse.move(pos[0],pos[1]); await pg.wait_for_timeout(250)
