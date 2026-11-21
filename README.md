@@ -13,7 +13,8 @@ explorer/
   data12.json          final data (rows = measured, est = estimates, sources, loo, apple specs)
   build.py             runs the whole data chain and rebuilds index.html
   gen_data.py          -> data.json   measured rows (Cinebench, HPL, Cyberpunk, metered LLM), reusing plot/all.py rows
-  model.py             -> data2.json  hierarchical ridge model in log space, leave-one-out errors, estimates, Apple power specs, power modes
+  model.py             -> data2.json  hierarchical ridge model in log space, leave-one-out errors, estimates, Apple power specs (from apple_power.json), power modes
+  apple_power.json     Apple's published power figures per Mac (support pages, environmental reports, tech specs, one ENERGY STAR record), with URLs
   llm.py               -> data3.json  llama.cpp thread (Llama 2 7B Q4_0, 20 chips) with estimated decode power
   blender.py           -> data4.json  Blender Open Data 4.5 medians (CPU, Metal), three-scene sum and per scene, with estimated power
   i9.py                -> data5.json  Intel i9-9880H MacBook Pro 16 (2019) baseline rows
@@ -69,7 +70,8 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 
 - **Measured wall power:** Notebookcheck (external monitor) for CPU and Cyberpunk; Jeff Geerling for HPL, M3 Ultra LLM and the cluster.
 - **Cinebench:** R23 → 2024 is stitched through the M4 Mac mini (about 5–6% rms). The Intel i9 uses the x86 ratio instead.
-- **Estimate model:** log e = workload + tier×workload + generation + tier + chip, ridge-regularised. Its leave-one-out rms sets the error bars. Apple's rated maximum power gives a lower bound on e.
+- **Estimate model:** log e = workload + tier×workload + generation + tier + chip, ridge-regularised. Its leave-one-out rms sets the error bars. Apple's rated maximum power gives a lower bound on e (desktops only).
+- **Apple's published power figures (`apple` in the data, model.py):** desktops (every Mac mini and Mac Studio chip on the page): idle and maximum wall power from Apple's support pages 103253 and 102027 (published 21 September 2026; the M1 Mac mini idle is 6.8 W; the M1, M2 and M2 Pro mini maxima are "CPU Max", a CPU-only load), plus sleep and off from the Product Environmental Report. Laptops (every MacBook on the page, and the M4 Max MacBook Pro 14 from its ENERGY STAR record A3185): the report's idle with the display on, sleep and off (115 V column; the 230 V figures, up to about 10% higher, are in each note), the included adapter and the battery from the tech-specs page. Points show them as "Apple: idle 4.07 W (display on), sleep …, 96 W adapter, 72.4 Wh battery" for laptops and "Apple: idle 7 W, max 50 W (support page); sleep …, off …" for desktops, so the two idle definitions (support-page idle vs report idle with display on, which disagree: 7 W vs 3.96 W for the M2 mini) are never mixed; the readout links the sources and adds notes. Flagged: the 14-inch M3 Max uses the M3 Pro table (the report has none for it); the 14-inch M4 and M4 Pro tables and the M4 Mac mini table repeat the earlier M3, M3 Pro and M2 tables; several tables cover a Pro and a Max chip; the M4 Pro mini figure has no core count and no per-mode split. Clusters and comparison machines get none. Only the desktop maximum bounds anything; the laptop adapter is not a bound, because laptops can draw from the battery beyond it.
 - **LLM decode power:** 0.75–1.1 × GPU-load wall power, calibrated on the M4 and M6 Mac mini.
 - **Blender power:**
   - CPU: 0.9–1.1 × Cinebench wall power.

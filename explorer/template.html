@@ -216,6 +216,8 @@ main:has(.tab[data-w="all"][aria-selected="true"]) #forms .chip svg,main:has(.ta
 .readout .cite{flex-basis:100%;margin:0;font-size:13px;color:var(--ink2)}
 .readout .cite a{color:var(--ink)}
 .tip .srcl{margin-top:6px;font-size:12px;opacity:.85}
+.tip .apl{margin-top:4px;font-size:12px;opacity:.85}
+.readout .apcite{font-size:12.5px}
 .readout .estnote{font-size:12.5px;color:var(--ink2);flex-basis:100%}
 
 /* lower sections */
@@ -402,6 +404,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
       <li>Throughput is fitted the same way. Published scores replace the model where they exist without matching power: the M3 Ultra scores 3,028 to 3,082 in Cinebench 2024 multi-core across reviews, and the M2 Ultra scores 28,550 in Cinebench R23.</li>
       <li>Leave-one-out validation removes each measured cell in turn, refits, and predicts it. The root-mean-square error of those predictions is the uncertainty shown on every estimate: <span id="loosig"></span>. Chips with no measurements get 1.5 times that.</li>
       <li>Apple publishes idle and maximum wall power for each Mac mini and Mac Studio. Maximum power gives a hard floor, work per joule ≥ throughput ÷ maximum power, which clips the lower error bar of some desktop estimates. GPU estimates are not clipped, because Apple's maximum includes CPU and GPU together.</li>
+      <li>Apple's published power figures, shown in each point's details: for a Mac mini or Mac Studio, idle and maximum wall power from Apple's support pages (a CPU-only maximum for the M1, M2 and M2 Pro Mac mini); for a laptop, idle with the display on, sleep and off from its Product Environmental Report (115 V column), with the adapter and battery from the tech specs. The two idles are different tests (7 W against 3.96 W for the M2 Mac mini), so they are labelled apart; shared, repeated and stand-in tables are noted on each point. None is a measurement under the benchmark load. Only the desktop maximum bounds anything: a laptop can draw from its battery beyond its adapter, so the adapter is not used.</li>
       <li>Power modes: Digital Trends measured the M4 Pro Mac mini in Low Power, Automatic and High Power mode (Cinebench 2024 multi-core 765, 1,622 and 1,707). Nobody published wall power per mode, so it is estimated from package power: about 46 W in High Power and 40 W in Automatic (Notebookcheck), and a 13.5 W cap in Low Power (Eclectic Light), times 1.15 for conversion losses plus 6 to 10 W for the rest of the machine.</li>
     </ul>
     <figure style="margin:0;position:relative" id="loofig">
@@ -726,11 +729,23 @@ function declutter(){const svg=$('chart'),{m}=G;if(!m)return;const bx=e=>{try{co
 function kRing(){const ov=$('over');if(!ov||!S.kbd||!S.kf)return;const q=S.pts.find(q=>q.r===S.kf);if(q)ov.appendChild(el('circle',{cx:q.px,cy:q.py,r:15.5,class:'kring'}))}
 
 /* ---------- tooltip & readout ---------- */
-function appleFor(r){if(r.form!=='desktop')return null;return APPLE.find(a=>a.chip===r.ck&&devName(r).startsWith(a.dev))||null}
+/* Apple's published figures for the machine named on a point: desktops by chip and model (support-page idle and maximum), laptops by
+   chip and model from the environmental report; where a chip has no core-count match, entries for its variants are merged. None for
+   clusters and comparison machines. */
+function appleFor(r){if(r.gen===0||r.nodes>1)return null;const d=devName(r);
+  if(r.form==='desktop')return APPLE.find(a=>a.kind==='desktop'&&a.chip===r.ck&&d.startsWith(a.dev))||null;
+  let c=APPLE.filter(a=>a.kind==='laptop'&&a.dev===d&&a.chip===r.chip);if(!c.length)c=APPLE.filter(a=>a.kind==='laptop'&&a.dev===d&&ck(a.chip)===r.ck);if(!c.length)return null;
+  if(c.length===1)return c[0];const m=Object.assign({},c[0]);for(const k of ['idle_on','sleep','off','adapter','battery']){const u=[...new Set(c.map(a=>a[k]))];if(u.length>1)m[k]=u.join(' or ')}
+  m.note=[...new Set(c.map(a=>a.note).filter(Boolean))].join(' ');return m}
+const W_=v=>v+' W';
+function appleText(a){if(a.kind==='desktop')return 'idle '+W_(a.idle)+', max '+W_(a.max)+(a.cpumax?' for a CPU-only load':'')+' (support page)'+(a.sleep!=null?'; sleep '+W_(a.sleep)+', off '+W_(a.off):'');
+  const tail=', '+a.adapter+' W adapter, '+a.battery+' Wh battery';
+  if(a.es)return 'ENERGY STAR short idle '+W_(a.es.short)+' (display on), long idle '+W_(a.es.long)+', sleep '+W_(a.es.sleep)+', off '+W_(a.es.off)+tail;
+  return 'idle '+W_(a.idle_on)+' (display on'+(a.proxy?', '+a.proxy:'')+'), sleep '+W_(a.sleep)+', off '+W_(a.off)+tail}
 function detailRows(r){if(r.ow&&!r.br){const o=r.o,ow=WL[r.ow],out=[['Workload',ow.tab+(vk(o)?', '+vk(o):'')]];
     if(o.elo)out.push(['Range',fmt(o.elo)+' to '+fmt(o.ehi)+' '+ow.eu]);out.push(['Throughput',fmt(o.x)+' '+ow.xu]);
     out.push(['Wall power'+(o.pe?', estimated':''),fmt(o.p)+' W'+(o.plo?' ('+fmt(o.plo)+' to '+fmt(o.phi)+')':'')+(o.est&&!o.mode&&!o.pe?' implied':'')]);
-    if(ow.per)out.push([ow.per[0],fmt(ow.per[1](o.e))]);const a=appleFor(o);if(a)out.push(['Apple rated idle / max',a.idle+' W / '+a.max+' W']);return out}
+    if(ow.per)out.push([ow.per[0],fmt(ow.per[1](o.e))]);const a=appleFor(o);if(a)out.push(['Apple',appleText(a)]);return out}
   if(r.ow){const o=r.o,ow=WL[r.ow],out=[['Workload',ow.tab+(vk(o)?', '+vk(o):'')]];
     if(r.elo)out.push(['Range',fmt(r.elo)+'× to '+fmt(r.ehi)+'×']);
     out.push(['Throughput',fmt(r.x)+'× ('+fmt(o.x)+' '+ow.xu+')']);out.push([ow.e,fmt(o.e)+' '+ow.eu]);
@@ -741,12 +756,12 @@ function detailRows(r){if(r.ow&&!r.br){const o=r.o,ow=WL[r.ow],out=[['Workload',
   out.push(['Throughput',fmt(r.x)+' '+w.xu]);
   out.push([r.pe?'Wall power, estimated':'Wall power',fmt(r.p)+' W'+(r.plo?' ('+fmt(r.plo)+' to '+fmt(r.phi)+')':'')+(r.est&&!r.mode&&!r.pe?' implied':'')]);
   if(w.per)out.push([w.per[0],fmt(w.per[1](r.e))]);
-  const a=appleFor(r);if(a)out.push(['Apple rated idle / max',a.idle+' W / '+a.max+' W']);
+  const a=appleFor(r);if(a)out.push(['Apple',appleText(a)]);
   return out}
 function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');tip.textContent='';
   tip.appendChild(h('b',null,name(r)+(r.pe?' (speed measured, power estimated)':r.est&&!r.mode?' (model estimate)':'')));
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
-  for(const [a,b] of detailRows(r)){const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
+  for(const [a,b] of detailRows(r)){if(a==='Apple'){tip.appendChild(h('div',{class:'apl'},'Apple: '+b));continue}const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
   {const s0=SRC[r.src];if(s0)tip.appendChild(h('div',{class:'srcl'},(r.pe?'Speed: ':'Source: ')+s0.name))}
   const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':r.gen===0?'Solid lines: other '+r.tier+' chips.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
   if(S.front&&S.fset&&S.fset.has(r))tip.appendChild(h('div',{class:'hint'},'On the efficiency frontier: no point shown is both faster and more efficient.'));
@@ -764,6 +779,8 @@ function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.
   const big=h('span',{class:'big'},r.ow&&!r.br?fmt(r.o.e):fmt(r.e)+(r.ow?'×':''));big.appendChild(h('small',null,r.ow&&!r.br?WL[r.ow].eu:r.ow?'baseline':w.eu));head.appendChild(big);R.appendChild(head);
   {const s0=SRC[r.src];if(s0){const c=h('p',{class:'cite'},r.pe?'Speed from ':'Source: ');c.appendChild(h('a',{href:s0.url,target:s0.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s0.name));R.appendChild(c)}}
   const dl=h('dl');for(const [a,bb] of detailRows(r)){const d=h('div');d.appendChild(h('dt',null,a));d.appendChild(h('dd',null,bb));dl.appendChild(d)}R.appendChild(dl);
+  {const a=appleFor(r.ow?r.o:r);if(a){const c=h('p',{class:'cite apcite'},'Apple\'s figures are published specifications, not measurements under this load, from ');const ks=[a.src,a.per,a.specs].filter(k=>k&&SRC[k]);
+    ks.forEach((k,i)=>{if(i)c.appendChild(document.createTextNode(i===ks.length-1?' and ':', '));c.appendChild(h('a',{href:SRC[k].url,target:'_blank',rel:'noopener'},SRC[k].name))});c.appendChild(document.createTextNode('.'+(a.note?' '+a.note:'')));R.appendChild(c)}}
   const rel=relatives(r);
   const relList=(title,list)=>{if(!list.length)return;const d=h('div',{class:'rel'});d.appendChild(h('span',{class:'rh'},title));
     for(const q of list){const bt=h('button',{type:'button'},shortName(q.r)+' '+(q.r.e/r.e).toFixed(2)+'×');
