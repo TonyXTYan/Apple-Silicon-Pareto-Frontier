@@ -1,0 +1,109 @@
+{
+ "researched": "2026-11-21",
+ "note": "LLM generation results for the NVIDIA N1X (RTX Spark) laptops; every value with the URL it was read from. id = position in this list, used by n1xllm.py. x is decode tokens/s. Only row 0 carries power measured with the run (whole laptop on battery, read by Windows and checked against the battery drain); n1xllm.py borrows power for the others from the same laptop model's Cyberpunk 2077 wall power already on the page. No GB10 (DGX Spark) value is used for the N1X.",
+ "rows": [
+  {
+   "id": 0,
+   "model": "Qwen3.6 35B-A3B",
+   "dev": "Asus ProArt P16 H7607 (RTX Spark)",
+   "x": 72.0,
+   "p_w": 91.0,
+   "p_lo": 89.0,
+   "p_hi": 93.5,
+   "engine": "llama.cpp b11582, CUDA",
+   "quant": "4-bit (\"Modèles quantifiés en 4 bits\"; the GGUF type is not named), 22 GB file",
+   "test": "30 consecutive 1,024-token answers (about 7 minutes of continuous generation), on battery, Asus Performance mode, 85 GiB reserved for the GPU",
+   "device": "Asus ProArt P16 with the RTX Spark N1X, 128 GB, 99.9 Wh battery, Windows 11 on Arm, driver 617.42",
+   "power": "\"En génération continue avec Qwen3.6-35B-A3B, mesurée entre 92 et 30 % de batterie, le ProArt P16 tire 89 à 93 W et perd environ 1,56 % de batterie par minute, tout en écrivant 72 tok/s\"; \"la RTX Spark consomme 0,36 Wh pour 1 000 tokens écrits\"; \"La puissance des deux PC est lue par Windows\". 1.56%/min of 99.9 Wh is 93.5 W; 0.36 Wh per 1,000 tokens is 0.77 tokens per joule.",
+   "others": "Plugged in, the same continuous run held 75.2 to 76.8 tok/s (76.1 in the table) with the GPU part at 43.8 W (nvidia-smi) against 30.3 W on battery. The same review ran the MacBook Pro 14 M5 Pro through the same test on battery: 68.1 tok/s at 60 to 65 W (0.27 Wh per 1,000 tokens), not added here.",
+   "src_name": "Frandroid, Nvidia RTX Spark review (Asus ProArt P16), 2026-10-15",
+   "url": "https://www.frandroid.com/test/3283093_test-nvidia-rtx-spark"
+  },
+  {
+   "id": 1,
+   "model": "Qwen3 8B",
+   "dev": "Asus ProArt P16 H7607 (RTX Spark)",
+   "x": 53.1,
+   "pp512": 3216,
+   "engine": "llama.cpp b11582 (llama-bench), CUDA",
+   "quant": "4-bit, GGUF type not named, 5 GB file",
+   "test": "llama-bench generation, plugged in, Performance mode, 91 GiB reserved for the GPU",
+   "device": "Asus ProArt P16 with the RTX Spark N1X, 128 GB",
+   "others": "On battery 52.0 tok/s; under Ollama 53.5; llama.cpp with Vulkan 38.4. CPU only: 14.2.",
+   "src_name": "Frandroid, Nvidia RTX Spark review (Asus ProArt P16), 2026-10-15",
+   "url": "https://www.frandroid.com/test/3283093_test-nvidia-rtx-spark"
+  },
+  {
+   "id": 2,
+   "model": "Qwen3.8 27B",
+   "dev": "Asus ProArt P16 H7607 (RTX Spark)",
+   "x": 16.3,
+   "pp512": 911,
+   "engine": "llama.cpp b11582 (llama-bench), CUDA",
+   "quant": "4-bit, GGUF type not named, 16.5 GB file",
+   "test": "llama-bench generation, plugged in, Performance mode, 91 GiB reserved for the GPU",
+   "device": "Asus ProArt P16 with the RTX Spark N1X, 128 GB",
+   "others": "On battery 16.1 tok/s; under Ollama 16.3; a second, 64 GB ProArt P16 gave 16.0 (b11384, Q4_K_XL on some models).",
+   "src_name": "Frandroid, Nvidia RTX Spark review (Asus ProArt P16), 2026-10-15",
+   "url": "https://www.frandroid.com/test/3283093_test-nvidia-rtx-spark"
+  },
+  {
+   "id": 3,
+   "model": "Qwen3.6 35B-A3B",
+   "dev": "Asus ProArt P16 H7607 (RTX Spark)",
+   "x": 74.8,
+   "pp512": 2633,
+   "engine": "llama.cpp b11582 (llama-bench), CUDA",
+   "quant": "4-bit, GGUF type not named, 22 GB file",
+   "test": "llama-bench generation, plugged in, Performance mode, 91 GiB reserved for the GPU",
+   "device": "Asus ProArt P16 with the RTX Spark N1X, 128 GB",
+   "others": "On battery 73.5 tok/s; under Ollama 75.7; the 64 GB ProArt P16 gave 71.5.",
+   "src_name": "Frandroid, Nvidia RTX Spark review (Asus ProArt P16), 2026-10-15",
+   "url": "https://www.frandroid.com/test/3283093_test-nvidia-rtx-spark"
+  },
+  {
+   "id": 4,
+   "model": "gpt-oss 120B",
+   "dev": "Asus ProArt P16 H7607 (RTX Spark)",
+   "x": 63.3,
+   "pp512": 2084,
+   "engine": "llama.cpp b11582 (llama-bench), CUDA",
+   "quant": "MXFP4, 63 GB file",
+   "test": "llama-bench generation, plugged in, Performance mode, 91 GiB reserved for the GPU",
+   "device": "Asus ProArt P16 with the RTX Spark N1X, 128 GB",
+   "others": "On battery 62.1 tok/s; llama.cpp with Vulkan 51.7.",
+   "src_name": "Frandroid, Nvidia RTX Spark review (Asus ProArt P16), 2026-10-15",
+   "url": "https://www.frandroid.com/test/3283093_test-nvidia-rtx-spark"
+  },
+  {
+   "id": 5,
+   "model": "gpt-oss 20B (Ollama)",
+   "dev": "Microsoft Surface Laptop Ultra (2026)",
+   "x": 58.0,
+   "engine": "Ollama, CUDA (native Arm64 build)",
+   "quant": "Ollama's gpt-oss:20b (12.8 GB file; natively MXFP4)",
+   "test": "Codex CLI coding agent, tier S at 64K context, generation rate, median of three runs, plugged in, Best performance",
+   "device": "Surface Laptop Ultra for Business, RTX Spark N1X, 128 GB (64 GB to the GPU), Windows 11 Pro 26H1, driver 32.0.16.1742",
+   "others": "At 128K context 59.2 tok/s. The chart alt text reads \"with the Surface at 58.0, 59.2, and 89.2 tokens per second\".",
+   "src_name": "StorageReview, Microsoft Surface Laptop Ultra for Business review (RTX Spark N1X), 2026-10-15",
+   "url": "https://www.storagereview.com/review/microsoft-surface-laptop-ultra-for-business-review-rtx-spark-n1x"
+  },
+  {
+   "id": 6,
+   "model": "Qwen3.6 35B-A3B",
+   "dev": "Microsoft Surface Laptop Ultra (2026)",
+   "x": 89.2,
+   "engine": "Ollama, CUDA (native Arm64 build)",
+   "quant": "not stated (21.1 GB file, consistent with a 4-bit GGUF)",
+   "test": "Codex CLI coding agent, tier M at 64K context, generation rate, median of three runs, plugged in, Best performance",
+   "device": "Surface Laptop Ultra for Business, RTX Spark N1X, 128 GB (64 GB to the GPU), Windows 11 Pro 26H1, driver 32.0.16.1742",
+   "others": "Faster than Frandroid's Ollama run of the same model on the ProArt P16 (75.7 tok/s), with a different file and Ollama version.",
+   "src_name": "StorageReview, Microsoft Surface Laptop Ultra for Business review (RTX Spark N1X), 2026-10-15",
+   "url": "https://www.storagereview.com/review/microsoft-surface-laptop-ultra-for-business-review-rtx-spark-n1x"
+  }
+ ],
+ "not_found": {
+  "Llama 2 7B Q4_0 tg128": "No N1X run: neither the CUDA scoreboard (discussion #15013) nor the Vulkan scoreboard (#10879) has an N1X or RTX Spark row (read 2026-11-21); no review quotes llama-bench on that model. The GB10 rows (57.21 tok/s CUDA, 58.51 Vulkan) are a different power envelope and are not relabelled.",
+  "other": "Principled Technologies (RTXSpark-vs-M5Pro-1026) reports llama-bench Qwen3.5-27B pp+tg combined rates only, no separate decode speed and no power. Notebookcheck's analysis has MLPerf Client only (already on the page). PCWorld (Surface, ProArt) gives no tok/s or LLM power; LTT Labs and Micro Center refused the fetch. Artificial Analysis gives completion times, not tok/s."
+ }
+}

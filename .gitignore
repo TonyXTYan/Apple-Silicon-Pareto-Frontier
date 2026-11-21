@@ -4,7 +4,7 @@ explorer/tests/shots/
 explorer/data.json
 explorer/data[2-9].json
 explorer/data1[0-9].json
-explorer/data20.json
+explorer/data2[01].json
 .DS_Store
 explorer/tests/*.png
 /c?.png
