@@ -565,11 +565,11 @@ const SIZES=[['XS',0,2,'under 2B'],['S',2,5,'2–5B'],['M',5,12,'5–12B'],['L',
 function pcount(r){const m=/(\d+(?:\.\d+)?)\s*([BT])\b/.exec(r.model||'');return m?+m[1]*(m[2]==='T'?1000:1):null}
 function psize(r){const b=pcount(r);if(b==null)return null;const z=SIZES.find(z=>b>=z[1]&&b<z[2]);return z?z[0]:null}
 function sizeOK(r){if(S.w!=='llm')return true;const z=psize(r);return !z||S.lsize.has(z)}
-function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||(!S.lmod?r.set!=='omlxq'&&r.set!=='omlxl':S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):(r.model===S.lmod||S.lmod.endsWith(' (oMLX)')&&r.model===S.lmod.slice(0,-7))&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='gpu'||!S.lgame||r.game===S.lgame)&&(!isCpu(S.w)||(r.bm||CB24)===S.lbm)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&(!S.ldev||r.w===S.ldev)))&&(S.w!=='hpl'||!S.lset||(S.lset==='hpl'?r.w==='hpl':r.set===S.lset)))}
+function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||(!S.lmod?r.set!=='omlxq'&&r.set!=='omlxl':S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('model:')?String(r.model||'').replace(' (oMLX)','')===S.lmod.slice(6)&&r.set!=='cluster':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):(r.model===S.lmod||S.lmod.endsWith(' (oMLX)')&&r.model===S.lmod.slice(0,-7))&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='gpu'||!S.lgame||r.game===S.lgame)&&(!isCpu(S.w)||(r.bm||CB24)===S.lbm)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&(!S.ldev||r.w===S.ldev)))&&(S.w!=='hpl'||!S.lset||(S.lset==='hpl'?r.w==='hpl':r.set===S.lset)))}
 function curBase(){return S.preview||S.base}
 // baseline value for workload w (and LLM model)
 function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S.est:allowEst;let c=ALL.filter(r=>r.w===w&&r.ck===ck(b.chip)&&!r.ex&&!r.mode&&(!r.est||ae||r.pe));
-  if(w==='llm'){c=c.filter(r=>r.model===(model||'Llama 2 7B Q4_0'))}
+  if(w==='llm'){const want=model||'Llama 2 7B Q4_0';c=want.startsWith('model:')?c.filter(r=>String(r.model||'').replace(' (oMLX)','')===want.slice(6)&&r.set!=='cluster'):c.filter(r=>r.model===want)}
   if(w==='gpu'){c=c.filter(r=>(r.game||CP)===(model||CP))}
   if(isCpu(w)){c=c.filter(r=>(r.bm||CB24)===(model||CB24))}
   if(w==='bl-cpu'||w==='bl-gpu'){c=c.filter(r=>(r.scene||'')===(model||''))}
@@ -1128,6 +1128,12 @@ $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
 $('fest').addEventListener('change',e=>{S.fest=e.target.checked;if(!S.front){S.front=true;$('front').checked=true}render();readout()});
+{/* every model on its own, grouped by size, so no model hides inside a collection */
+  const sel=$('lmod'),col=document.createElement('optgroup');col.label='Collections';[...sel.options].forEach(o=>col.appendChild(o));sel.appendChild(col);
+  const by=new Map();for(const r of ALL){if(r.w!=='llm'||!r.model||r.set==='cluster')continue;const m=r.model.replace(' (oMLX)','');if(!by.has(m))by.set(m,new Set());by.get(m).add(r.ck)}
+  for(const [z,,,t] of SIZES){const ms=[...by.keys()].filter(m=>psize({model:m})===z).sort((a,b)=>pcount({model:a})-pcount({model:b})||a.localeCompare(b));if(!ms.length)continue;
+    const g=document.createElement('optgroup');g.label='One model, '+z+' ('+t+')';for(const m of ms){const n=by.get(m).size;const o=document.createElement('option');o.value='model:'+m;o.textContent=m+' ('+n+(n===1?' chip)':' chips)');g.appendChild(o)}sel.appendChild(g)}
+  sel.value=S.lmod||''}
 $('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;all()});
 $('lgame').addEventListener('change',e=>{S.lgame=e.target.value;S.pin=null;all()});
 $('lbm').addEventListener('change',e=>{S.lbm=e.target.value;S.pin=null;all()});
