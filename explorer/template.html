@@ -224,13 +224,16 @@ td.num,th.num{text-align:right}
 #matrix tr.isbase td{font-weight:600}
 #matrix tr.isbase td:first-child::after{content:"baseline";font-weight:500;font-size:12px;border:1px solid var(--ink);border-radius:999px;padding:0 6px;margin-left:8px}
 #matrix tr.ispre td:first-child::after{content:"previewing";font-weight:500;font-size:12px;border:1px dashed var(--ink2);border-radius:999px;padding:0 6px;margin-left:8px;color:var(--ink2)}
-#matrix tr.isbase td:first-child::after,#matrix tr.ispre td:first-child::after{display:block;width:max-content;margin:2px 0 0 21px}
+@media (max-width:699px){#matrix tr.isbase td:first-child::after,#matrix tr.ispre td:first-child::after{display:block;width:max-content;margin:2px 0 0 21px}
+#matrix tbody tr td:first-child{height:57px}
+#mkey{min-height:12em;align-content:flex-start}}
 #matrix td.cell{min-width:128px}
 #matrix thead th.num{white-space:normal;min-width:128px;vertical-align:bottom;line-height:1.3}
 #matrix td.na{color:var(--ink3)}
 #matrix td.isest{font-style:italic;outline:1px dashed var(--ink3);outline-offset:-4px}
 #matrix td.cell{line-height:1.3;vertical-align:middle}
-#matrix td.cell>div{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+#matrix td.cell>div{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:1px;min-height:37px}
+#matrix tbody td:first-child{height:37px}
 #matrix td.cell .rx{font-weight:600}
 #matrix td.cell .vx{color:var(--ink2);font-size:12.5px;font-style:normal}
 #matrix td.cell .l2{display:block;font-size:12px;color:var(--ink2);font-style:normal}
@@ -356,6 +359,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
       <button type="button" class="chip seg" data-mshow="both" role="radio" aria-checked="true">Both</button></div>
     <label class="sw" for="munc"><input type="checkbox" id="munc" checked> Uncertainty range</label>
     <label class="sw" for="mest"><input type="checkbox" id="mest" checked> Fill gaps with estimates</label>
+    <button type="button" class="btn ghost" id="mclear">Clear baseline</button>
   </div>
   <div class="mkey" id="mkey"></div>
   <p class="scrollhint" id="mhint" hidden>The table scrolls sideways; the chip column stays put.</p>
@@ -802,7 +806,7 @@ function rove(rows,cur){rows.forEach((t,i)=>{t.tabIndex=i===(cur>=0?cur:0)?0:-1;
 /* fade the right edge and show the hint only when a table is wider than its box */
 function overflow(){document.querySelectorAll('.tablewrap').forEach(w=>{const o=w.scrollWidth>w.clientWidth+1;w.classList.toggle('over',o);w.classList.toggle('end',o&&w.scrollLeft+w.clientWidth>=w.scrollWidth-2);const th=w.querySelector('th');w.style.scrollPaddingLeft=th&&o?th.offsetWidth+'px':''});
   $('mhint').hidden=!$('matrix').parentNode.classList.contains('over')}
-function matrixFill(){const b=curBase(),bv={},gm={};MWS.forEach((k,i)=>{const vs=MROWS.map(m=>m.cells[i].r).filter(Boolean);gm[k]=vs.length?Math.exp(vs.reduce((a,r)=>a+Math.log(r.e),0)/vs.length):null});MWS.forEach((k,i)=>{bv[k]=baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':null,S.mest);MROWS.ths[i].title=b&&!bv[k]?'The baseline has no value for this workload':''});
+function matrixFill(){{const mc=$('mclear');mc.disabled=!S.base;mc.textContent=S.base?'Clear baseline':'No baseline set'}const b=curBase(),bv={},gm={};MWS.forEach((k,i)=>{const vs=MROWS.map(m=>m.cells[i].r).filter(Boolean);gm[k]=vs.length?Math.exp(vs.reduce((a,r)=>a+Math.log(r.e),0)/vs.length):null});MWS.forEach((k,i)=>{bv[k]=baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':null,S.mest);MROWS.ths[i].title=b&&!bv[k]?'The baseline has no value for this workload':''});
   for(const {t,c,cells} of MROWS){t.className=S.preview&&ck(S.preview.chip)===c?'ispre':(!S.preview&&S.base&&ck(S.base.chip)===c?'isbase':'');
     for(const {td,r,k} of cells){td.className='num cell';td.style.background='';
       if(!r){td.textContent='–';td.classList.add('na');td.title='not measured';continue}
@@ -824,6 +828,7 @@ function radios(sel,pick){const bs=[...document.querySelectorAll(sel)];const syn
 radios('[data-mshow]',b=>{S.mshow=b.dataset.mshow;matrixFill()});
 $('munc').addEventListener('change',e=>{S.munc=e.target.checked;matrixFill()});
 $('mest').addEventListener('change',e=>{S.mest=e.target.checked;matrix()});
+$('mclear').addEventListener('click',()=>{S.base=null;S.preview=null;DER.clear();syncBaseSel();all();live('Baseline cleared. Values are in absolute units.')});
 $('matrix').addEventListener('mouseleave',()=>{if(S.preview&&!$('matrix').contains(document.activeElement)){S.preview=null;render();matrixFill();readout()}});
 $('matrix').addEventListener('focusout',e=>{if(S.preview&&!(e.relatedTarget&&$('matrix').contains(e.relatedTarget))&&!$('matrix').matches(':hover')){S.preview=null;render();matrixFill();readout()}});
 document.querySelectorAll('.tablewrap').forEach(w=>{w.addEventListener('scroll',()=>w.classList.toggle('end',w.scrollLeft+w.clientWidth>=w.scrollWidth-2),{passive:true});if(window.ResizeObserver)new ResizeObserver(overflow).observe(w)});
