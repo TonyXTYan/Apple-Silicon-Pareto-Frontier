@@ -5,73 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Apple Silicon Work per Joule</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=Schibsted+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap" rel="stylesheet">
 <style>
-/* Layout idea: a bench instrument. The scatter is the measuring surface, the readout panel beside it is the meter, and the baseline is the one dial everything else is zeroed against. */
-:root{
-  --surface:#fcfcfb; --panel:#f2f1ec; --ink:#17191c; --ink2:#4f5155; --ink3:#87888a; --rule:#dcdbd4; --grid:#ebeae5;
-  --s-base:#2a78d6; --s-pro:#eb6834; --s-max:#1baf7a; --s-ultra:#3a3b3f; --s-intel:#c2418f;
-  --pos:#2a78d6; --neg:#e34948; --focus:#2a78d6;
-  --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
-  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+/* Layout idea: the plot is the instrument. Above it sit only the inputs that change what it measures (workload, baseline, LLM model); the options that change only how it is drawn sit in a rail beside it on desktop and behind one disclosure on mobile. Neutrals are brushed aluminium, so the only colour on the page is data and the focus ring. */
+:root{ color-scheme:light;
+  --page:#F2F4F6; --field:#FFFFFF; --panel:#E7EAEE; --ink:#14171C; --ink2:#4A515B; --ink3:#626A75; --rule:#D3D8DE; --grid:#E9ECF0; --focus:#1F5FBF;
+  --s-base:#2a78d6; --s-pro:#e05a1a; --s-max:#2a925c; --s-ultra:#3a3b3f; --s-intel:#c2418f;
+  --pos:#2a78d6; --neg:#e34948;
+  --surface:var(--page);
+  --display:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){ color-scheme:dark;
-    --surface:#1a1a19; --panel:#242422; --ink:#f0efec; --ink2:#c3c2b7; --ink3:#8f8e86; --rule:#3a3a37; --grid:#2a2a28;
-    --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --pos:#3987e5; --neg:#e66767; --focus:#6da7ec; }
+    --page:#16181B; --field:#0F1113; --panel:#1F2226; --ink:#ECEEF1; --ink2:#B3BAC3; --ink3:#8A929C; --rule:#343940; --grid:#22262B; --focus:#8AB4F8;
+    --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --pos:#3987e5; --neg:#e66767; }
 }
 :root[data-theme="dark"]{ color-scheme:dark;
-  --surface:#1a1a19; --panel:#242422; --ink:#f0efec; --ink2:#c3c2b7; --ink3:#8f8e86; --rule:#3a3a37; --grid:#2a2a28;
-  --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --pos:#3987e5; --neg:#e66767; --focus:#6da7ec; }
+  --page:#16181B; --field:#0F1113; --panel:#1F2226; --ink:#ECEEF1; --ink2:#B3BAC3; --ink3:#8A929C; --rule:#343940; --grid:#22262B; --focus:#8AB4F8;
+  --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --pos:#3987e5; --neg:#e66767; }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-body{background:var(--surface);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
-main{max-width:1320px;margin:0 auto;padding:28px 20px 64px;display:flex;flex-direction:column;gap:22px}
-h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.2vw,44px);line-height:1.02;margin:0;letter-spacing:-.02em;text-wrap:balance}
-h1 .unit{font-weight:500;color:var(--ink2)}
-h2{font-family:var(--display);font-weight:700;font-size:21px;margin:0;letter-spacing:-.01em;text-wrap:balance}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--page);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+main{--gut:24px;max-width:1360px;min-width:0;margin:0 auto;padding:24px var(--gut) 64px;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--display);font-weight:750;font-stretch:112%;font-size:clamp(28px,3.2vw,36px);line-height:1.05;margin:0;letter-spacing:-.015em;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-stretch:108%;font-size:22px;line-height:1.2;margin:0;letter-spacing:-.005em;text-wrap:balance}
 p{margin:0}
 a{color:inherit;text-underline-offset:2px}
-button,select{font:inherit;color:inherit}
+button,select,input{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-header{display:flex;flex-direction:column;gap:10px}
-.deck{color:var(--ink2);max-width:70ch}
-.tabs{display:flex;flex-wrap:wrap;gap:6px}
-.tab{border:1px solid var(--rule);background:transparent;padding:7px 13px 8px;border-radius:7px;cursor:pointer;text-align:left;display:flex;flex-direction:column;line-height:1.25}
-.tab small{color:var(--ink3);font-size:12px}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.tab[aria-selected="true"] small{color:var(--surface);opacity:.7}
-.finding{max-width:95ch;font-size:14px;color:var(--ink);margin:8px 2px 4px;line-height:1.5}
-.controls{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
-.group{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.group>.gl{font-size:13px;color:var(--ink3);margin-right:2px}
-.chip{border:1px solid var(--rule);background:transparent;border-radius:999px;padding:3px 11px 3px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13.5px}
-.chip[aria-pressed="false"]{color:var(--ink3)}
-.chip[aria-pressed="false"] svg{opacity:.25}
-.sw{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer}
-.sw input{accent-color:var(--ink);width:15px;height:15px;margin:0}
-.basesel{display:inline-flex;align-items:center;gap:8px;font-size:13.5px}
-.basesel select{border:1px solid var(--rule);background:var(--surface);border-radius:7px;padding:4px 8px}
-.stage{display:flex;flex-direction:column;gap:10px}
-.ztools{position:absolute;top:10px;right:12px;display:flex;gap:4px;z-index:3}
-.zb{font:inherit;font-size:12px;line-height:1;padding:5px 8px;min-width:26px;border:1px solid var(--rule);border-radius:6px;background:var(--surface);color:var(--ink2);cursor:pointer}
-.zb:hover:not(:disabled){color:var(--ink);border-color:var(--ink3)} .zb:disabled{opacity:.45;cursor:default} .zb:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
-#chart{touch-action:pan-y;cursor:crosshair} #chart.dragging{cursor:grabbing}
-.chartwrap.fs{position:fixed;inset:0;z-index:50;border-radius:0;border:0;padding:10px;overflow:auto}
-.chartwrap{position:relative;border:1px solid var(--rule);border-radius:10px;background:var(--surface);padding:6px}
-#chart{display:block;width:100%;touch-action:pan-y;user-select:none}
-#chart text{font-family:var(--body);font-size:11.5px;fill:var(--ink2)}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;padding:0}
+header.top{display:flex;flex-direction:column;gap:8px}
+.deck{color:var(--ink2);max-width:38em;text-wrap:pretty}
+
+/* workload strip: one row at every width, scrolls inside itself */
+.tabs{position:relative;display:flex;flex-wrap:nowrap;gap:2px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:3px;border:1px solid var(--rule);border-radius:9px;background:var(--field)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;scroll-snap-align:start;border:0;background:transparent;border-radius:7px;min-height:44px;padding:6px 12px 7px;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:center;line-height:1.25;font-size:13.5px;font-weight:500}
+.tab small{color:var(--ink3);font-size:12.5px;font-weight:400}
+.tab:hover:not([aria-selected="true"]){background:var(--panel)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--field);font-weight:600}
+.tab[aria-selected="true"] small{color:var(--field);opacity:.8}
+.tab:focus-visible{outline-offset:-2px;box-shadow:inset 0 0 0 4px var(--field)}
+@media (min-width:1200px){.tab{flex:1 1 0;min-width:0}}
+@media (max-width:1199px){.tabs{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent)}.tabs::after{content:"";flex:0 0 40px}}
+
+/* plot column + rail */
+.layout{display:flex;flex-direction:column;gap:12px;min-width:0}
+.layout>*{min-width:0}
+@media (min-width:1000px){
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 264px;gap:12px 32px;align-items:start}
+  .layout>*{grid-column:1}
+  .layout>.rail{grid-column:2;grid-row:1 / span 3;position:sticky;top:16px;align-self:start;padding:6px 4px 8px;margin:0 -4px;max-height:calc(100vh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+}
+.vs{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 24px;min-width:0}
+.basesel{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;min-width:0;max-width:100%}
+.selw{position:relative;display:inline-flex;min-width:0;max-width:100%}
+.selw::after{content:"";position:absolute;right:11px;top:50%;width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.basesel select{-webkit-appearance:none;appearance:none;border:1px solid var(--rule);background:var(--field);border-radius:7px;padding:4px 30px 4px 10px;min-height:32px;max-width:100%;min-width:0;text-overflow:ellipsis;cursor:pointer}
+.basesel select:hover{border-color:var(--ink3)}
+.vsbase{align-items:baseline;flex-wrap:wrap;column-gap:8px;row-gap:2px;font-size:20px;font-weight:650;font-stretch:108%;flex:0 1 auto;line-height:1.3}
+.vsbase .vsl{color:var(--ink2);font-weight:500;flex:none}
+.vsbase .selw{display:inline-block;flex:0 1 auto;border-radius:3px}
+.vsbase .selw::after{display:none}
+.vsbase .selv{text-decoration:underline 2px var(--ink3);text-underline-offset:5px;text-wrap:balance}
+.vsbase .selv::after{content:"";display:inline-block;width:8px;height:8px;margin:0 4px 0 10px;border:solid currentColor;border-width:0 2px 2px 0;transform:translateY(-5px) rotate(45deg)}
+.vsbase .selw:hover .selv{text-decoration-color:var(--ink)}
+.vsbase select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;padding:0;border:0;min-height:0;cursor:pointer}
+.vsbase .selw:has(select:focus-visible){outline:2px solid var(--focus);outline-offset:4px}
+.vsbase .vsx{font-size:13.5px;font-weight:400;font-stretch:100%;color:var(--ink2);line-height:1.4}
+.vsmod{font-size:13.5px}
+
+.plot{--surface:var(--field);margin:0;border:1px solid var(--rule);border-radius:10px;background:var(--field);overflow:hidden}
+.chartwrap{position:relative;background:var(--field);padding:6px}
+.chartwrap.fs{position:fixed;inset:0;z-index:50;padding:10px;overflow:auto}
+.ctop{display:flex;align-items:center;gap:8px;padding:2px 2px 4px 8px}
+.zhint{margin-right:auto;font-size:12.5px;color:var(--ink3);line-height:1.3}
+.zhint .tch{display:none}
+@media (max-width:560px){.zhint .ptr{display:none}}
+@media (hover:none) and (pointer:coarse){.zhint .ptr{display:none}.zhint .tch{display:inline}}
+.ztools{display:flex;gap:4px;flex:none}
+.zb{font-size:12.5px;line-height:1;min-height:28px;min-width:30px;padding:5px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--field);color:var(--ink2);cursor:pointer}
+.zb:hover:not(:disabled){color:var(--ink);border-color:var(--ink3)} .zb:disabled{opacity:.45;cursor:default}
+#chart{display:block;width:100%;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:crosshair;border-radius:4px}
+#chart.dragging{cursor:grabbing}
+#chart:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+#chart:focus:not(:focus-visible){outline:none}
+#chart text{font-family:var(--body);font-size:11.5px;fill:var(--ink2);font-variant-numeric:tabular-nums}
 #chart .axt{font-size:12.5px;fill:var(--ink2)}
-#chart .lbl{font-size:11.5px;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3.2px;stroke-linejoin:round}
-#chart .lbl.rel{font-weight:600}
+#chart .lbl{font-size:11.5px;font-stretch:87.5%;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3.2px;stroke-linejoin:round}
+#chart .lbl.rel{font-weight:650}
 #chart .grid{stroke:var(--grid);stroke-width:1}
 #chart .axis{stroke:var(--rule);stroke-width:1}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
 #chart .fring{fill:none;stroke:var(--ink);stroke-width:1.4}
 #chart .iso{stroke:var(--ink3);stroke-width:1;stroke-dasharray:3 5;opacity:.5}
-#chart .isot{fill:var(--ink3);font-size:10.5px}
+#chart .isot{fill:var(--ink3);font-size:11px}
 #chart g.scale.scoff{opacity:.3}
 #chart g.scale.scon text{fill:var(--ink);font-weight:600}
 #chart.focused .isot{opacity:.2}
@@ -83,7 +116,8 @@ header{display:flex;flex-direction:column;gap:10px}
 #chart .spoke-gen{stroke:var(--ink);stroke-width:1.3;opacity:.55}
 #chart .spoke-tier{stroke:var(--ink);stroke-width:1.3;stroke-dasharray:5 4;opacity:.55}
 #chart .baseline-ring{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-dasharray:1.5 2.5}
-.t-Intel{--c:var(--s-intel)} .t-base{--c:var(--s-base)} .t-Pro{--c:var(--s-pro)} .t-Max{--c:var(--s-max)} .t-Ultra{--c:var(--s-ultra)}
+#chart .kring{fill:none;stroke:var(--focus);stroke-width:2.5}
+.t-Intel{--c:var(--s-intel)} .t-base{--c:var(--s-base)} .t-Pro{--c:var(--s-pro)} .t-Max{--c:var(--s-max)} .t-Ultra{--c:var(--s-ultra)} .t-key{--c:var(--ink3)}
 #chart .mk.solid{fill:var(--c);stroke:var(--surface);stroke-width:1.6}
 #chart .mk.hollow{fill:var(--surface);stroke:var(--c);stroke-width:2}
 #chart .mk.est{fill:var(--surface);stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2}
@@ -93,152 +127,242 @@ header{display:flex;flex-direction:column;gap:10px}
 #chart .ring{fill:none;stroke:var(--ink);stroke-width:1.8}
 #chart g.dim{opacity:.16}
 @media (prefers-reduced-motion:no-preference){#chart g.m{transition:opacity .12s}}
-.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.45;max-width:300px;z-index:3;box-shadow:0 6px 22px rgba(0,0,0,.25)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--field);border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.45;width:max-content;max-width:min(300px,calc(100% - 12px));z-index:4;box-shadow:0 6px 22px rgba(0,0,0,.25)}
 .tip b{font-weight:600;font-size:13.5px;display:block}
-.tip .v{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.01em}
+.tip .v{font-size:20px;font-weight:700;letter-spacing:-.01em}
 .tip .r{display:flex;justify-content:space-between;gap:14px}
 .tip .r span:first-child{opacity:.72}
-.tip .hint{opacity:.65;margin-top:6px;font-size:11.5px}
+.tip .hint{opacity:.7;margin-top:6px;font-size:12px}
 .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink2);padding:24px;text-align:center}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--ink2);padding:6px 4px 0}
+
+/* key under the plot */
+.key{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;padding:10px 14px 12px;border-top:1px solid var(--rule);font-size:12.5px;line-height:1.4}
+.keyh{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--ink)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.note{color:var(--ink2);font-size:13.5px;max-width:95ch}
-/* readout panel */
-.readout{border-top:1px solid var(--rule);padding:10px 2px 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;font-size:13.5px}
+#legend svg[viewBox]{width:18px;height:18px}
+.legend .lgh{color:var(--ink2)}
+.legend .lbr{flex-basis:100%;height:0}
+.keynote{grid-column:2;color:var(--ink2);max-width:40em}
+
+.finding{max-width:38em;font-size:15px;color:var(--ink);margin:4px 0 0;text-wrap:pretty}
+.note{color:var(--ink2);font-size:13.5px;max-width:37em}
+
+/* rail ("Display options") */
+.rail{min-width:0}
+.rail>summary{list-style:none;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;border:1px solid var(--rule);border-radius:9px;background:var(--field);font-weight:600;font-size:14px;cursor:pointer}
+.rail>summary::-webkit-details-marker{display:none}
+.rail>summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.rail[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
+.rail[open]>summary{margin-bottom:16px}
+@media (prefers-reduced-motion:no-preference){.rail>summary::after{transition:transform .15s}}
+@media (min-width:1000px){.rail>summary{display:none}}
+.railbody{display:flex;flex-direction:column;gap:20px}
+.rg{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
+.rg .group{gap:6px}
+.rg>.group+.group{margin-top:12px}
+.rail .gl{display:block;width:100%;font-size:12.5px;color:var(--ink3);font-weight:500;margin-bottom:2px}
+.enc{color:var(--ink3);font-weight:400}
+.rail .sub{margin-left:24px}
+@media (min-width:1000px){.rail .seg{width:100%;justify-content:flex-start}}
+main:has(.tab[data-w="all"][aria-selected="true"]) #forms .chip svg,main:has(.tab[data-w="all"][aria-selected="true"]) #forms .enc{display:none}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.group{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.controls .gl{font-size:13px;color:var(--ink3);margin-right:2px}
+.chip{border:1px solid var(--rule);background:var(--field);border-radius:999px;min-height:32px;padding:3px 12px 3px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;line-height:1.2;color:var(--ink);text-align:left}
+.chip:hover{border-color:var(--ink3)}
+.chip[aria-pressed="false"]{color:var(--ink3);background:transparent;border-style:dashed}
+.chip[aria-pressed="false"] svg{opacity:.3}
+.chip.seg{padding:3px 12px}
+.chip.seg[aria-checked="true"]{background:var(--ink);color:var(--field);border-color:var(--ink)}
+.chip.seg[aria-checked="false"]{color:var(--ink2)}
+.sw{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;line-height:1.3;cursor:pointer;min-height:32px}
+.sw input{accent-color:var(--ink);width:16px;height:16px;margin:0;flex:none}
+@media (pointer:coarse){.chip,.zb{min-height:40px}.zb{min-width:40px}.sw{min-height:40px}.sw input{width:20px;height:20px}.basesel:not(.vsbase) select{min-height:40px}}
+
+/* readout: sits directly under the plot */
+.readout{border-left:3px solid var(--ink);padding:2px 0 2px 14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;font-size:13.5px}
 .readout:empty{display:none}
 .readout .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.readout h3{font-family:var(--display);font-size:16px;margin:0;line-height:1.2}
+.readout h2{font-family:var(--display);font-stretch:108%;font-weight:650;font-size:17px;margin:0;line-height:1.2}
 .readout .sub{font-size:12.5px;color:var(--ink2)}
-.readout .big{font-family:var(--display);font-weight:700;font-size:22px;line-height:1;letter-spacing:-.01em}
-.readout .big small{font-family:var(--body);font-size:13px;font-weight:500;color:var(--ink2);letter-spacing:0;margin-left:4px}
+.readout .big{font-weight:700;font-size:24px;line-height:1;letter-spacing:-.01em}
+.readout .big small{font-size:13px;font-weight:500;color:var(--ink2);letter-spacing:0;margin-left:4px}
 .readout dl{display:flex;flex-wrap:wrap;gap:2px 16px;margin:0}
 .readout dl div{display:flex;gap:6px}
 .readout dt{color:var(--ink2)} .readout dd{margin:0}
 .readout .rel{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px}
 .readout .rel .rh{color:var(--ink2)}
-.readout .rel button{border:1px solid var(--rule);background:none;padding:1px 8px;border-radius:999px;cursor:pointer;font-size:12.5px}
-.readout .rel button:hover{background:var(--surface)}
+.readout .rel button{border:1px solid var(--rule);background:var(--field);padding:2px 9px;min-height:28px;border-radius:999px;cursor:pointer;font-size:12.5px}
+.readout .rel button:hover{border-color:var(--ink3)}
 .readout .acts{display:flex;flex-wrap:wrap;gap:8px}
-.btn{border:1px solid var(--ink);background:var(--ink);color:var(--surface);border-radius:7px;padding:3px 10px;cursor:pointer;font-size:13px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--field);border-radius:7px;padding:4px 12px;min-height:32px;cursor:pointer;font-size:13px}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--ink3)}
 .btn[disabled]{opacity:.45;cursor:default}
 .readout .src{font-size:12.5px;color:var(--ink2)}
 .readout .estnote{font-size:12.5px;color:var(--ink2);flex-basis:100%}
-.readout .idle{font-size:13.5px;color:var(--ink2);display:flex;flex-direction:column;gap:8px}
-/* matrix */
-section{display:flex;flex-direction:column;gap:10px}
-.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px}
-table{border-collapse:collapse;width:100%;font-size:13.5px}
+
+/* lower sections */
+section{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--page)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
 th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 th{font-weight:500;color:var(--ink2);background:var(--panel);font-size:12.5px;position:sticky;top:0;z-index:1}
 td.num,th.num{text-align:right}
+#matrix th:first-child,#matrix td:first-child,#table th:first-child,#table td:first-child{position:sticky;left:0;z-index:1;background:linear-gradient(to left,var(--rule) 1px,var(--page) 1px)}
+#matrix th:first-child,#table th:first-child{z-index:2;background:linear-gradient(to left,var(--rule) 1px,var(--panel) 1px)}
 #matrix{min-width:720px}
 #matrix tbody tr{cursor:pointer}
 #matrix tbody tr:hover td:first-child,#matrix tbody tr:focus-visible td:first-child{box-shadow:inset 3px 0 0 var(--ink)}
+#matrix tbody tr:focus-visible,#table tbody tr:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
 #matrix tr.isbase td{font-weight:600}
-#matrix tr.isbase td:first-child::after{content:"baseline";font-weight:500;font-size:11px;border:1px solid var(--ink);border-radius:999px;padding:0 6px;margin-left:8px}
-#matrix tr.ispre td:first-child::after{content:"previewing";font-weight:500;font-size:11px;border:1px dashed var(--ink2);border-radius:999px;padding:0 6px;margin-left:8px;color:var(--ink2)}
-#matrix td.cell{min-width:150px}
+#matrix tr.isbase td:first-child::after{content:"baseline";font-weight:500;font-size:12px;border:1px solid var(--ink);border-radius:999px;padding:0 6px;margin-left:8px}
+#matrix tr.ispre td:first-child::after{content:"previewing";font-weight:500;font-size:12px;border:1px dashed var(--ink2);border-radius:999px;padding:0 6px;margin-left:8px;color:var(--ink2)}
+#matrix tr.isbase td:first-child::after,#matrix tr.ispre td:first-child::after{display:block;width:max-content;margin:2px 0 0 21px}
+#matrix td.cell{min-width:128px}
+#matrix thead th.num{white-space:normal;min-width:128px;vertical-align:bottom;line-height:1.3}
 #matrix td.na{color:var(--ink3)}
 #matrix td.isest{font-style:italic;outline:1px dashed var(--ink3);outline-offset:-4px}
 #matrix td.cell{line-height:1.3;vertical-align:middle}
-#matrix td.cell>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+#matrix td.cell>div{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
 #matrix td.cell .rx{font-weight:600}
 #matrix td.cell .vx{color:var(--ink2);font-size:12.5px;font-style:normal}
-#matrix td.cell .rx:only-child,#matrix td.cell .vx:only-child{margin-left:auto}
 #matrix td.cell .l2{display:block;font-size:12px;color:var(--ink2);font-style:normal}
-#matrix td.cell .l3{display:block;font-size:11.5px;color:var(--ink3);font-style:normal}
-.chip.seg{padding:3px 11px}
-.chip.seg[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.chip.seg[aria-pressed="false"]{color:var(--ink2)}
+#matrix td.cell .l3{display:block;font-size:12px;color:var(--ink2);font-style:normal}
 .mkey{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink2);align-items:center}
-.ramp{display:inline-flex;border-radius:4px;overflow:hidden;border:1px solid var(--rule)}
+.ramp{display:inline-flex;border-radius:4px;overflow:hidden;border:1px solid var(--rule);vertical-align:middle}
 .ramp i{display:block;width:22px;height:12px}
-details{border:1px solid var(--rule);border-radius:10px}
-details>summary{cursor:pointer;padding:11px 14px;font-family:var(--display);font-weight:700;font-size:18px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
-details>summary::-webkit-details-marker{display:none}
-details>summary::after{content:"Show";font-family:var(--body);font-weight:500;font-size:13px;color:var(--ink2);border:1px solid var(--rule);border-radius:999px;padding:2px 10px}
-details[open]>summary::after{content:"Hide"}
-details>summary small{font-family:var(--body);font-weight:400;font-size:13px;color:var(--ink2);margin-left:8px}
+.scrollhint{font-size:12.5px;color:var(--ink3)}
+.tablewrap.over:not(.end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),rgba(0,0,0,.25));mask-image:linear-gradient(90deg,#000 calc(100% - 36px),rgba(0,0,0,.25))}
+details:not(.rail){border:1px solid var(--rule);border-radius:10px}
+details:not(.rail)>summary{cursor:pointer;padding:12px 14px;min-height:48px;font-family:var(--display);font-weight:700;font-stretch:108%;font-size:18px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+details:not(.rail)>summary::-webkit-details-marker{display:none}
+details:not(.rail)>summary::after{content:"Show";flex:none;font-family:var(--body);font-stretch:100%;font-weight:500;font-size:13px;color:var(--ink2);border:1px solid var(--rule);border-radius:999px;padding:3px 12px;background:var(--field)}
+details:not(.rail)[open]>summary::after{content:"Hide"}
+details:not(.rail)>summary .sumh{font:inherit;letter-spacing:inherit;margin:0}
+details:not(.rail)>summary small{font-family:var(--body);font-stretch:100%;font-weight:400;font-size:13px;color:var(--ink2);margin-left:8px}
 details .inner{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
 #table{min-width:780px}
 #table th button{border:0;background:none;padding:0;cursor:pointer;font-weight:500;color:inherit}
 #table th[aria-sort] button::after{content:" ↓"} #table th[aria-sort="ascending"] button::after{content:" ↑"}
 #table td.src{white-space:normal;min-width:220px;color:var(--ink2)}
 #table tbody tr{cursor:pointer}
-#table tbody tr:hover,#table tbody tr.on{background:var(--panel)}
+#table tbody tr:hover td,#table tbody tr.on td{background:var(--panel)}
+#table tbody tr:hover td:first-child,#table tbody tr.on td:first-child{background:linear-gradient(to left,var(--rule) 1px,var(--panel) 1px)}
 td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
-.pill{font-size:11px;border:1px dashed var(--ink3);border-radius:999px;padding:0 6px;margin-left:6px;color:var(--ink2);white-space:nowrap}
-.method{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
-@media (max-width:860px){.method{grid-template-columns:1fr}}
-.method.wide{grid-template-columns:1fr}
-#loofig{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.pill{font-size:12px;border:1px dashed var(--ink3);border-radius:999px;padding:0 6px;margin-left:6px;color:var(--ink2);white-space:nowrap}
+.method{display:grid;grid-template-columns:minmax(0,520px) 340px;gap:18px 48px;align-items:start}
+@media (max-width:860px){.method{grid-template-columns:minmax(0,1fr)}}
+.method.wide{grid-template-columns:minmax(0,1fr)}
+#loofig{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
 #loofig svg{width:100%}
-.method ul,.gaps{margin:0;padding-left:18px;color:var(--ink2);display:flex;flex-direction:column;gap:5px;font-size:14px}
-#loo text{font-family:var(--body);font-size:11px;fill:var(--ink2)}
-@media (max-width:560px){ body{font-size:14.5px} main{padding:20px 16px 44px} .tab{padding:6px 9px} }
+.method ul,.gaps{margin:0;padding-left:18px;color:var(--ink2);display:flex;flex-direction:column;gap:5px;font-size:14px;max-width:36em}
+#loo text{font-family:var(--body);font-size:var(--lfz,11px);fill:var(--ink2)}
+#chart.nar text{font-size:12px}
+#chart.nar .axt{font-size:12.5px}
+#chart.nar .lbl,#chart.nar .isot{font-size:12px}
+
+@media (max-width:699px){
+  .deck-more{display:none}
+  .tabs{margin-inline:calc(-1 * var(--gut));border-inline:0;border-radius:0;padding-inline:var(--gut) 3px;scroll-padding-inline:var(--gut)}
+  .vsbase{font-size:17px;display:flex;width:100%}
+  .key{grid-template-columns:minmax(0,1fr);gap:6px}
+  .keynote{grid-column:1}
+  .readout .big{font-size:20px}
+  .tip{font-size:12px;padding:8px 10px}
+  .tip .v{font-size:18px}
+  #looBig{display:none}
+  #table td.src{min-width:0;white-space:nowrap}
+  #table{font-size:13px}
+  #table td{line-height:1.35}
+  #table td:first-child{white-space:normal;min-width:136px;width:150px}
+}
+@media (max-width:560px){ body{font-size:14.5px} main{--gut:16px;padding:16px var(--gut) 44px;gap:14px} .finding{font-size:14.5px} .zhint{font-size:12px} }
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 <main>
-<header>
+<header class="top">
   <h1>Apple Silicon work per joule</h1>
-  <p class="deck">How much computing each Mac gets out of a joule taken from the wall, across seven kinds of work. Measured points come from published whole-system power, not chip power. Hover a point to see its relatives and exact power line, click it to pin its details under the chart, and pick any chip as the baseline.</p>
+  <p class="deck">How much computing each Mac gets out of a joule taken from the wall, across seven kinds of work. <span class="deck-more">Measured points use published whole-system power, not chip power; any chip can be the baseline.</span></p>
 </header>
 
 <div class="tabs" role="tablist" aria-label="Workload" id="tabs"></div>
 
-<div class="controls">
-  <label class="basesel" for="base">Baseline <select id="base"></select></label>
-  <div class="group" id="tiers"><span class="gl">Chip tier</span></div>
-  <div class="group" id="forms"><span class="gl">Machine</span></div>
-  <label class="sw" for="est"><input type="checkbox" id="est"> Model estimates and power modes</label>
-  <label class="sw" for="err"><input type="checkbox" id="err" checked> Error bars</label>
-  <label class="sw" for="flg"><input type="checkbox" id="flg" checked> Weaker measurements</label>
-  <label class="sw" for="front" title="Joins, with straight segments, the points that no other point beats on both speed and work per joule. Dashed ends continue it past the slowest and fastest frontier points with the chosen fit to the frontier points, anchored at each end point. Uses central values."><input type="checkbox" id="front"> Efficiency frontier</label>
-  <label class="basesel" for="lmod" id="lmodw" hidden>Model <select id="lmod"><option value="">Every model and context</option><option value="Llama 2 7B Q4_0">Llama 2 7B Q4_0, every chip</option><option value="Llama 3 8B Q4_K_M">Llama 3 8B Q4_K_M, by context</option><option value="Llama 3 8B F16">Llama 3 8B F16, by context</option><option value="Llama 3 70B Q4_K_M">Llama 3 70B Q4_K_M, by context</option><option value="Llama 3 70B F16">Llama 3 70B F16, by context</option><option value="set:mlx">MLX vs GGUF, same machine</option><option value="set:cluster">Mac Studio clusters (exo vs llama.cpp RPC)</option><option value="other">Other metered runs</option></select></label>
-  <label class="basesel" for="ffit">ends <select id="ffit"><option value="pow">power-law fit</option><option value="exp">exponential fit</option><option value="log">logarithmic fit</option><option value="lin">linear fit</option></select></label>
-  <div class="group" role="radiogroup" aria-label="What hovering highlights"><span class="gl">Hover highlights</span>
-    <button type="button" class="chip seg" data-hmode="rel" aria-pressed="true">Related chips</button>
-    <button type="button" class="chip seg" data-hmode="chip" aria-pressed="false">Same chip</button>
-    <button type="button" class="chip seg" data-hmode="machine" aria-pressed="false">Same chip and machine</button></div>
-</div>
+<div class="layout" role="tabpanel" id="panel" aria-labelledby="tab-all">
+  <div class="vs">
+    <label class="basesel vsbase" for="base"><span class="vsl" id="basel">Relative to</span> <span class="selw"><span class="selv" id="basev" aria-hidden="true"></span><select id="base"></select></span><span class="vsx" id="basex" hidden></span></label>
+    <label class="basesel vsmod" for="lmod" id="lmodw" hidden>Model <span class="selw"><select id="lmod"><option value="">Every model and context</option><option value="Llama 2 7B Q4_0">Llama 2 7B Q4_0, every chip</option><option value="Llama 3 8B Q4_K_M">Llama 3 8B Q4_K_M, by context</option><option value="Llama 3 8B F16">Llama 3 8B F16, by context</option><option value="Llama 3 70B Q4_K_M">Llama 3 70B Q4_K_M, by context</option><option value="Llama 3 70B F16">Llama 3 70B F16, by context</option><option value="set:mlx">MLX vs GGUF, same machine</option><option value="set:cluster">Mac Studio clusters (exo vs llama.cpp RPC)</option><option value="other">Other metered runs</option></select></span></label>
+  </div>
 
-<div class="stage">
-  <div>
-    <div class="chartwrap" id="wrap">
-      <div class="ztools" role="group" aria-label="Chart view"><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
-      <svg id="chart" role="img" aria-labelledby="charttitle"><title id="charttitle"></title></svg>
+  <figure class="plot">
+    <div class="chartwrap" id="wrap" aria-label="Chart">
+      <div class="ctop">
+        <p class="zhint"><span class="ptr">Scroll to zoom, drag to pan, arrow keys step through points</span><span class="tch">Tap a point for details; once zoomed, drag sideways to pan</span></p>
+        <div class="ztools" role="group" aria-label="Chart view"><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
+      </div>
+      <svg id="chart" tabindex="0" role="application" aria-roledescription="scatter plot" aria-labelledby="charttitle" aria-describedby="charthelp"><title id="charttitle"></title></svg>
       <div class="tip" id="tip" hidden></div>
       <div class="empty" id="empty" hidden></div>
     </div>
-    <div class="legend" id="legend"></div>
-    <p class="finding" id="finding"></p>
-  </div>
-  <div class="readout" id="readout" aria-live="polite"></div>
+    <div class="key"><span class="keyh">Key</span><div class="legend" id="legend"></div>
+      <p class="keynote">Bars: wall-power range on measured points, ±1 leave-one-out SD on estimates. Dotted circle: the baseline. Click or tap a point to pin it.</p></div>
+  </figure>
+  <p id="charthelp" class="sr">Arrow keys step through the visible points: left and right in order of speed, up and down in order of work per joule; Home and End jump to the slowest and fastest. Enter or Space pins the point, Escape clears it. Plus and minus zoom, zero resets.</p>
+  <p id="live" class="sr" aria-live="polite" aria-atomic="true"></p>
+
+  <div class="readout" id="readout"></div>
+
+  <details class="rail" id="opts"><summary>Display options</summary><div class="railbody">
+    <div class="rg">
+      <div class="group" id="tiers"><span class="gl">Chip tier <span class="enc">(colour)</span></span></div>
+      <div class="group" id="forms"><span class="gl">Machine <span class="enc">(shape)</span></span></div>
+    </div>
+    <div class="rg"><span class="gl">Points</span>
+      <label class="sw" for="est"><input type="checkbox" id="est"> Model estimates and power modes</label>
+      <label class="sw" for="flg"><input type="checkbox" id="flg" checked> Weaker measurements</label>
+      <label class="sw" for="err"><input type="checkbox" id="err" checked> Error bars</label>
+    </div>
+    <div class="rg"><span class="gl">Efficiency frontier</span>
+      <label class="sw" for="front" title="Joins, with straight segments, the points that no other point beats on both speed and work per joule. Dashed ends continue it past the slowest and fastest frontier points with the chosen fit to the frontier points, anchored at each end point. Uses central values."><input type="checkbox" id="front"> Draw frontier</label>
+      <label class="basesel sub" for="ffit">Ends <span class="selw"><select id="ffit"><option value="pow">power-law fit</option><option value="exp">exponential fit</option><option value="log">logarithmic fit</option><option value="lin">linear fit</option></select></span></label>
+    </div>
+    <div class="rg">
+      <div class="group" role="radiogroup" aria-labelledby="hml" style="width:100%"><span class="gl" id="hml">Hover highlights</span>
+        <button type="button" class="chip seg" data-hmode="rel" role="radio" aria-checked="true">Related chips</button>
+        <button type="button" class="chip seg" data-hmode="chip" role="radio" aria-checked="false">Same chip</button>
+        <button type="button" class="chip seg" data-hmode="machine" role="radio" aria-checked="false">Same chip and machine</button></div>
+    </div>
+  </div></details>
+
+  <p class="finding" id="finding"></p>
+  <p class="note" id="wnote"></p>
 </div>
-<p class="note" id="wnote"></p>
 
 <section>
   <h2>The same chip, different work</h2>
-  <p class="note">Each cell is the chip's best measured machine on that workload divided by the baseline chip on the same workload; estimates fill the gaps unless you turn them off. Hover a row to preview it as the baseline, and click to keep it. The main chart follows.</p>
+  <p class="note">Each cell is the chip's best measured machine on that workload divided by the baseline chip on the same workload; estimates fill the gaps unless you turn them off. Hover a row, or focus it and move with the arrow keys, to preview it as the baseline; click it or press Enter to keep it. The main chart follows.</p>
   <div class="controls" id="mopts">
-    <div class="group" role="radiogroup" aria-label="Cell contents"><span class="gl">Cells show</span>
-      <button type="button" class="chip seg" data-mshow="ratio" aria-pressed="false">Ratio to baseline</button>
-      <button type="button" class="chip seg" data-mshow="value" aria-pressed="false">Value with units</button>
-      <button type="button" class="chip seg" data-mshow="both" aria-pressed="true">Both</button></div>
+    <div class="group" role="radiogroup" aria-labelledby="mcl"><span class="gl" id="mcl">Cells show</span>
+      <button type="button" class="chip seg" data-mshow="ratio" role="radio" aria-checked="false">Ratio to baseline</button>
+      <button type="button" class="chip seg" data-mshow="value" role="radio" aria-checked="false">Value with units</button>
+      <button type="button" class="chip seg" data-mshow="both" role="radio" aria-checked="true">Both</button></div>
     <label class="sw" for="munc"><input type="checkbox" id="munc" checked> Uncertainty range</label>
     <label class="sw" for="mest"><input type="checkbox" id="mest" checked> Fill gaps with estimates</label>
   </div>
   <div class="mkey" id="mkey"></div>
+  <p class="scrollhint" id="mhint" hidden>The table scrolls sideways; the chip column stays put.</p>
   <div class="tablewrap"><table id="matrix"><thead></thead><tbody></tbody></table></div>
 </section>
 
 <details id="numbers">
-  <summary><span id="tabletitle"></span></summary>
+  <summary><h2 class="sumh" id="tabletitle"></h2></summary>
   <div class="inner">
-    <p class="note">Click a row to pin it in the readout. Hover a row to find it on the chart.</p>
+    <p class="note">Click a row, or focus it and press Enter or Space, to pin it in the readout; the arrow keys move between rows. Hover or focus a row to find it on the chart.</p>
     <div class="tablewrap"><table id="table"><thead></thead><tbody></tbody></table></div>
   </div>
 </details>
@@ -263,7 +387,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
 </section>
 
 <details>
-  <summary><span>What is missing <small>and what was left out</small></span></summary>
+  <summary><h2 class="sumh">What is missing <small>and what was left out</small></h2></summary>
   <div class="inner">
   <ul class="gaps">
     <li><b>Ultra chips under Cinebench.</b> Reviews in English, German and Japanese give M3 Ultra scores but no wall power for the run. PC Watch reports about 146 W with Cinebench and a game running together. The M3 Ultra is measured only under HPL and LLM generation, where Jeff Geerling metered it at the wall. Its Cinebench points are estimates.</li>
@@ -380,14 +504,15 @@ function frontFit(P,type){if(P.length<2)return null;const n=P.length,L=Math.log;
   if(type==='lin')return {mul:false,g:x=>a+b*x,label:`Frontier fit: y = ${f2(a)}${sg(b)}·x`};
   return {mul:true,g:x=>Math.exp(a)*Math.pow(x,b),label:`Frontier fit: work per joule ∝ x^${f2(b)}, so power ∝ x^${f2(1-b)}`}}
 function render(){
-  const w=WL[S.w], rows=visible(), ax=axisRel(), svg=$('chart');
+  const w=WL[S.w], rows=visible(), ax=axisRel(), svg=$('chart');baseTitle();
   while(svg.childNodes.length>1)svg.removeChild(svg.lastChild);
-  $('charttitle').textContent=w.tab+': work per joule against throughput for '+rows.length+' machines';
-  const FS=$('wrap').classList.contains('fs'),W=Math.max(320,$('wrap').clientWidth-(FS?20:12)), H=FS?Math.max(360,window.innerHeight-24):Math.round(Math.max(400,Math.min(660,W*.64)));
+  $('charttitle').textContent=w.tab+': work per joule against throughput for '+rows.length+' machines'+(rows.length?'. Highest work per joule: '+name(rows.reduce((a,b)=>b.e>a.e?b:a))+'.':'');
+  const FS=$('wrap').classList.contains('fs'),W=Math.max(260,$('wrap').clientWidth-(FS?20:12)), H=FS?Math.max(360,window.innerHeight-24-$('wrap').querySelector('.ctop').offsetHeight):Math.round(Math.max(400,Math.min(660,W*.6)));
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('height',H);
   $('empty').hidden=rows.length>0;S.pts=[];
   if(!rows.length){$('empty').textContent='No machines match these filters. Turn a chip tier or machine type back on.';return}
   const AB=absAll(),AW0=AB?WS5.filter(k=>rows.some(r=>r.ow===k)):[],AW=AB&&W-(24+AW0.length*(W<560?46:62))<520?[AW0.includes(S.scaleW)?S.scaleW:AW0[0]].filter(Boolean):AW0,colW=W<560?46:62,rowH=17;
+  svg.classList.toggle('nar',W<560);
   const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=ax?ax.k:1, narrow=narrow0;
   let x0=Infinity,x1=0,y0=Infinity,y1=0;
   for(const r of rows){x0=Math.min(x0,S.err&&r.xlo?r.xlo:r.x);x1=Math.max(x1,S.err&&r.xhi?r.xhi:r.x);
@@ -400,22 +525,28 @@ function render(){
   const g=el('g',{});svg.appendChild(g);
   if(AB){const mini=(gg,k2,x,y)=>{const s2=shape(WSHAPE[k2],'',x,y,.72);s2.setAttribute('style','fill:var(--ink2)');gg.appendChild(s2)};const g0=g;
     AW.forEach((k2,i)=>{const g=el('g',{class:'scale','data-w':k2});g0.appendChild(g);const xr=xref(k2),wl=WL[k2],yy=H-m.b+14+i*rowH;
-      for(const v of ticks(x0*xr,x1*xr)){const px=X(v/xr);if(px<m.l+4||px>W-m.r-4)continue;if(i===0)g.appendChild(el('line',{x1:px,x2:px,y1:m.t,y2:H-m.b,class:'grid'}));
-        g.appendChild(el('line',{x1:px,x2:px,y1:yy-11,y2:yy-8,style:'stroke:var(--ink3)'}));g.appendChild(el('text',{x:px,y:yy+1,'text-anchor':'middle'},fmtT(v)))}
+      let lastR=-1e9;for(const v of ticks(x0*xr,x1*xr)){const px=X(v/xr);if(px<m.l+4||px>W-m.r-4)continue;if(i===0)g.appendChild(el('line',{x1:px,x2:px,y1:m.t,y2:H-m.b,class:'grid'}));
+        g.appendChild(el('line',{x1:px,x2:px,y1:yy-11,y2:yy-8,style:'stroke:var(--ink3)'}));lastR=xTick(g,px,yy+1,fmtT(v),lastR)}
       mini(g,k2,m.l-colW*AW.length+6,yy-4);if(AW.length===AW0.length)g.appendChild(el('text',{x:m.l-colW*AW.length+14,y:yy,'text-anchor':'start'},wl.short+' ('+wl.xu+')'));
       const cx=m.l-6-(AW.length-1-i)*colW;
       for(const v of ticks(y0*xr,y1*xr)){const py=Y(v/xr);if(py<m.t+6||py>H-m.b-4)continue;if(i===0)g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:py,y2:py,class:'grid'}));
-        g.appendChild(el('text',{x:cx,y:py+4,'text-anchor':'end'},fmtT(v)))}
+        g.appendChild(el('text',{x:cx,y:py+4,'text-anchor':'end',class:'tk'},fmtT(v)))}
       if(AW.length===AW0.length){mini(g,k2,cx-14,m.t-40);g.appendChild(el('text',{x:cx,y:m.t-22,'text-anchor':'end',style:'font-size:10.5px'},wl.hs||wl.short));g.appendChild(el('text',{x:cx,y:m.t-9,'text-anchor':'end',style:'font-size:10.5px'},wl.eu))}});
 }
   else{
-  for(const t of ticks(x0,x1)){g.appendChild(el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'}));g.appendChild(el('text',{x:X(t),y:H-m.b+16,'text-anchor':'middle'},fmtT(t)+(w.combined?'×':'')))}
-  for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end'},fmtT(t)+(ax||w.combined?'×':'')))}}
+  let lastR=-1e9;for(const t of ticks(x0,x1)){g.appendChild(el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'}));lastR=xTick(g,X(t),H-m.b+16,fmtT(t)+(w.combined?'×':''),lastR)}
+  for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end',class:'tk'},fmtT(t)+(ax||w.combined?'×':'')))}}
   g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axis'}));g.appendChild(el('line',{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:'axis'}));
   const bN=w.combined?(()=>{const b=curBase()||DEFBASE;return b.chip+(b.dev?' '+b.dev:'')})():'';
-  g.appendChild(el('text',{x:(m.l+W-m.r)/2,y:H-9,'text-anchor':'middle',class:'axt'},AB?(AW.length<AW0.length?WL[AW[0]].short+' throughput ('+WL[AW[0]].xu+'), tap a point to switch scale':'Throughput, one scale per workload (shape), faster to the right'):w.combined?'Throughput relative to '+bN+' on the same workload, faster to the right':w.x+', faster to the right'));
-  const yl=AB?(AW.length<AW0.length?WL[AW[0]].short+' work per joule ('+WL[AW[0]].eu+')':'Work per joule, one scale per workload, more efficient upward'):w.combined?'Work per joule relative to '+bN+', more efficient upward':(ax?'Work per joule relative to '+ax.b.chip+' '+devName(ax.b):w.e+' ('+w.eu+')')+', more efficient upward';
-  g.appendChild(el('text',{x:15,y:(m.t+H-m.b)/2,'text-anchor':'middle',class:'axt',transform:`rotate(-90 15 ${(m.t+H-m.b)/2})`},yl));
+  const sc=AW.length<AW0.length&&AW[0]?WL[AW[0]]:null,bL=ax?ax.b.chip+' '+devName(ax.b):'';
+  const xc=AB?(sc?[sc.short+' throughput ('+sc.xu+'), tap a point to switch scale',sc.short+' throughput ('+sc.xu+')']:['Throughput, one scale per workload (shape), faster to the right','Throughput, one scale per workload','Throughput'])
+    :w.combined?['Throughput relative to '+bN+' on the same workload, faster to the right','Throughput relative to the baseline, faster to the right','Throughput vs baseline']:[w.x+', faster to the right',w.x,'Throughput ('+w.xu+')'];
+  const yc=AB?(sc?[sc.short+' work per joule ('+sc.eu+')',sc.short+' ('+sc.eu+')']:['Work per joule, one scale per workload, more efficient upward','Work per joule, one scale per workload','Work per joule'])
+    :w.combined?['Work per joule relative to '+bN+', more efficient upward','Work per joule relative to the baseline','Work per joule vs baseline']
+    :ax?['Work per joule relative to '+bL+', more efficient upward','Work per joule relative to '+bL,'Work per joule vs '+ax.b.chip,'Work per joule vs baseline']:[w.e+' ('+w.eu+'), more efficient upward',w.e+' ('+w.eu+')'];
+  const fitT=(t,c,av)=>{for(const s of c){t.textContent=s;let n=0;try{n=t.getComputedTextLength()}catch(_){}if(n<=av)return}};
+  {const cx=(m.l+W-m.r)/2,cy=(m.t+H-m.b)/2;const xt=el('text',{x:cx,y:H-9,'text-anchor':'middle',class:'axt'});g.appendChild(xt);fitT(xt,xc,2*Math.min(cx,W-cx)-8);
+   const yt=el('text',{x:15,y:cy,'text-anchor':'middle',class:'axt',transform:`rotate(-90 15 ${cy})`});g.appendChild(yt);fitT(yt,yc,2*Math.min(cy,H-cy)-8)}
   const clip=el('clipPath',{id:'cp'});clip.appendChild(el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b}));svg.appendChild(clip);
   const iso=el('g',{'clip-path':'url(#cp)'});svg.appendChild(iso);
   const pmin=x0/(y1/k), pmax=x1/(y0/k);let pw=[];
@@ -423,7 +554,7 @@ function render(){
   if(pw.length>6)pw=pw.filter((_,i)=>i%2===0);
   for(const P of pw){const f=x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
     const lx=Math.min(x1,y1*P/k), px=X(lx)-6, py=Y(f(lx))+13;
-    if(px>m.l+40&&py<H-m.b-6)iso.appendChild(el('text',{x:px,y:py,'text-anchor':'end',class:'isot'},fmtT(P)+(w.combined&&!AB?'× power':' W')))}
+    if(px>m.l+40&&py<H-m.b-6)iso.appendChild(el('text',{x:px,y:py,'text-anchor':'end',class:'isot isol'},fmtT(P)+(w.combined&&!AB?'× power':' W')))}
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(r.x),py:Y(r.e*k)}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();
@@ -432,12 +563,12 @@ function render(){
       for(const p of by){if(p.r.e>best*1.0000001){f.push(p);best=p.r.e}}f.reverse();for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
       fg.appendChild(el('path',{d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
-      if(grp.size>1&&f.length>=2){const z=f[f.length-1],r0=z.r,lab=r0.ow?WL[r0.ow].short:(r0.model||'');if(lab){const t=el('text',{x:z.px+12,y:z.py-10,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:10.5px;font-style:italic;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'frontier: '+lab);fg.appendChild(t)}}
+      if(grp.size>1&&f.length>=2){const z=f[f.length-1],r0=z.r,lab=r0.ow?WL[r0.ow].short:(r0.model||'');if(lab){const t=el('text',{x:z.px+12,y:z.py-10,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:10.5)+'px;font-style:italic;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'frontier: '+lab);fg.appendChild(t)}}
       const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*k]),S.ffit);if(!fit)continue;
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{d:'M'+pts2.join('L'),class:'front ftail',style:op}))};
       const a=f[0],z=f[f.length-1];tail(a.r.x,x0,[a.r.x,a.r.e*k]);tail(z.r.x,x1,[z.r.x,z.r.e*k]);
-      if(S.w!=='all'&&f.length>=2){const t=el('text',{x:m.l+8,y:H-m.b-8,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:11.5px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},fit.label);fg.appendChild(t)}}}
+      if(S.w!=='all'&&f.length>=2){const t=el('text',{x:m.l+8,y:H-m.b-8,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},fit.label);fg.appendChild(t)}}}
   {const tg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(tg,under);const tr=new Map();for(const p of pts)if(p.r.grp){const key=p.r.grp;if(!tr.has(key))tr.set(key,[]);tr.get(key).push(p)}
     for(const g of tr.values()){if(g.length<2)continue;g.sort((a,b)=>a.r.ord-b.r.ord);const l=el('path',{d:'M'+g.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'t-'+g[0].r.tier,style:'fill:none;stroke:var(--c);stroke-width:1.4;opacity:.55'});tg.appendChild(l);
       const z=g[g.length-1];tg.appendChild(el('circle',{cx:z.px,cy:z.py,r:2,class:'t-'+z.r.tier,style:'fill:var(--c)'}))}}
@@ -455,8 +586,9 @@ function render(){
   drawFocus();
 }
 function placeLabels(list,cls,maxL){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
-  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
-  for(const p of list){if(n>=maxL)break;const t=shortName(p.r),tw=t.length*6.3+6;
+  const bb=e=>{try{const b=e.getBBox();return b.width?[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]:null}catch(_){return null}};
+  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
+  for(const p of list){if(n>=maxL)break;const t=shortName(p.r),tw=t.length*(G.narrow?6.6:6.3)+6;
     for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
       const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
       if(bx[0]<m.l+2||bx[2]>W-m.r+8||bx[1]<m.t-6||bx[3]>H-m.b-2)continue;if(boxes.some(b=>hit(b,bx)))continue;
@@ -476,7 +608,7 @@ function relatives(r){if(S.hmode!=='rel'){const sameDev=q=>devName(q)===devName(
 function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)return;lg.textContent='';ov.textContent='';un.textContent='';
   const f=S.hover||S.pin;const p=f&&S.pts.find(q=>q.r===f);
   for(const q of S.pts)q.g.classList.remove('dim');{const fw=(S.hover||S.pin||{}).ow;document.querySelectorAll('#chart g.scale').forEach(gs=>{gs.classList.toggle('scon',!!fw&&gs.dataset.w===fw);gs.classList.toggle('scoff',!!fw&&gs.dataset.w!==fw)})}$('chart').classList.toggle('focused',!!(S.hover||S.pin));
-  if(!p){defaultLabels();return}
+  if(!p){defaultLabels();declutter();return}
   const {X,Y,x0,x1,y0,y1,m,W,H,k}=G,r=p.r,rel=relatives(r),keep=new Set([p,...rel.gen,...rel.tier]);
   for(const q of S.pts)if(!keep.has(q))q.g.classList.add('dim');
   // exact iso-power line through the point
@@ -485,15 +617,28 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},(r.ow&&r.br?fmt(P)+'× baseline power ('+fmt(r.o.p)+' W)':fmt(r.ow?r.o.p:P)+' W')+(r.est?' (estimated)':'')));
   // crosshair to axes with value chips
   un.appendChild(el('line',{x1:p.px,x2:p.px,y1:p.py,y2:H-m.b,class:'cross'}));un.appendChild(el('line',{x1:m.l,x2:p.px,y1:p.py,y2:p.py,class:'cross'}));
-  const chipAt=(x,y,t,an)=>{const c=el('g',{class:'axchip'}),tw=t.length*6.6+10;const rx=an==='middle'?x-tw/2:an==='start'?x:x-tw;
+  const chipAt=(x,y,t,an)=>{const c=el('g',{class:'axchip'}),tw=t.length*(G.narrow?6.9:6.6)+10;const rx=an==='middle'?x-tw/2:an==='start'?x:x-tw;
     c.appendChild(el('rect',{x:rx,y:y-9,width:tw,height:18,rx:4}));c.appendChild(el('text',{x:rx+tw/2,y:y+4,'text-anchor':'middle'},t));ov.appendChild(c)};
-  const wl=WL[r.ow||S.w];if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');chipAt(m.l+2,p.py,fmt(r.o.e)+' '+wl.eu,'start')}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');chipAt(m.l+2,p.py,fmt(r.e*k)+(k!==1||r.ow?'×':' '+wl.eu),'start')}
+  // the y chip sits in the left margin, right-aligned to the axis; the unit is dropped when the margin is too narrow for it
+  const ychip=(n,u)=>{const cw=t=>t.length*(G.narrow?6.9:6.6)+10,t=cw(n+u)<=m.l-5?n+u:n;chipAt(Math.max(m.l-3,cw(t)+2),p.py,t,'end')};
+  const wl=WL[r.ow||S.w];if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');k!==1||r.ow?ychip(fmt(r.e*k)+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
   // spokes
   for(const q of rel.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-gen'}));
   for(const q of rel.tier)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-tier'}));
   ov.appendChild(el('circle',{cx:p.px,cy:p.py,r:11.5,class:'ring'}));
   placeLabels([p,...rel.gen,...rel.tier],'rel',40);
+  kRing();declutter();
 }
+function xTick(g,x,y,t,lastR){const tx=el('text',{x,y,'text-anchor':'middle',class:'tk'},t);g.appendChild(tx);let bw=t.length*6.5;try{bw=tx.getComputedTextLength()||bw}catch(_){}
+  if(x-bw/2<lastR+8){tx.remove();return lastR}return x+bw/2}
+/* hide power labels that sit on a point or a point label, and tick labels under an axis chip */
+function declutter(){const svg=$('chart'),{m}=G;if(!m)return;const bx=e=>{try{const b=e.getBBox();return b.width?[b.x,b.y,b.x+b.width,b.y+b.height]:null}catch(_){return null}},hit=(a,b)=>a&&b&&a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
+  const chips=[...svg.querySelectorAll('#over .axchip rect')].map(bx).filter(Boolean);
+  const obst=[...svg.querySelectorAll('#labels text,#under .isoxt')].map(bx).filter(Boolean).concat(chips);
+  for(const p of S.pts)obst.push([p.px-7,p.py-7,p.px+7,p.py+7]);
+  for(const t of svg.querySelectorAll('.isol')){t.style.display='';const b=bx(t);if(!b||b[0]<m.l+2||obst.some(o=>hit(o,b)))t.style.display='none'}
+  for(const t of svg.querySelectorAll('.tk')){t.style.visibility='';if(chips.length&&chips.some(c=>hit(c,bx(t))))t.style.visibility='hidden'}}
+function kRing(){const ov=$('over');if(!ov||!S.kbd||!S.kf)return;const q=S.pts.find(q=>q.r===S.kf);if(q)ov.appendChild(el('circle',{cx:q.px,cy:q.py,r:15.5,class:'kring'}))}
 
 /* ---------- tooltip & readout ---------- */
 function appleFor(r){if(r.form!=='desktop')return null;return APPLE.find(a=>a.chip===r.ck&&devName(r).startsWith(a.dev))||null}
@@ -513,23 +658,23 @@ function detailRows(r){if(r.ow&&!r.br){const o=r.o,ow=WL[r.ow],out=[['Workload',
   if(w.per)out.push([w.per[0],fmt(w.per[1](r.e))]);
   const a=appleFor(r);if(a)out.push(['Apple rated idle / max',a.idle+' W / '+a.max+' W']);
   return out}
-function showTip(p,cx,cy){const r=p.r,w=WL[S.w],tip=$('tip');tip.textContent='';
+function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');tip.textContent='';
   tip.appendChild(h('b',null,name(r)+(r.pe?' (speed measured, power estimated)':r.est&&!r.mode?' (model estimate)':'')));
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
   for(const [a,b] of detailRows(r)){const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
-  const rel=relatives(r);if(rel.gen.length||rel.tier.length)tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
+  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
   if(S.front&&S.fset&&S.fset.has(r))tip.appendChild(h('div',{class:'hint'},'On the efficiency frontier: no point shown is both faster and more efficient.'));
-  tip.appendChild(h('div',{class:'hint'},'Click to pin.'));
-  tip.hidden=false;const tw=tip.offsetWidth,th=tip.offsetHeight,svg=$('chart'),k=svg.getBoundingClientRect().width/svg.viewBox.baseVal.width,o=6,{m,W,H}=G;
-  const L=o+(m.l+8)*k,Rt=o+(W-m.r-8)*k-tw,T=o+(m.t+8)*k,B=o+(H-m.b-8)*k-th;
-  const cand=[[Rt,T],[L,T],[Rt,B],[L,B],[o+((m.l+W-m.r)/2)*k-tw/2,T],[o+((m.l+W-m.r)/2)*k-tw/2,B]];let best=null;
-  for(const [x,y] of cand){let n=0;for(const q of S.pts){const qx=o+q.px*k,qy=o+q.py*k;if(qx>x-10&&qx<x+tw+10&&qy>y-10&&qy<y+th+10)n+=(q===p?1000:(q.g.classList.contains('dim')?1:6))}
-    const d=Math.hypot(x+tw/2-(o+p.px*k),y+th/2-(o+p.py*k));if(!best||n<best.n||(n===best.n&&d>best.d))best={x,y,n,d}}
-  tip.style.left=Math.max(4,best.x)+'px';tip.style.top=Math.max(4,best.y)+'px'}
+  tip.appendChild(h('div',{class:'hint'},mode==='touch'?'Tap empty plot space to close. Full details are under the chart.':mode==='key'?(S.pin===r?'Pinned: full details are under the chart. Esc clears.':'Enter or Space pins it. Esc clears.'):'Click to pin.'));
+  tip.hidden=false;const wrap=$('wrap'),wb=wrap.getBoundingClientRect(),svg=$('chart'),sb=svg.getBoundingClientRect(),k=sb.width/svg.viewBox.baseVal.width,ox=sb.left-wb.left+wrap.scrollLeft,oy=sb.top-wb.top+wrap.scrollTop,tw=tip.offsetWidth,th=tip.offsetHeight,{m,W,H}=G;
+  const L=ox+(m.l+8)*k,Rt=ox+(W-m.r-8)*k-tw,T=oy+(m.t+8)*k,B=oy+(H-m.b-8)*k-th,Cx=ox+((m.l+W-m.r)/2)*k-tw/2;
+  const cand=[[Rt,T],[L,T],[Rt,B],[L,B],[Cx,T],[Cx,B]];let best=null;
+  for(const [x,y] of cand){let n=0;for(const q of S.pts){const qx=ox+q.px*k,qy=oy+q.py*k;if(qx>x-10&&qx<x+tw+10&&qy>y-10&&qy<y+th+10)n+=(q===p?1000:(q.g.classList.contains('dim')?1:6))}
+    const d=Math.hypot(x+tw/2-(ox+p.px*k),y+th/2-(oy+p.py*k));if(!best||n<best.n||(n===best.n&&d>best.d))best={x,y,n,d}}
+  tip.style.left=Math.max(4,Math.min(wrap.clientWidth-tw-4,best.x))+'px';tip.style.top=Math.max(4,Math.min(wrap.scrollHeight-th-4,best.y))+'px'}
 function hideTip(){$('tip').hidden=true}
 function readout(){const R=$('readout');R.textContent='';const r=S.pin&&S.pin.w===S.w?S.pin:null,w=WL[S.w],b=curBase();
   if(!r)return;
-  const head=h('div',{class:'head'});head.appendChild(h('h3',null,name(r)+(r.est&&!r.mode?' (estimate)':'')));
+  const head=h('div',{class:'head'});head.appendChild(h('h2',null,name(r)+(r.est&&!r.mode?' (estimate)':'')));
   const big=h('span',{class:'big'},r.ow&&!r.br?fmt(r.o.e):fmt(r.e)+(r.ow?'×':''));big.appendChild(h('small',null,r.ow&&!r.br?WL[r.ow].eu:r.ow?'baseline':w.eu));head.appendChild(big);R.appendChild(head);
   const dl=h('dl');for(const [a,bb] of detailRows(r)){const d=h('div');d.appendChild(h('dt',null,a));d.appendChild(h('dd',null,bb));dl.appendChild(d)}R.appendChild(dl);
   const rel=relatives(r);
@@ -546,11 +691,14 @@ function readout(){const R=$('readout');R.textContent='';const r=S.pin&&S.pin.w=
   const s2=SRC[r.src];const n=h('div',{class:'estnote'},(notes.length?notes.join(' ')+' ':'')+(s2?'Source: ':''));
   if(s2)n.appendChild(h('a',{href:s2.url,target:s2.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s2.name));R.appendChild(n)
 }
-function pin(r){if(r.ow&&r.ow!==S.scaleW){S.scaleW=r.ow;if(absAll()&&$('wrap').clientWidth<772){S.pin=r;render();readout();table();return}}S.pin=r;S.hover=null;hideTip();drawFocus();readout();table()}
+function pin(r){if(r.ow&&r.ow!==S.scaleW){S.scaleW=r.ow;if(absAll()&&$('wrap').clientWidth<772){S.pin=r;render();readout();table();return}}S.pin=r;S.hover=null;hideTip();drawFocus();readout();table();live('Pinned '+name(r)+'. Details are under the chart.')}
+function live(t){const l=$('live');if(!l)return;l.textContent='';setTimeout(()=>{l.textContent=t},40)}
 function nearest(ev){const svg=$('chart'),b=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal,k=vb.width/b.width;const x=(ev.clientX-b.left)*k,y=(ev.clientY-b.top)*k;
   let best=null,bd=40*40;const {m:M,W:WW,H:HH}=G;for(const p of S.pts){if(S.zoom&&(p.px<M.l||p.px>WW-M.r||p.py<M.t||p.py>HH-M.b))continue;const d=(p.px-x)**2+(p.py-y)**2;if(d<bd){bd=d;best=p}}return best&&{p:best,cx:best.px/k+6,cy:best.py/k+6}}
-$('chart').addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const n=nearest(e);const r=n?n.p.r:null;if(r!==S.hover){S.hover=r;drawFocus()}n?showTip(n.p,n.cx,n.cy):hideTip()});
-$('chart').addEventListener('pointerleave',()=>{S.hover=null;hideTip();drawFocus()});
+$('chart').addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const n=nearest(e);const r=n?n.p.r:null;if(r!==S.hover){S.hover=r;drawFocus()}n?showTip(n.p,'hover'):hideTip()});
+$('chart').addEventListener('pointerleave',e=>{if(e.pointerType==='touch')return;const kp=S.kbd&&S.pts.find(q=>q.r===S.kf);S.hover=kp?kp.r:null;kp?showTip(kp,'key'):hideTip();drawFocus()});
+$('chart').addEventListener('pointerdown',e=>{S.ptype=e.pointerType},true);
+document.addEventListener('pointerdown',e=>{if(!$('wrap').contains(e.target))hideTip()});
 function viewKey(){const b=curBase();return S.w+'|'+(b?b.chip+'|'+(b.dev||''):'')+'|'+(S.lmod||'')}
 function zoomBy(f,cx,cy){const {x0,x1,y0,y1}=G,{m,W,H}=G;const fx=cx==null?.5:(cx-m.l)/(W-m.l-m.r),fy=cy==null?.5:(H-m.b-cy)/(H-m.t-m.b);
   const lx0=Math.log(x0),lx1=Math.log(x1),ly0=Math.log(y0),ly1=Math.log(y1),px=lx0+fx*(lx1-lx0),py=ly0+fy*(ly1-ly0);
@@ -564,25 +712,48 @@ function panBy(dx,dy){const {x0,x1,y0,y1,m,W,H}=G;const sx=Math.log(x1/x0)/(W-m.
 const svgPt=e=>{const svg=$('chart'),b=svg.getBoundingClientRect(),k=svg.viewBox.baseVal.width/b.width;return [(e.clientX-b.left)*k,(e.clientY-b.top)*k,k]};
 $('chart').addEventListener('wheel',e=>{if(e.ctrlKey&&e.deltaY===0)return;e.preventDefault();const [x,y]=svgPt(e);zoomBy(Math.exp(Math.max(-1,Math.min(1,e.deltaY*(e.deltaMode?0.05:0.0015)))),x,y)},{passive:false});
 {const ptrs=new Map();let drag=null,pinch=null;S.dragged=false;
-  $('chart').addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(ptrs.size===1&&e.pointerType!=='touch'){drag={x:e.clientX,y:e.clientY,moved:false}}
+  $('chart').addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(ptrs.size===1&&(e.pointerType!=='touch'||S.zoom)){drag={x:e.clientX,y:e.clientY,moved:false,t:e.pointerType==='touch'}}
     if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),cx:(a[0]+b[0])/2,cy:(a[1]+b[1])/2};drag=null}});
   window.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);
-    if(pinch&&ptrs.size===2){const [a,b]=[...ptrs.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(d>10&&Math.abs(d/pinch.d-1)>.02){const [x,y]=svgPt({clientX:(a[0]+b[0])/2,clientY:(a[1]+b[1])/2});zoomBy(pinch.d/d,x,y);pinch.d=d}return}
+    if(pinch&&ptrs.size===2){const [a,b]=[...ptrs.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]),mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+      if(S.zoom&&Math.hypot(mx-pinch.cx,my-pinch.cy)>2){const kk=svgPt({clientX:mx,clientY:my})[2];panBy((mx-pinch.cx)*kk,(my-pinch.cy)*kk);pinch.cx=mx;pinch.cy=my}
+      if(d>10&&Math.abs(d/pinch.d-1)>.02){const [x,y]=svgPt({clientX:mx,clientY:my});zoomBy(pinch.d/d,x,y);pinch.d=d}return}
     if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<5)return;
     if(!drag.moved){drag.moved=true;$('chart').classList.add('dragging');try{$('chart').setPointerCapture(e.pointerId)}catch(_){};hideTip();S.hover=null}
-    const k=svgPt(e)[2];panBy(dx*k,dy*k);drag.x=e.clientX;drag.y=e.clientY});
+    const k=svgPt(e)[2];panBy(dx*k,drag.t?0:dy*k);drag.x=e.clientX;drag.y=e.clientY});
   const end=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(drag&&drag.moved){S.dragged=true;setTimeout(()=>S.dragged=false,0)}drag=null;$('chart').classList.remove('dragging')};
   window.addEventListener('pointerup',end);window.addEventListener('pointercancel',end)}
 {let last=0,lx=0,ly=0;$('chart').addEventListener('pointerdown',e=>{const t=performance.now();if(t-last<350&&Math.hypot(e.clientX-lx,e.clientY-ly)<8&&S.zoom){S.zoom=null;render();readout();last=0;return}last=t;lx=e.clientX;ly=e.clientY})}
 $('zin').addEventListener('click',()=>zoomBy(.7));$('zout').addEventListener('click',()=>zoomBy(1/.7));
 $('zreset').addEventListener('click',()=>{S.zoom=null;render();readout()});
-function setFS(on){$('wrap').classList.toggle('fs',on);$('zfs').textContent=on?'Exit full screen':'Full screen';document.body.style.overflow=on?'hidden':'';hideTip();render();readout()}
+function setFS(on){const w=$('wrap');w.classList.toggle('fs',on);$('zfs').textContent=on?'Exit full screen':'Full screen';document.body.style.overflow=on?'hidden':'';
+  if(on){w.setAttribute('role','dialog');w.setAttribute('aria-modal','true')}else{w.removeAttribute('role');w.removeAttribute('aria-modal')}hideTip();render();readout();if(!on&&w.contains(document.activeElement)&&document.activeElement!==$('zfs'))$('zfs').focus()}
+$('wrap').addEventListener('keydown',e=>{if(e.key!=='Tab'||!$('wrap').classList.contains('fs'))return;const f=[...$('wrap').querySelectorAll('button:not(:disabled),[tabindex="0"]')];const i=f.indexOf(document.activeElement);
+  if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}});
 $('zfs').addEventListener('click',()=>{const w=$('wrap'),on=!w.classList.contains('fs');
   if(on){if(w.requestFullscreen)w.requestFullscreen().catch(()=>{}).finally(()=>setFS(true));else setFS(true)}else{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});setFS(false)}});
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&$('wrap').classList.contains('fs'))setFS(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('wrap').classList.contains('fs'))setFS(false)});
 window.addEventListener('resize',()=>{if($('wrap').classList.contains('fs'))render()});
-$('chart').addEventListener('click',e=>{if(S.dragged)return;const n=nearest(e);if(n)pin(n.p.r);else if(S.pin){S.pin=null;drawFocus();readout();table()}});
+$('chart').addEventListener('click',e=>{if(S.dragged)return;const n=nearest(e);const tch=S.ptype==='touch'||S.ptype==='pen';
+  if(n){const r=n.p.r;pin(r);if(tch){const p=S.pts.find(q=>q.r===r);if(p)showTip(p,'touch')}}else{hideTip();if(S.pin){S.pin=null;drawFocus();readout();table()}}});
+/* keyboard: the plot is one tab stop; arrow keys move through the visible points */
+function kInView(p){const {m,W,H}=G;return p.px>=m.l-1&&p.px<=W-m.r+1&&p.py>=m.t-1&&p.py<=H-m.b+1}
+function kOrder(ax){return S.pts.slice().sort(ax==='x'?(a,b)=>a.r.x-b.r.x||a.r.e-b.r.e:(a,b)=>a.r.e-b.r.e||a.r.x-b.r.x)}
+function kSay(p,i,n){const r=p.r,w=WL[S.w],v=r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?' times the baseline':' '+w.eu);const t=detailRows(r).find(d=>d[0]==='Throughput');
+  return name(r)+(r.est&&!r.mode?' (estimate)':'')+': '+v+(t?', throughput '+t[1]:'')+(n?'. Point '+(i+1)+' of '+n+'.':'.')}
+function kGo(p,i,n){if(S.zoom&&!kInView(p)){const {x0,x1,y0,y1,k}=G,r=p.r,fx=Math.sqrt(x1/x0),fy=Math.sqrt(y1/y0),cy=r.e*k;S.zoom={key:viewKey(),x0:r.x/fx,x1:r.x*fx,y0:cy/fy,y1:cy*fy};render();readout();p=S.pts.find(q=>q.r===r)||p}
+  S.kbd=true;S.kf=p.r;S.hover=p.r;drawFocus();showTip(p,'key');live(kSay(p,i,n))}
+$('chart').addEventListener('focus',()=>{const c=$('chart');if(!c.matches(':focus-visible'))return;const list=kOrder('x');if(!list.length)return;
+  let p=S.kf&&list.find(q=>q.r===S.kf);if(!p&&S.pin)p=list.find(q=>q.r===S.pin);if(!p)p=list[0];kGo(p,list.indexOf(p),list.length)});
+$('chart').addEventListener('blur',()=>{if(!S.kbd)return;S.kbd=false;S.hover=null;hideTip();drawFocus()});
+$('chart').addEventListener('keydown',e=>{const k=e.key;
+  if(k==='+'||k==='='){e.preventDefault();zoomBy(.7);return}if(k==='-'||k==='_'){e.preventDefault();zoomBy(1/.7);return}if(k==='0'){e.preventDefault();S.zoom=null;render();readout();return}
+  const nav={ArrowRight:['x',1],ArrowLeft:['x',-1],ArrowUp:['e',1],ArrowDown:['e',-1],Home:['x',-1e9],End:['x',1e9]}[k];
+  if(nav){e.preventDefault();const list=kOrder(nav[0]);if(!list.length)return;const i=list.findIndex(q=>q.r===S.kf);
+    const j=Math.abs(nav[1])>1?(nav[1]<0?0:list.length-1):i<0?(nav[1]>0?0:list.length-1):Math.max(0,Math.min(list.length-1,i+nav[1]));kGo(list[j],j,list.length);return}
+  if(k==='Enter'||k===' '){e.preventDefault();const r=S.kf;if(!r||!S.pts.some(q=>q.r===r))return;pin(r);S.kbd=true;S.kf=r;S.hover=r;drawFocus();const p=S.pts.find(q=>q.r===r);if(p)showTip(p,'key');return}
+  if(k==='Escape'&&(S.pin||S.hover)){e.stopPropagation();if(S.pin){S.pin=null;readout();table()}S.hover=null;hideTip();drawFocus();live('Cleared.')}});
 
 /* ---------- baseline selector ---------- */
 function chipList(){const m=new Map();for(const r of ALL){if(r.gen==null||r.mode)continue;if(r.est&&!S.est&&!ROWS.some(q=>q.ck===r.ck))continue;m.set(r.ck,r.tier)}
@@ -593,25 +764,40 @@ function syncBaseSel(){const s=$('base'),isAll=S.w==='all';s.textContent='';cons
   for(const g of gens){const og=h('optgroup',{label:g===0?'Intel, 2019':'M'+g+' generation'});
     for(const [c] of chipList().filter(c=>gen(c[0])===g)){og.appendChild(h('option',{value:c+'|'},c+', best machine'));
       for(const [k,r] of machines)if(r.ck===c)og.appendChild(h('option',{value:k},c+' '+devName(r)))}s.appendChild(og)}
-  const b=S.base;s.value=b?(ck(b.chip)+'|'+(b.dev||'')):'';if(s.value===''&&b){s.appendChild(h('option',{value:ck(b.chip)+'|'+(b.dev||'')},b.chip));s.value=ck(b.chip)+'|'+(b.dev||'')}}
+  const b=S.base;s.value=b?(ck(b.chip)+'|'+(b.dev||'')):'';if(s.value===''&&b){s.appendChild(h('option',{value:ck(b.chip)+'|'+(b.dev||'')},b.chip));s.value=ck(b.chip)+'|'+(b.dev||'')}baseTitle()}
+/* the plot title reads 'Relative to X' only where the axes really are ratios to X */
+function baseTitle(){const s=$('base'),o=s.options[s.selectedIndex],w=WL[S.w],x=$('basex');$('basev').textContent=o?o.text:'';
+  const br=S.base&&baseRow(S.w,S.base),rel=!!S.base&&(w.combined||(!w.absAxis&&!!br));
+  $('basel').textContent=rel?'Relative to':'Baseline';x.hidden=!S.base||rel;if(x.hidden)return;
+  x.textContent=!br?'no reading on this workload; axes in absolute units':!visible().includes(br)?(S.w==='llm'&&S.lmod?'not in this model set':'hidden by the current filters')+'; axes in absolute units':'ringed on the plot; these axes stay in absolute units'}
 $('base').addEventListener('change',e=>{const v=e.target.value;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;all()});
 
 /* ---------- matrix ---------- */
 const MWS=['cpu-all','cpu-one','hpl','bl-cpu','gpu','bl-gpu','llm'];let MROWS=[];
 function mbest(c,k){let c2=ALL.filter(r=>r.w===k&&r.ck===c&&!r.ex&&!r.mode&&(k!=='llm'||r.model==='Llama 2 7B Q4_0')&&(S.mest||!r.est||r.pe));
   const meas=c2.filter(r=>!r.est&&r.q!=='C');if(meas.length)c2=meas;return c2.sort((a,b2)=>b2.e-a.e)[0]}
-function matrix(){const thead=$('matrix').tHead,tb=$('matrix').tBodies[0];thead.textContent='';tb.textContent='';MROWS=[];
+function matrix(){const ae=document.activeElement,fk=ae&&ae.closest&&ae.closest('#matrix tbody tr')?ae._k:null;const thead=$('matrix').tHead,tb=$('matrix').tBodies[0];thead.textContent='';tb.textContent='';MROWS=[];
   const tr=h('tr');tr.appendChild(h('th',{scope:'col'},'Chip'));const ths=[];
   for(const k of MWS){const th=h('th',{class:'num',scope:'col'},WL[k].tab+(k==='llm'?' (7B, est. power)':k.startsWith('bl-')?' (est. power)':''));ths.push(th);tr.appendChild(th)}thead.appendChild(tr);MROWS.ths=ths;
   for(const [c,tier] of chipList()){const rs=MWS.map(k=>mbest(c,k));if(!rs.some(Boolean))continue;
-    const t=h('tr',{tabindex:0});const td=h('td');const s=glyph('laptop',tier,'solid');s.setAttribute('class','dot t-'+tier);td.appendChild(s);td.appendChild(document.createTextNode(c));t.appendChild(td);
+    const t=h('tr',{tabindex:0});t._k=c;const td=h('td');const s=glyph('laptop',tier,'solid');s.setAttribute('class','dot t-'+tier);td.appendChild(s);td.appendChild(document.createTextNode(c));t.appendChild(td);
     const cells=MWS.map((k,i)=>{const cell=h('td',{class:'num cell'});t.appendChild(cell);return {td:cell,r:rs[i],k}});
     const set=()=>{S.base={chip:c,dev:null};S.preview=null;syncBaseSel();all()};
-    const prev=()=>{if(S.preview&&S.preview.chip===c)return;S.preview={chip:c,dev:null};render();matrixFill();readout()};
+    const prev=()=>{if(S.noPrev||(S.preview&&S.preview.chip===c))return;S.preview={chip:c,dev:null};render();matrixFill();readout()};
     t.addEventListener('mouseenter',prev);t.addEventListener('focus',prev);
     t.addEventListener('click',set);t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();set()}});
     tb.appendChild(t);MROWS.push({t,c,cells})}
-  matrixFill()}
+  rove(MROWS.map(m=>m.t),MROWS.findIndex(m=>S.base&&ck(S.base.chip)===m.c));
+  if(fk!=null){const m=MROWS.find(m=>m.c===fk);if(m){S.noPrev=true;m.t.focus({preventScroll:true});S.noPrev=false}}
+  matrixFill();overflow()}
+/* one tab stop per table; arrow keys move between rows */
+function rove(rows,cur){rows.forEach((t,i)=>{t.tabIndex=i===(cur>=0?cur:0)?0:-1;
+  t.addEventListener('focus',()=>{for(const x of rows)x.tabIndex=x===t?0:-1});
+  t.addEventListener('keydown',e=>{if(e.target!==t||e.altKey||e.ctrlKey||e.metaKey)return;const j={ArrowDown:i+1,ArrowUp:i-1,Home:0,End:rows.length-1}[e.key];if(j==null)return;e.preventDefault();
+    const n=rows[Math.max(0,Math.min(rows.length-1,j))];n.focus({preventScroll:true});const b=n.getBoundingClientRect();if(b.top<0)scrollBy(0,b.top-8);else if(b.bottom>innerHeight)scrollBy(0,b.bottom-innerHeight+8)})})}
+/* fade the right edge and show the hint only when a table is wider than its box */
+function overflow(){document.querySelectorAll('.tablewrap').forEach(w=>{const o=w.scrollWidth>w.clientWidth+1;w.classList.toggle('over',o);w.classList.toggle('end',o&&w.scrollLeft+w.clientWidth>=w.scrollWidth-2);const th=w.querySelector('th');w.style.scrollPaddingLeft=th&&o?th.offsetWidth+'px':''});
+  $('mhint').hidden=!$('matrix').parentNode.classList.contains('over')}
 function matrixFill(){const b=curBase(),bv={},gm={};MWS.forEach((k,i)=>{const vs=MROWS.map(m=>m.cells[i].r).filter(Boolean);gm[k]=vs.length?Math.exp(vs.reduce((a,r)=>a+Math.log(r.e),0)/vs.length):null});MWS.forEach((k,i)=>{bv[k]=baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':null,S.mest);MROWS.ths[i].title=b&&!bv[k]?'The baseline has no value for this workload':''});
   for(const {t,c,cells} of MROWS){t.className=S.preview&&ck(S.preview.chip)===c?'ispre':(!S.preview&&S.base&&ck(S.base.chip)===c?'isbase':'');
     for(const {td,r,k} of cells){td.className='num cell';td.style.background='';
@@ -621,28 +807,35 @@ function matrixFill(){const b=curBase(),bv={},gm={};MWS.forEach((k,i)=>{const vs
       const sf2=x=>{const p=Number(x.toPrecision(2));return p>=100?Math.round(p).toLocaleString('en-US'):String(p)};const vtxt=pm(fmt(r.e),(r.ehi-r.elo)/2,sf2)+unit;
       if(hasB&&S.mshow!=='value'){const rt=tl+(S.mshow==='ratio'?pm(v.toFixed(2),(r.ehi-r.elo)/2/bv[k].e,x=>x.toFixed(2)):v.toFixed(2))+'×';box.appendChild(h('span',{class:'rx'},rt))}
       if(!hasB||S.mshow!=='ratio')box.appendChild(h('span',{class:'vx'},(!hasB||S.mshow==='value'?tl:'')+vtxt));
-      const sv=hasB?v:(gm[k]?r.e/gm[k]:null);if(sv){const L=Math.log2(sv),a=Math.min(1,Math.abs(L)/1.3)*52;td.style.background=`color-mix(in srgb, ${L>=0?'var(--pos)':'var(--neg)'} ${a.toFixed(0)}%, var(--surface))`}
+      const sv=hasB?v:(gm[k]?r.e/gm[k]:null);if(sv){const L=Math.log2(sv),a=Math.min(1,Math.abs(L)/1.3)*35;td.style.background=`color-mix(in srgb, ${L>=0?'var(--pos)':'var(--neg)'} ${a.toFixed(0)}%, var(--surface))`}
       if(r.est)td.classList.add('isest');td.title=name(r)+(r.est?' (estimate)':'')+(r.elo?', range '+fmt(r.elo)+' to '+fmt(r.ehi)+unit:'')}}
   const mk=$('mkey');mk.textContent='';const ramp=h('span',{class:'ramp'});
-  for(const [c,a] of [['neg',52],['neg',26],[null,0],['pos',26],['pos',52]]){const i=h('i');i.style.background=c?`color-mix(in srgb, var(--${c}) ${a}%, var(--surface))`:'var(--surface)';ramp.appendChild(i)}
+  for(const [c,a] of [['neg',35],['neg',18],[null,0],['pos',18],['pos',35]]){const i=h('i');i.style.background=c?`color-mix(in srgb, var(--${c}) ${a}%, var(--surface))`:'var(--surface)';ramp.appendChild(i)}
   const s1=h('span');s1.appendChild(document.createTextNode(b?'Less efficient than the baseline ':'No baseline, so shading compares each cell with its column\'s geometric mean: less efficient '));s1.appendChild(ramp);s1.appendChild(document.createTextNode(' more efficient'));mk.appendChild(s1);
   mk.appendChild(h('span',null,'~ and a dashed outline mark a model estimate'));if(S.munc)mk.appendChild(h('span',null,'± is half the range: the power spread for measured cells, ±1 leave-one-out SD for estimates (asymmetric ranges are shown in the tooltip), baseline uncertainty not included'));if(b)mk.appendChild(h('span',null,'Baseline: '+(S.preview?S.preview.chip+' (preview)':b.chip+(b.dev?' '+b.dev:''))))}
-document.querySelectorAll('[data-mshow]').forEach(b=>b.addEventListener('click',()=>{S.mshow=b.dataset.mshow;document.querySelectorAll('[data-mshow]').forEach(x=>x.setAttribute('aria-pressed',x===b));matrixFill()}));
+function radios(sel,pick){const bs=[...document.querySelectorAll(sel)];const sync=v=>bs.forEach(x=>{x.setAttribute('aria-checked',x===v);x.tabIndex=x===v?0:-1});
+  bs.forEach((b,i)=>{b.addEventListener('click',()=>{sync(b);pick(b)});
+    b.addEventListener('keydown',e=>{const d={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];const j=d?(i+d+bs.length)%bs.length:e.key==='Home'?0:e.key==='End'?bs.length-1:null;if(j==null)return;e.preventDefault();bs[j].focus();bs[j].click()})});
+  sync(bs.find(b=>b.getAttribute('aria-checked')==='true')||bs[0])}
+radios('[data-mshow]',b=>{S.mshow=b.dataset.mshow;matrixFill()});
 $('munc').addEventListener('change',e=>{S.munc=e.target.checked;matrixFill()});
 $('mest').addEventListener('change',e=>{S.mest=e.target.checked;matrix()});
-$('matrix').addEventListener('mouseleave',()=>{if(S.preview){S.preview=null;render();matrixFill();readout()}});
+$('matrix').addEventListener('mouseleave',()=>{if(S.preview&&!$('matrix').contains(document.activeElement)){S.preview=null;render();matrixFill();readout()}});
+$('matrix').addEventListener('focusout',e=>{if(S.preview&&!(e.relatedTarget&&$('matrix').contains(e.relatedTarget))&&!$('matrix').matches(':hover')){S.preview=null;render();matrixFill();readout()}});
+document.querySelectorAll('.tablewrap').forEach(w=>{w.addEventListener('scroll',()=>w.classList.toggle('end',w.scrollLeft+w.clientWidth>=w.scrollWidth-2),{passive:true});if(window.ResizeObserver)new ResizeObserver(overflow).observe(w)});
+$('numbers').addEventListener('toggle',overflow);
 
 /* ---------- numbers table ---------- */
-function table(){const w=WL[S.w],rows=visible(),thead=$('table').tHead,tb=$('table').tBodies[0];thead.textContent='';tb.textContent='';
+function table(){const ae=document.activeElement,fs=ae&&ae.closest&&ae.closest('#table thead')?ae._k:null,fr=ae&&ae.closest&&ae.closest('#table tbody tr'),fk=fr?fr._k:null,fi=fr?[...fr.parentNode.children].indexOf(fr):-1;const w=WL[S.w],rows=visible(),thead=$('table').tHead,tb=$('table').tBodies[0];thead.textContent='';tb.textContent='';
   $('tabletitle').textContent='Numbers behind the chart: '+w.tab;
   const AB=absAll();const cols=w.combined?[['name','Machine',0],['wl','Workload',0],['x',AB?'Throughput':'Throughput vs baseline',1],['e',AB?'Work per joule':'Work per joule vs baseline',1],['p',AB?'Wall power (W)':'Wall power vs baseline',1],['src','Measurement and source',0]]:[['name','Machine',0],['x','Throughput ('+w.xu+')',1],['e',w.e+' ('+w.eu+')',1],...(relOf(rows[0]||{})||rows.some(r=>relOf(r))?[['rel','vs baseline',1]]:[]),['p','Wall power (W)',1]];if(w.per&&!w.combined)cols.push(['per',w.per[0],1]);if(!w.combined)cols.push(['src','Measurement and source',0]);
   const val=(r,k)=>{if(k==='name')return name(r);if(k==='wl')return WL[r.ow].tab+(r.model?', '+r.model:'');if(k==='rel'){const v=relOf(r);return v?v.v:-1}if(k==='per')return w.per[1](r.e);if(k==='src')return (SRC[r.src]||{}).name||'';return r[k]};
   const tr=h('tr');for(const [k,t,num] of cols){const th=h('th',num?{class:'num',scope:'col'}:{scope:'col'});
-    if(k==='src')th.textContent=t;else{const bt=h('button',{type:'button'},t);bt.addEventListener('click',()=>{S.sort=[k,S.sort[0]===k?-S.sort[1]:(num?-1:1)];table()});th.appendChild(bt);
+    if(k==='src')th.textContent=t;else{const bt=h('button',{type:'button'},t);bt._k=k;bt.addEventListener('click',()=>{S.sort=[k,S.sort[0]===k?-S.sort[1]:(num?-1:1)];table()});th.appendChild(bt);
       if(S.sort[0]===k)th.setAttribute('aria-sort',S.sort[1]>0?'ascending':'descending')}tr.appendChild(th)}thead.appendChild(tr);
   const [sk,sd]=S.sort;const key=cols.some(c=>c[0]===sk)?sk:'e';
   rows.sort((a,b)=>{const A=val(a,key),B=val(b,key);return (typeof A==='string'?A.localeCompare(B):A-B)*sd});
-  for(const r of rows){const t=h('tr',{tabindex:0});if(S.pin===r)t.className='on';
+  const trs=[];for(const r of rows){const t=h('tr',{tabindex:0});t._k=r;trs.push(t);if(S.pin===r)t.className='on';
     for(const [k,,num] of cols){const td=h('td',num?{class:'num'}:(k==='src'?{class:'src'}:null));
       if(k==='name'){const s=glyph(r.form,r.tier,kindOf(r));s.setAttribute('class','dot t-'+r.tier);td.appendChild(s);td.appendChild(document.createTextNode(name(r)+(r.est&&!r.mode?' (estimate)':'')))}
       else if(k==='wl')td.textContent=val(r,k);
@@ -656,17 +849,25 @@ function table(){const w=WL[S.w],rows=visible(),thead=$('table').tHead,tb=$('tab
         if(r.q!=='A'&&!r.est)td.appendChild(h('span',{class:'pill',title:r.note||''},r.q==='C'?'method not stated':'weaker power figure'))}
       else td.textContent=fmt(val(r,k));t.appendChild(td)}
     t.addEventListener('mouseenter',()=>{S.hover=r;drawFocus()});t.addEventListener('mouseleave',()=>{S.hover=null;drawFocus()});
-    t.addEventListener('click',()=>pin(r));t.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();pin(r)}});tb.appendChild(t)}}
+    t.addEventListener('focus',()=>{S.hover=r;drawFocus()});t.addEventListener('blur',()=>{if(S.hover===r){S.hover=null;drawFocus()}});
+    t.addEventListener('click',()=>pin(r));t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pin(r)}});tb.appendChild(t)}
+  rove(trs,rows.indexOf(S.pin));
+  if(fs!=null){const b=[...thead.querySelectorAll('button')].find(b=>b._k===fs);if(b)b.focus({preventScroll:true})}
+  if(fr){const n=trs.find(t=>t._k===fk)||trs[Math.min(fi,trs.length-1)];if(n)n.focus({preventScroll:true})}
+  overflow()}
 
 /* ---------- legend, LOO plot ---------- */
 function legend(){const L=$('legend');L.textContent='';const add=(node,t)=>{const s=h('span');s.appendChild(node);s.appendChild(document.createTextNode(t));L.appendChild(s)};const vis=visible();
+  const br=()=>L.appendChild(h('i',{class:'lbr','aria-hidden':'true'}));
+  if(S.w==='all')L.appendChild(h('span',{class:'lgh'},'Colour is the chip tier:'));
   for(const t of TIERS)if(vis.some(r=>r.tier===t))add(glyph('laptop',t,'solid'),t==='base'?'Base chip':t);
-  if(S.w==='all'){for(const k of WS5)if(vis.some(r=>r.ow===k))add(glyph(WSHAPE[k],'Ultra','solid'),WL[k].tab)}
-  if(S.w.startsWith('cpu')){add(glyph('laptop','Ultra','solid'),'Cinebench 2024');add(glyph('laptop','Ultra','hollow'),'Cinebench R23, converted')}
-  if(vis.some(r=>r.est))add(glyph('laptop','Ultra','est'),'estimate');
-  if(vis.some(r=>r.q!=='A'&&!r.est)){const s=el('svg',{width:22,height:22,viewBox:'-11 -11 22 22',class:'t-Ultra','aria-hidden':'true'});const c=el('circle',{r:9});c.setAttribute('style','fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5');s.appendChild(c);add(s,'weaker power figure')}
+  if(S.w==='all'){const ws=WS5.filter(k=>vis.some(r=>r.ow===k));if(ws.length){br();L.appendChild(h('span',{class:'lgh'},'Shape is the workload:'));for(const k of ws)add(glyph(WSHAPE[k],'key','solid'),WL[k].tab)}br()}
+  if(S.w.startsWith('cpu')){add(glyph('laptop','key','solid'),'Cinebench 2024');add(glyph('laptop','key','hollow'),'Cinebench R23, converted')}
+  if(vis.some(r=>r.est))add(glyph('laptop','key','est'),'estimate');
+  if(vis.some(r=>r.q!=='A'&&!r.est)){const s=el('svg',{width:22,height:22,viewBox:'-11 -11 22 22',class:'t-key','aria-hidden':'true'});const c=el('circle',{r:9});c.setAttribute('style','fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5');s.appendChild(c);add(s,'weaker power figure')}
   const s=el('svg',{width:26,height:10,'aria-hidden':'true'});const l=el('line',{x1:0,x2:26,y1:5,y2:5});l.setAttribute('style','stroke:var(--ink3);stroke-dasharray:3 5');s.appendChild(l);add(s,S.w==='all'?'constant power ratio':'constant wall power')}
 function looPlot(){const big=S.looBig,svg=$('loo'),L=DATA.loo.e,W=big?900:340,H=big?560:300,m={l:52,r:16,t:14,b:42};svg.textContent='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  looFz();
   const rel={};for(const p of L){const ref=ROWS.find(r=>r.w===p.w&&r.chip==='M4'&&r.dev==='Mac mini');rel[p.w]=ref?ref.e:1}
   const LX=DATA.loo.x;const pts=L.map(p=>({w:p.w,chip:p.chip,meas:p.meas,pred:p.pred,ref:rel[p.w],a:p.meas/rel[p.w],b:p.pred/rel[p.w],lx:LX.find(q=>q.chip===p.chip&&q.w===p.w)}));let lo=Infinity,hi=0;for(const p of pts){lo=Math.min(lo,p.a,p.b);hi=Math.max(hi,p.a,p.b)}lo/=1.15;hi*=1.15;
   const S2=v=>Math.log(v/lo)/Math.log(hi/lo),X=v=>m.l+S2(v)*(W-m.l-m.r),Y=v=>H-m.b-S2(v)*(H-m.t-m.b);
@@ -696,6 +897,7 @@ function looPlot(){const big=S.looBig,svg=$('loo'),L=DATA.loo.e,W=big?900:340,H=
   const sg=DATA.loosig.e,pc=v=>Math.round((Math.exp(v)-1)*100)+'%';
   $('loosig').textContent='CPU all-core '+pc(sg['cpu-all'])+', CPU single-thread '+pc(sg['cpu-one'])+', linear algebra '+pc(sg.hpl)+', GPU '+pc(sg.gpu)}
 
+function looFz(){const svg=$('loo'),vb=svg.viewBox.baseVal,w=svg.getBoundingClientRect().width;if(!w||!vb||!vb.width)return;svg.style.setProperty('--lfz',Math.min(14,Math.max(7,12*vb.width/w)).toFixed(2)+'px')}
 function looTip(e){const L=S.loo;if(!L)return;const svg=L.svg,b=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal,k=vb.width/b.width;
   const x=(e.clientX-b.left)*k,y=(e.clientY-b.top)*k;let best=null,bd=(L.big?26:18)**2;for(const p of L.pts){const d=(p.px-x)**2+(p.py-y)**2;if(d<bd){bd=d;best=p}}
   const hl=$('loohl'),tip=$('lootip');hl.textContent='';if(!best){tip.hidden=true;return}
@@ -729,15 +931,17 @@ $('looBig').addEventListener('click',()=>{S.looBig=!S.looBig;$('loofig').parentN
 function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';const cb=curBase();
   $('finding').textContent=S.w==='all'&&cb?'Every workload as a ratio to the '+cb.chip+(cb.dev?' '+cb.dev:'')+' on the same workload: right is faster, up is more work per joule, and each diagonal is a constant ratio of wall power. Against the last Intel MacBook Pro 16, Apple Silicon does roughly 2 to 7 times the CPU work per joule, 3 to 8 times on one thread and 5 to 11 times on LLM generation, while running from about as fast to roughly 25 times faster. Hover a point to draw lines to the same chip on its other workloads; choose None as the baseline for absolute units with one scale per workload.':w.finding;$('wnote').textContent=w.note;
   {const b=curBase();if(b){const miss=(S.w==='all'?WS5:[S.w]).filter(k=>!baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':null));if(miss.length)$('wnote').textContent+=' Not shown against '+b.chip+': '+miss.map(k=>WL[k].tab).join(', ')+', which have no reading for it. Pick an Apple baseline or None to see them.'}}
-  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.w===S.w));
+  document.querySelectorAll('.tab').forEach(t=>{const on=t.dataset.w===S.w;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;
+    if(on){$('panel').setAttribute('aria-labelledby',t.id);const s=$('tabs');if(t.offsetLeft<s.scrollLeft||t.offsetLeft+t.offsetWidth>s.scrollLeft+s.clientWidth)s.scrollLeft=t.offsetLeft-(t.offsetLeft<s.scrollLeft?16:s.clientWidth-t.offsetWidth-48)}});
   if(S.pin&&(S.pin.w!==S.w||(!S.est&&S.pin.est)))S.pin=null;render();readout();table();legend();matrix()}
-for(const k in WL){const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
+for(const k in WL){const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k,id:'tab-'+k,'aria-controls':'panel'});
+  b.addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tab')],i=ts.indexOf(b);const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i-1+ts.length)%ts.length:e.key==='Home'?0:e.key==='End'?ts.length-1:null;if(j==null)return;e.preventDefault();ts[j].focus();ts[j].click()});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
   b.addEventListener('click',()=>{S.w=k;S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
 for(const t of TIERS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph('laptop',t,'solid'));b.appendChild(document.createTextNode(t==='base'?'Base':t));
   b.addEventListener('click',()=>{S.tiers.has(t)?S.tiers.delete(t):S.tiers.add(t);b.setAttribute('aria-pressed',S.tiers.has(t));hideTip();render();table();legend()});$('tiers').appendChild(b)}
-for(const [f,t] of FORMS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph(f,'Ultra','solid'));b.appendChild(document.createTextNode(t));
+for(const [f,t] of FORMS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph(f,'key','solid'));b.appendChild(document.createTextNode(t));
   b.addEventListener('click',()=>{S.forms.has(f)?S.forms.delete(f):S.forms.add(f);b.setAttribute('aria-pressed',S.forms.has(f));hideTip();render();table();legend()});$('forms').appendChild(b)}
-document.querySelectorAll('[data-hmode]').forEach(b=>b.addEventListener('click',()=>{S.hmode=b.dataset.hmode;document.querySelectorAll('[data-hmode]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawFocus();readout()}));
+radios('[data-hmode]',b=>{S.hmode=b.dataset.hmode;drawFocus();readout()});
 $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()});
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
@@ -747,8 +951,9 @@ $('est').addEventListener('change',e=>{S.est=e.target.checked;syncBaseSel();all(
 $('st1').textContent=DATA.stitch.all;$('st2').textContent=DATA.stitch.one;
 window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(WL[k]&&k!==S.w){S.w=k;all()}});
 if(WL[location.hash.slice(1)])S.w=location.hash.slice(1);
+{const mq=matchMedia('(min-width:1000px)');if(mq.matches)$('opts').open=true;const f=e=>{if(e.matches)$('opts').open=true};mq.addEventListener?mq.addEventListener('change',f):mq.addListener(f)}
 syncBaseSel();looPlot();all();
-if(window.ResizeObserver)new ResizeObserver(()=>{hideTip();render()}).observe($('wrap'));else window.addEventListener('resize',render);
+if(window.ResizeObserver){new ResizeObserver(()=>{hideTip();render()}).observe($('wrap'));new ResizeObserver(looFz).observe($('loofig'))}else window.addEventListener('resize',render);
 </script>
 </body>
 </html>

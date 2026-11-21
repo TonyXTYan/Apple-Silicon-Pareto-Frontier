@@ -5,3 +5,5 @@ explorer/data.json
 explorer/data[2-6].json
 .DS_Store
 explorer/tests/*.png
+/c?.png
+explorer/c?.png

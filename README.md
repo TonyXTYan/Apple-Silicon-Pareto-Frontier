@@ -76,4 +76,4 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
 - **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters.
-- **Palette:** colours come from the dataviz skill's validated palette. Intel is #c2418f in light mode and #b84a8c in dark.
+- **Palette:** colours come from the dataviz skill's validated palette. Intel is #c2418f in light mode and #b84a8c in dark; the light-mode Max green is darkened to #16a372 for 3:1 contrast on the white plot field.
