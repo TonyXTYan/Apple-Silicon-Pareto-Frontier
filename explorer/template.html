@@ -582,6 +582,9 @@ function render(){
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
       fg.appendChild(el('path',{d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
       if(grp.size>1&&f.length>=2){const z=f[f.length-1],r0=z.r,lab=r0.ow?WL[r0.ow].short:(r0.model||'');if(lab){const t=el('text',{x:z.px+12,y:z.py-10,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:10.5)+'px;font-style:italic;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'frontier: '+lab);fg.appendChild(t)}}
+      if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
+        const a=f[0];fg.appendChild(el('path',{d:'M'+X(x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),class:'front ftail',style:op}));
+        if(S.w!=='all')fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'One point is both fastest and most efficient, so the frontier is its corner'));continue}
       const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*k]),S.ffit);if(!fit)continue;
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{d:'M'+pts2.join('L'),class:'front ftail',style:op}))};
