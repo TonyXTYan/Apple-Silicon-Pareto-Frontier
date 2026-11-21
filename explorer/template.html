@@ -238,6 +238,8 @@ td.num,th.num{text-align:right}
 #matrix th:first-child,#matrix td:first-child,#table th:first-child,#table td:first-child{position:sticky;left:0;z-index:1;background:linear-gradient(to left,var(--rule) 1px,var(--page) 1px)}
 #matrix th:first-child,#table th:first-child{z-index:2;background:linear-gradient(to left,var(--rule) 1px,var(--panel) 1px)}
 #matrix{min-width:720px}
+/* the matrix grows past the text column to the window's full width, keeping the page gutter */
+.bleed{--bw:calc(100vw - var(--sbw,0px) - 2 * var(--gut));width:max(100%,var(--bw));margin-left:min(0px,calc((100% - var(--bw)) / 2));max-width:none}
 #matrix tbody tr{cursor:pointer}
 #matrix tbody tr:hover td:first-child,#matrix tbody tr:focus-visible td:first-child{box-shadow:inset 3px 0 0 var(--ink)}
 #matrix tbody tr:focus-visible,#table tbody tr:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
@@ -396,7 +398,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
   </div>
   <div class="mkey" id="mkey"></div>
   <p class="scrollhint" id="mhint" hidden>The table scrolls sideways; the chip column stays put.</p>
-  <div class="tablewrap"><table id="matrix"><thead></thead><tbody></tbody></table></div>
+  <div class="tablewrap bleed"><table id="matrix"><thead></thead><tbody></tbody></table></div>
 </section>
 
 <details id="numbers">
@@ -1125,6 +1127,7 @@ function fromHash(){const k=location.hash.slice(1);if(k==='blas'){S.lset='julia-
 window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.w=k;autoBase();all()}});
 {const k=fromHash();if(k){S.w=k;autoBase()}}
 {const mq=matchMedia('(min-width:1000px)');if(mq.matches)$('opts').open=true;const f=e=>{if(e.matches)$('opts').open=true};mq.addEventListener?mq.addEventListener('change',f):mq.addListener(f)}
+{const sb=()=>document.documentElement.style.setProperty('--sbw',(innerWidth-document.documentElement.clientWidth)+'px');sb();addEventListener('resize',sb)}
 syncBaseSel();looPlot();all();
 if(window.ResizeObserver){new ResizeObserver(()=>{hideTip();render()}).observe($('wrap'));new ResizeObserver(looFz).observe($('loofig'))}else window.addEventListener('resize',render);
 </script>
