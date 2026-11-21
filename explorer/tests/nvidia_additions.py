@@ -16,12 +16,12 @@ async def main():
         n1=await pg.evaluate(f"ALL.filter(r=>r.chip==='{N1}'&&!r.bm).map(r=>[r.w,r.tier,r.form,r.gen,!!r.pe,r.q])"); print('N1X rows',n1)
         nb=await pg.evaluate(f"ALL.filter(r=>r.chip==='{N1}'&&r.bm).map(r=>r.w+' '+r.bm).sort()"); print('N1X Benchmark-menu rows',nb)   # cpubench2.py: Geekbench 6 and Cinebench 2026, two laptops x two CPU tabs
         if nb!=sorted([w+' '+bm for w in ('cpu-all','cpu-one') for bm in ('Cinebench 2026','Geekbench 6') for _ in (0,1)]): errs.append('N1X Benchmark-menu rows wrong')
-        if sorted(r[0] for r in n1)!=['bl-cpu','bl-gpu','cpu-all','cpu-all','cpu-one','cpu-one','gpu','gpu','llm'] or any(r[1]!='NVIDIA' or r[2]!='laptop' or r[3]!=0 for r in n1): errs.append('N1X rows wrong')   # bl-cpu and bl-gpu from mxfill.py
+        if sorted(r[0] for r in n1)!=['bl-cpu']*4+['bl-gpu']*4+['cpu-all','cpu-all','cpu-one','cpu-one','gpu','gpu','llm'] or any(r[1]!='NVIDIA' or r[2]!='laptop' or r[3]!=0 for r in n1): errs.append('N1X rows wrong')   # bl-cpu and bl-gpu from mxfill.py, each with three scene rows from blscenes.py
         if not await pg.evaluate("ALL.some(r=>r.chip==='NVIDIA GB10'&&r.model==='Llama 3.3 70B'&&!r.est&&r.p===156)"): errs.append('GB10 Llama 3.3 70B row missing')
         sp=await pg.evaluate("ALL.filter(r=>r.dev==='NVIDIA DGX Spark').map(r=>[r.model,r.p,r.plo,r.phi,!!r.pe])"); print('DGX Spark',sp)
         if len(sp)!=5 or any(not (s[4] and s[1]==160 and s[2]==120 and s[3]==206) for s in sp): errs.append('DGX Spark rows')
         if await pg.evaluate("ALL.some(r=>/ThinkPad P1/.test(r.dev))"): errs.append('flagged ThinkPad P1 Gen 7 should be left out')
-        for c,n in (('NVIDIA GeForce RTX 4060 Laptop',6),('NVIDIA GeForce RTX 4060',2),('NVIDIA GeForce RTX 5090',3),('NVIDIA GeForce RTX 5090 Laptop',6)):   # mxfill.py adds Blender GPU and Llama 2 7B rows
+        for c,n in (('NVIDIA GeForce RTX 4060 Laptop',9),('NVIDIA GeForce RTX 4060',5),('NVIDIA GeForce RTX 5090',6),('NVIDIA GeForce RTX 5090 Laptop',9)):   # mxfill.py adds Blender GPU and Llama 2 7B rows; blscenes.py three Blender GPU scene rows each
             k=await pg.evaluate(f"ALL.filter(r=>r.chip==='{c}').length")
             if k!=n: errs.append(f'{c}: {k} rows, expected {n}')
         # baseline: an N1X laptop on the CPU and gaming tabs
