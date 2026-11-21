@@ -11,7 +11,7 @@
 /* Layout idea: the plot is the instrument. Above it sit only the inputs that change what it measures (workload, baseline, LLM model); the options that change only how it is drawn sit in a rail beside it on desktop and behind one disclosure on mobile. Neutrals are brushed aluminium, so the only colour on the page is data and the focus ring. */
 :root{ color-scheme:light;
   --page:#F2F4F6; --field:#FFFFFF; --panel:#E7EAEE; --ink:#14171C; --ink2:#4A515B; --ink3:#626A75; --rule:#D3D8DE; --grid:#E9ECF0; --focus:#1F5FBF;
-  --s-base:#2a78d6; --s-pro:#e05a1a; --s-max:#2a925c; --s-ultra:#3a3b3f; --s-intel:#c2418f;
+  --s-base:#2a78d6; --s-pro:#e05a1a; --s-max:#2a925c; --s-ultra:#3a3b3f; --s-intel:#c2418f; --s-amd:#943207; --s-qcom:#430ceb; --s-nv:#7c0899;
   --pos:#2a78d6; --neg:#e34948;
   --surface:var(--page);
   --display:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -20,11 +20,11 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){ color-scheme:dark;
     --page:#16181B; --field:#0F1113; --panel:#1F2226; --ink:#ECEEF1; --ink2:#B3BAC3; --ink3:#8A929C; --rule:#343940; --grid:#22262B; --focus:#8AB4F8;
-    --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --pos:#3987e5; --neg:#e66767; }
+    --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --s-amd:#85552e; --s-qcom:#8c0cf5; --s-nv:#f525cb; --pos:#3987e5; --neg:#e66767; }
 }
 :root[data-theme="dark"]{ color-scheme:dark;
   --page:#16181B; --field:#0F1113; --panel:#1F2226; --ink:#ECEEF1; --ink2:#B3BAC3; --ink3:#8A929C; --rule:#343940; --grid:#22262B; --focus:#8AB4F8;
-  --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --pos:#3987e5; --neg:#e66767; }
+  --s-base:#3987e5; --s-pro:#d95926; --s-max:#199e70; --s-ultra:#e6e5df; --s-intel:#b84a8c; --s-amd:#85552e; --s-qcom:#8c0cf5; --s-nv:#f525cb; --pos:#3987e5; --neg:#e66767; }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
@@ -124,10 +124,12 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .spoke-tier{stroke:var(--ink);stroke-width:1.3;stroke-dasharray:5 4;opacity:.55}
 #chart .baseline-ring{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-dasharray:1.5 2.5}
 #chart .kring{fill:none;stroke:var(--focus);stroke-width:2.5}
-.t-Intel{--c:var(--s-intel)} .t-base{--c:var(--s-base)} .t-Pro{--c:var(--s-pro)} .t-Max{--c:var(--s-max)} .t-Ultra{--c:var(--s-ultra)} .t-key{--c:var(--ink3)}
+.t-Intel{--c:var(--s-intel)} .t-AMD{--c:var(--s-amd)} .t-Qualcomm{--c:var(--s-qcom)} .t-NVIDIA{--c:var(--s-nv)} .t-base{--c:var(--s-base)} .t-Pro{--c:var(--s-pro)} .t-Max{--c:var(--s-max)} .t-Ultra{--c:var(--s-ultra)} .t-key{--c:var(--ink3)}
 #chart .mk.solid{fill:var(--c);stroke:var(--surface);stroke-width:1.6}
 #chart .mk.hollow{fill:var(--surface);stroke:var(--c);stroke-width:2}
 #chart .mk.est{fill:var(--surface);stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2}
+#chart .mk.gfill{fill:color-mix(in srgb,var(--c) 55%,var(--surface));stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2}
+#chart .pairl{fill:none;stroke:var(--c);stroke-width:1;opacity:.4}
 #chart .flag{fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5}
 #chart .eb{stroke:var(--c);stroke-width:1.1;opacity:.5}
 #chart .eb.est{opacity:.22}
@@ -237,6 +239,7 @@ td.num,th.num{text-align:right}
 #matrix tbody tr td:first-child{height:57px}
 #mkey{min-height:12em;align-content:flex-start}}
 #matrix td.cell{min-width:128px}
+#matrix tr.msep td{position:static;background:var(--panel);color:var(--ink2);font-size:12.5px;font-weight:600;height:auto!important;padding:6px 10px}
 #matrix thead th.num{white-space:normal;min-width:128px;vertical-align:bottom;line-height:1.3}
 #matrix td.na{color:var(--ink3)}
 #matrix td.isest{font-style:italic;outline:1px dashed var(--ink3);outline-offset:-4px}
@@ -303,7 +306,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
 <main>
 <header class="top">
   <h1>Apple Silicon work per joule</h1>
-  <p class="deck">How much computing each Mac gets out of a joule taken from the wall, across seven kinds of work. <span class="deck-more">Measured points use published whole-system power, not chip power; any chip can be the baseline.</span></p>
+  <p class="deck">How much computing each Mac gets out of a joule taken from the wall, across eight kinds of work, with Intel, AMD, Qualcomm and NVIDIA machines for comparison. <span class="deck-more">Measured points use published whole-system power, not chip power; any chip can be the baseline.</span></p>
 </header>
 
 <div class="tabs" role="tablist" aria-label="Workload" id="tabs"></div>
@@ -313,6 +316,9 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     <label class="basesel vsbase" for="base"><span class="vsl" id="basel">Relative to</span> <span class="selw"><span class="selv" id="basev" aria-hidden="true"></span><select id="base"></select></span><span class="vsx" id="basex" hidden></span></label>
     <label class="basesel vsmod" for="lmod" id="lmodw" hidden>Model <span class="selw"><select id="lmod"><option value="">Every model and context</option><option value="Llama 2 7B Q4_0">Llama 2 7B Q4_0, every chip</option><option value="Llama 3 8B Q4_K_M">Llama 3 8B Q4_K_M, by context</option><option value="Llama 3 8B F16">Llama 3 8B F16, by context</option><option value="Llama 3 70B Q4_K_M">Llama 3 70B Q4_K_M, by context</option><option value="Llama 3 70B F16">Llama 3 70B F16, by context</option><option value="set:mlx">MLX vs GGUF, same machine</option><option value="set:cluster">Mac Studio clusters (exo vs llama.cpp RPC)</option><option value="other">Other metered runs</option></select></span></label>
     <label class="basesel vsmod" for="lgame" id="lgamew" hidden>Game <span class="selw"><select id="lgame"><option value="">Every game</option><option value="Cyberpunk 2077">Cyberpunk 2077 (power measured)</option><option value="Baldur's Gate 3">Baldur's Gate 3</option><option value="Assassin's Creed Shadows">Assassin's Creed Shadows</option></select></span></label>
+    <label class="basesel vsmod" for="lset" id="lsetw" hidden>Set <span class="selw"><select id="lset"><option value="julia-sgemm">fp32 GEMM 2048³, Accelerate vs OpenBLAS (10 chips)</option><option value="arxiv-sgemm">Peak fp32 GEMM, CPU vs GPU (M1 to M4)</option><option value="julia-dgemm">fp64 DGEMM, performance cores (3 chips)</option><option value="">Every set</option></select></span></label>
+    <label class="basesel vsmod" for="lscene" id="lscenew" hidden>Scene <span class="selw"><select id="lscene"><option value="">All three scenes, summed</option><option value="monster">Monster</option><option value="junkshop">Junkshop</option><option value="classroom">Classroom</option></select></span></label>
+    <label class="basesel vsmod" for="ldev" id="ldevw" hidden>Device <span class="selw"><select id="ldev"><option value="">CPU and GPU</option><option value="bl-cpu">CPU only</option><option value="bl-gpu">GPU only (Metal)</option></select></span></label>
     <div class="group vsize" id="lsizew" role="group" aria-labelledby="lsl" hidden><span class="gl" id="lsl">Model size</span></div>
   </div>
 
@@ -412,8 +418,9 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
   <ul class="gaps">
     <li><b>Ultra chips under Cinebench.</b> Reviews in English, German and Japanese give M3 Ultra scores but no wall power for the run. PC Watch reports about 146 W with Cinebench and a game running together. The M3 Ultra is measured only under HPL and LLM generation, where Jeff Geerling metered it at the wall. Its Cinebench points are estimates.</li>
     <li><b>Other languages.</b> Notebookcheck's German pages carry the same measurements as the English ones. Geekerwan (Chinese) publishes per-core power curves from package power, not wall power, and in video only. ITmedia and PC Watch (Japanese) give scores without matched wall power. Macwelt (German) gives about 124 W for the M4 Max Mac Studio under combined CPU and GPU load, which is not a single workload.</li>
-    <li><b>Blender.</b> Render speeds are Blender Open Data medians (Blender 4.5), which pool every machine with a given chip, so a laptop, a Mac mini and a Mac Studio count alike. No source pairs them with metered wall energy, so all Blender points have estimated power: on the CPU, the same machine's Cinebench all-core wall power (0.9 to 1.1 times); on the GPU, 0.45 to 0.95 times its Cyberpunk 2077 wall power, a factor anchored only by one package-power reading. Error bars combine the spread of the median, the power range and the factor in quadrature on a log scale, and are about one standard deviation.</li>
+    <li><b>Blender.</b> Render speeds are Blender Open Data medians (Blender 4.5), which pool every machine with a given chip, so a laptop, a Mac mini and a Mac Studio count alike. No source pairs them with metered wall energy, so all Blender points have estimated power: on the CPU, the same machine's Cinebench all-core wall power (0.9 to 1.1 times); on the GPU, 0.45 to 0.95 times its Cyberpunk 2077 wall power, a factor anchored only by one package-power reading. Error bars combine the spread of the median, the power range and the factor in quadrature on a log scale, and are about one standard deviation. The per-scene medians (monster, junkshop, classroom) come from the full Open Data snapshot and reuse the three-scene power. GPU points use each chip's full-core GPU; the cut-down variants in Open Data (for example the 30-core M3 Max or the 16-core M4 Pro) are left out, because no machine with them has a measured or modelled power on this page. Medians over three runs or fewer (M5 Ultra, M6, M5 Pro GPU) are marked as weaker measurements.</li>
     <li><b>Other games.</b> Nobody publishes wall power for Baldur's Gate 3 or Assassin's Creed Shadows on these Macs, so those points borrow the Cyberpunk 2077 reading of the same machine. Total War: Pharaoh is left out because it is engine-limited near 50 to 56 fps from the M4 Pro up to the M5 Max, so it says little about the GPU; Shadow of the Tomb Raider because it has no M5, M5 Pro or M5 Max results. Upscaled or frame-generated results (MetalFX) and Geekerwan's figures, which are chip power rather than wall power, are not mixed in.</li>
+    <li><b>Comparison machines.</b> Thirteen Intel, AMD, Qualcomm and NVIDIA machines, chosen for coverage: Notebookcheck's Cinebench and Cyberpunk 2077 wall readings and Jeff Geerling's HPL and LLM runs. Where a review published no Cinebench 2024 power, another test's wall power stands in and the point is marked as weaker; some Cyberpunk frame rates come from the review rather than the efficiency chart used for the Macs, which reads 5 to 15% higher; the Snapdragon runs the game under emulation; discrete-GPU laptops and desktops are measured as a whole. Power modes matter more on these chips than on a Mac (an HX 370 laptop goes from 10.2 to 21.3 points per watt between 80 W and 15 W), and only one setting per machine is shown. None ran the Llama 2 7B Q4_0 all-chip test.</li>
     <li><b>M5 Ultra.</b> The only wall-power figures found came from a blog whose 70B token rates are about 1.5 times the memory-bandwidth limit, so they are excluded. Its points here are model estimates.</li>
     <li><b>iMacs</b> are excluded because their wall power includes the built-in display.</li>
     <li><b>Hollow points</b> were measured with Cinebench R23 and converted to Cinebench 2024 units through the M4 Mac mini, which was measured in both. Five machines scored in both put the conversion error at about <span id="st1"></span>% for all-core and <span id="st2"></span>% for single-thread work.</li>
@@ -426,7 +433,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
 <script>
 const DATA=/*DATA*/;
 const SRC=DATA.sources;
-const ck=c=>c.replace(/ \d+c$/,''), gen=c=>{if(/^Intel/.test(c))return 0;const m=/^M(\d)/.exec(c);return m?+m[1]:null};
+const ck=c=>c.replace(/ \d+c$/,''), gen=c=>{if(/^(Intel|AMD|Qualcomm|NVIDIA) /.test(c))return 0;const m=/^M(\d)/.exec(c);return m?+m[1]:null};
 const ROWS=DATA.rows.map(r=>Object.assign(r,{ck:ck(r.chip),gen:gen(r.chip)}));
 const EST=DATA.est.map(r=>Object.assign(r,{ck:r.ck||ck(r.chip),gen:gen(r.chip)}));
 const ALL=ROWS.concat(EST);
@@ -436,30 +443,36 @@ const WL={
    finding:'All seven kinds of work on one chart in absolute units. Each workload keeps its own physical scale, shown as a row of ticks under the plot and a column beside it, marked with the workload\'s shape. Its points are slid along the constant-power diagonals so the M4 Mac mini lands at the same place on every workload; because both axes move together, the diagonals are true wall power in watts for every point. Hover a point to draw lines to the same chip on its other workloads. Pick a baseline to switch to ratios instead.',
    note:'Read a value off the scale with the matching shape: a circle is read on the CPU all-cores row, a square on the linear-algebra row, and so on. Height can be compared within a workload, not across workloads, because work units differ; horizontal position is likewise per workload. Distance along the diagonals, i.e. power, is directly comparable across everything. With a baseline chosen, both axes become ratios to that machine on the same workload.'},
  'llm':{tab:'LLM generation',short:'LLM',sub:'tokens out',x:'Generation speed (tokens per second)',xu:'tok/s',e:'Tokens per joule',eu:'tok/J',per:['J per token',e=>1/e],absAxis:true,
-   finding:'Dashed points are every chip from the llama.cpp benchmark thread generating with Llama 2 7B (Q4_0), with wall power estimated from each chip\'s measured or modelled power under full GPU load. They land between 0.5 and 1.0 tokens per joule, about 1 to 2 J per token. The ranges overlap, so the ordering is not resolved. Ultras sit at the bottom: they are fastest but carry two dies and a 150 W-plus platform. Solid points are the few runs metered at the wall. Lines join one chip running one model as the generated length grows from 512 to 8,192 tokens (XiongjieDai\'s llama-bench sweep): speed falls as the KV cache grows while power stays roughly fixed, so each line slides down along a constant-power diagonal. Paired points join the same model on the same machine under llama.cpp (GGUF) and MLX, ending at the MLX point; with power assumed equal, the efficiency gain is the speed gain, largest for small models where llama.cpp\'s per-token overhead dominates. Cluster lines join 1, 2 and 4 M3 Ultra Mac Studios (Geerling, RDMA over Thunderbolt 5): exo gets faster with nodes but every node draws power, so joules per token roughly double from 1 to 4 nodes; llama.cpp RPC gets slower. Use the Model menu to isolate any of these sets.',
+   finding:'Dashed points are every chip from the llama.cpp benchmark thread generating with Llama 2 7B (Q4_0), with wall power estimated from each chip\'s measured or modelled power under full GPU load. They land between 0.5 and 1.0 tokens per joule, about 1 to 2 J per token. The ranges overlap, so the ordering is not resolved. Ultras sit at the bottom: they are fastest but carry two dies and a 150 W-plus platform. Solid points are the few runs metered at the wall, including comparison machines from Jeff Geerling\'s tests (peak power, so lower bounds): with Llama 3.2 3B an RTX 4090 desktop generates 335 tokens per second at 1.3 tokens per joule for the whole PC, about the M4 Mac mini\'s 1.4, while the NVIDIA GB10 (0.76) and the Ryzen AI Max+ 395 Framework Desktop (0.66) sit near the M3 Ultra Mac Studio (0.69). Lines join one chip running one model as the generated length grows from 512 to 8,192 tokens (XiongjieDai\'s llama-bench sweep): speed falls as the KV cache grows while power stays roughly fixed, so each line slides down along a constant-power diagonal. Paired points join the same model on the same machine under llama.cpp (GGUF) and MLX, ending at the MLX point; with power assumed equal, the efficiency gain is the speed gain, largest for small models where llama.cpp\'s per-token overhead dominates. Cluster lines join 1, 2 and 4 M3 Ultra Mac Studios (Geerling, RDMA over Thunderbolt 5): exo gets faster with nodes but every node draws power, so joules per token roughly double from 1 to 4 nodes; llama.cpp RPC gets slower. Use the Model menu to isolate any of these sets.',
    note:'Generation is memory-bandwidth bound, so speed tracks bandwidth while power tracks how much silicon is lit. Decode wall power is taken as 0.75 to 1.1 times GPU-load wall power, calibrated on the two machines with both readings. M5 and M6 speeds come from a newer llama.cpp build than older chips, which flatters them somewhat. Compare points that share a model; ratios to the baseline use the baseline running the same model.'},
  'cpu-all':{tab:'CPU, all cores',short:'CPU all',sub:'Cinebench render',x:'Throughput (Cinebench 2024 points)',xu:'pts',e:'Points per joule',eu:'pts/J',
-   finding:'Fanless MacBook Airs do the most all-core work per joule, led by the M4 Air 13 at 39 points per joule. The M6 Mac mini is the one machine that is both fast and efficient. Turn on estimates to see the Ultra chips and the M4 Pro Mac mini in its three power modes, where Low Power gives about a fifth more work per joule at less than half the speed.',
+   finding:'Fanless MacBook Airs do the most all-core work per joule, led by the M4 Air 13 at 39 points per joule. The M6 Mac mini is the one machine that is both fast and efficient. Turn on estimates to see the Ultra chips and the M4 Pro Mac mini in its three power modes, where Low Power gives about a fifth more work per joule at less than half the speed. Of the comparison machines, the Snapdragon X Elite Galaxy Book4 Edge 16 comes closest at 22 points per joule, about the M2 MacBook Air; the Ryzen AI Max+ 395 in the ROG Flow Z13 matches M3 Max speed at 15, and the big Intel and AMD gaming and desktop machines fall to 9 to 11 (their power figures are weaker: see each point).',
    note:'Notebookcheck measures the whole machine at the wall with an external monitor and divides the Cinebench score by the average power. Points per watt and points per joule are the same number.'},
  'cpu-one':{tab:'CPU, one thread',short:'CPU one',sub:'Cinebench render',x:'Throughput (Cinebench 2024 points)',xu:'pts',e:'Points per joule',eu:'pts/J',
    finding:'With one thread busy, every Mac gets between a third and two thirds of the work per joule it gets with all cores busy, because the fixed platform power is charged to one core. Base chips have stayed near 12 to 15 from M1 to M6 while speed nearly doubled. Mac Studios are lowest, near 6.',
    note:'Same method and score scale as the all-core view, so the two can be compared directly.'},
  'hpl':{tab:'Linear algebra',short:'HPL',sub:'HPL, double precision',x:'Throughput (Gflops)',xu:'Gflops',e:'GFLOP per joule',eu:'GFLOP/J',per:['pJ per FLOP',e=>1000/e],
-   finding:'The M4 Mac mini delivers 7.6 GFLOP per joule, about 132 pJ per double-precision operation at the wall. The M3 Ultra Mac Studio runs 4.3 times faster at 6.0 GFLOP per joule. The estimates put the base chips of each generation at the top, as in the all-core CPU view.',
+   finding:'The M4 Mac mini delivers 7.6 GFLOP per joule, about 132 pJ per double-precision operation at the wall. The M3 Ultra Mac Studio runs 4.3 times faster at 6.0 GFLOP per joule. The estimates put the base chips of each generation at the top, as in the all-core CPU view. Comparison machines, all run by Geerling on the CPU with BLIS: the Core 5 320 Dell XPS 13 reaches 6.2 (its own display may count), the NVIDIA GB10\'s Arm cores 4.4, the Core Ultra 7 265K desktop 2.7 and the Ryzen AI Max+ 395 Framework Desktop board 2.3.',
    note:'High Performance Linpack solves a dense linear system in double precision on the CPU. Jeff Geerling records average wall power over the run. Several entries ran inside a Linux container.'},
+ 'blas':{tab:'Numerical libraries',short:'BLAS',sub:'Accelerate, OpenBLAS',x:'Throughput (GFLOPS)',xu:'GFLOPS',e:'GFLOP per joule',eu:'GFLOP/J',per:['pJ per FLOP',e=>1000/e],absAxis:true,
+   finding:'Every point here is speed measured, power estimated: no wall power was metered for any of these runs, and each speed is a single community or paper run. In the Julia Discourse set (single-precision 2048 × 2048 × 2048 matrix products on ten chips), Accelerate, which runs on Apple\'s matrix units, is 1.9 to 4.9 times as fast as OpenBLAS on the ordinary cores of the same machine; lines run from OpenBLAS (ring) to Accelerate (filled). Both libraries are given the same estimated power, so the efficiency gap equals the speed gap by construction. On these estimates Accelerate does 28 to 63 GFLOP per joule, the M4 highest and the M5 Pro and M5 Max lowest: at this size their Accelerate runs (about 2,770 GFLOPS) are slower than the M4 Pro\'s 3,406, while their OpenBLAS runs are the fastest of any chip short of the M3 Ultra. Each bar spans almost a factor of 3, so the ordering of chips is not resolved; the gap between libraries is. The Set menu adds Hubner et al.\'s peak single-precision products on the M1 to M4 base chips, where Metal on the GPU is 1.5 to 2.1 times as fast as Accelerate on the CPU, and three double-precision runs.',
+   note:'GFLOPS is billions of floating-point operations per second; one 2048³ product is about 17.2 GFLOP. The Julia runs used 4 to 20 BLAS threads, Julia 1.12 or 1.13 and different macOS versions, and the thread does not name the machines, so power is borrowed from the chip\'s best-measured machine (named in the details). Power is 0.5 to 1.4 times that machine\'s Cinebench 2024 all-core wall power: Accelerate stops scaling after about two threads, which argues for less, while HPL draws 1.1 to 1.4 times the Cinebench power on the M4 Mac mini and the M1 Max Mac Studio. Hubner et al. measured package power with powermetrics (0.2 to 0.27 TFLOPS per watt on the CPU, 0.21 to 0.46 on the GPU); that leaves out the rest of the machine, so it bounds their points from above. The double-precision set ran on the performance cores; compare it with HPL in the Linear algebra tab. This tab stays out of All workloads and the matrix.'},
  'gpu':{tab:'Gaming',short:'Gaming',sub:'Cyberpunk, BG3, ACS',x:'Frame rate (frames per second)',xu:'fps',e:'Frames per joule',eu:'frames/J',per:['J per frame',e=>1/e],get absAxis(){return !S.lgame},
-   finding:'Three demanding games at 1080p on the highest preset, frame rates from Notebookcheck. Only Cyberpunk 2077 has wall power measured while it ran: the fanless M5 MacBook Air 13 renders 1.1 frames per joule and the M6 Mac mini 0.94 at nearly twice the frame rate, while the M5 Max MacBook Pro 16 is the fastest at 93 fps and still returns 0.68. Baldur\'s Gate 3 and Assassin\'s Creed Shadows points reuse each machine\'s Cyberpunk wall power, so they are drawn as estimates with a wider range. Per frame, Baldur\'s Gate 3 is the lightest (1 to 1.6 frames per joule on M5 and M6 machines) and Assassin\'s Creed Shadows the heaviest (0.3 to 0.6). With Draw frontier on, each game gets its own frontier. Use the Game menu to show one game on its own. A baseline divides each game by that machine in the same game, so it sits at 1× in every game. GPU estimates are the least reliable on this page: leave-one-out error is about 40%.',
+   finding:'Three demanding games at 1080p on the highest preset, frame rates from Notebookcheck. Only Cyberpunk 2077 has wall power measured while it ran: the fanless M5 MacBook Air 13 renders 1.1 frames per joule and the M6 Mac mini 0.94 at nearly twice the frame rate, while the M5 Max MacBook Pro 16 is the fastest Mac at 93 fps and still returns 0.68. Among the comparison machines (Cyberpunk only) the Panther Lake Minisforum mini PC returns 0.74 and the Lunar Lake Zenbook S 14 0.70; the RTX 5090 Laptop in the XMG Neo 16 runs fastest of all at 155 fps for 289 W at the wall (0.54), counting the whole laptop. Baldur\'s Gate 3 and Assassin\'s Creed Shadows points reuse each machine\'s Cyberpunk wall power, so they are drawn as estimates with a wider range. Per frame, Baldur\'s Gate 3 is the lightest (1 to 1.6 frames per joule on M5 and M6 machines) and Assassin\'s Creed Shadows the heaviest (0.3 to 0.6). With Draw frontier on, each game gets its own frontier. Use the Game menu to show one game on its own. A baseline divides each game by that machine in the same game, so it sits at 1× in every game. GPU estimates are the least reliable on this page: leave-one-out error is about 40%.',
    note:'Settings: Cyberpunk 2077 ultra without upscaling, Baldur\'s Gate 3 Ultra with TAA, Assassin\'s Creed Shadows Ultra High, all 1920×1080; wall power with an external monitor. Power was measured in Cyberpunk only: the other two games are assumed to draw the same wall power, with the range widened by about 12%, so their frames per joule are only as good as that assumption (on the M5 Air the chip drew slightly more in Baldur\'s Gate 3). The M5 Max MacBook Pro 14 is capped by its 97 W adapter, with the battery covering the rest, so its efficiency is overstated in every game. M4-era results are older reviews and may be translated builds (Notebookcheck called the M4 Mac mini\'s Cyberpunk run emulated; Baldur\'s Gate 3 was native), so compare generations with care. Frame rate is efficiency times power; ratios to the baseline use the baseline in the same game. The matrix and the All workloads view use Cyberpunk only.'},
- 'bl-cpu':{tab:'Blender, CPU',short:'Blender CPU',hs:'Bl. CPU',sub:'Cycles path tracing',x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
+ 'blender':{tab:'Blender',short:'Blender',sub:'Cycles, CPU and GPU',pool:['bl-cpu','bl-gpu'],x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
+   finding:'The same Cycles render on the CPU (dashed rings) and on the GPU (filled), joined by a thin line for each chip. Every point is an estimate: render speed is measured (Blender Open Data medians, Blender 4.5), wall power is borrowed from the same machine running Cinebench (CPU) or Cyberpunk 2077 (GPU). On the CPU the Apple chips span 0.064 to 0.13 samples per joule (the 2019 Intel i9 MacBook Pro manages 0.025), led by the M6 Mac mini; Max and Ultra chips cluster near 0.085, because more cores at similar clocks buy speed, not efficiency. On the GPU the same render costs 3.5 times (M1 Pro) to about 20 times (M3 Ultra, M5 Ultra) less energy. M3 is the step change: hardware ray tracing lifts the GPU-to-CPU ratio from 3.5 to 7 on M1 and M2 chips (M2 Ultra 11) to 11 to 13 on M3 base, Pro and Max. Every GPU range spans a factor of 2 to 3 and overlaps its neighbours. Comparison chips (three-scene sum only) render on the CPU at 0.029 (Core Ultra 9 275HX, Core Ultra 7 265K desktop) to 0.076 samples per joule (Panther Lake 358H), below the Apple base chips, and the RTX 5090 Laptop with OptiX reaches 1.2 on the GPU, about the M4 Max. The Scene menu splits the score into its three scenes: on the CPU of the M1, M2 and M3 base chips the junkshop scene runs 5 to 10 times slower than on their Pro siblings, a real Open Data median, so there the GPU is 11 to 26 times as efficient.',
+   note:'One sample is one ray path traced per pixel. The Open Data score is samples per minute summed over the monster, junkshop and classroom scenes; here it is divided by 60 so that throughput over work per joule is power in watts, and each scene is assumed to draw the power of the three-scene run. Medians pool every machine with the chip, so the device named is the one whose power was borrowed. CPU power is 0.9 to 1.1 times that machine\'s Cinebench all-core wall power; GPU power is 0.45 to 0.95 times its Cyberpunk 2077 wall power, because Cycles keeps the GPU busy while the CPU idles, unlike a game. Ultra and older-chip power comes from the model and carries its 40% error on top. GPU points are the full-core configuration of each chip (the 8-core M2 where that is the machine whose power is borrowed). Points with a dashed outer ring rest on three Open Data runs or fewer (M5 Ultra, M6, M5 Pro GPU).'},
+ 'bl-cpu':{notab:true,tab:'Blender, CPU',short:'Blender CPU',hs:'Bl. CPU',sub:'Cycles path tracing',x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
    finding:'All points are estimates: render speed is measured (Blender Open Data medians), wall power is taken from the same machine running Cinebench, which is the same kind of all-core path-tracing load. They span 0.06 to 0.13 samples per joule. The M6 Mac mini leads at 0.13, then the M5 and M4 base chips near 0.11. Max and Ultra chips cluster near 0.085: more cores at similar clocks buy speed, not efficiency.',
    note:'One sample is one ray path traced per pixel. The Open Data score is samples per minute summed over three scenes; here it is divided by 60 so that throughput over work per joule is power in watts. Medians pool every machine with the chip, so the device named is the one whose power was borrowed.'},
- 'bl-gpu':{tab:'Blender, GPU',short:'Blender GPU',hs:'Bl. GPU',sub:'Cycles on Metal',x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
+ 'bl-gpu':{notab:true,tab:'Blender, GPU',short:'Blender GPU',hs:'Bl. GPU',sub:'Cycles on Metal',x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
    finding:'The same render on the GPU costs 5 to 15 times less energy than on the CPU of the same chip. M3 is the step change: hardware ray tracing more than doubles samples per joule from M2 Max (about 0.5) to M3 Max (about 1.1). The M6 Mac mini and the M3 Ultra reach about 1.7, the M5 Ultra about 1.9, but every GPU range here spans a factor of 2 to 3 and overlaps its neighbours.',
    note:'Render speed is the Blender Open Data median for the GPU configuration named in the details. Wall power is 0.45 to 0.95 times the machine\'s Cyberpunk 2077 wall power, because Cycles keeps the GPU busy while the CPU idles, unlike a game. Ultra and older-chip power comes from the model and carries its 40% error on top.'},
 };
-const TIERS=['Intel','base','Pro','Max','Ultra'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
+const TIERS=['base','Pro','Max','Ultra','Intel','AMD','Qualcomm','NVIDIA'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
 const CP='Cyberpunk 2077',GAB={'Cyberpunk 2077':'CP2077',"Baldur's Gate 3":'BG3',"Assassin's Creed Shadows":'ACS'};
-const S={lgame:'',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
+const S={lgame:'',lscene:'',ldev:'',lset:'julia-sgemm',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
   base:null,ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -467,45 +480,60 @@ function h(n,a,t){const e=document.createElement(n);if(a)for(const k in a)e.setA
 function fmt(v){if(v==null||!isFinite(v))return '–';const a=Math.abs(v);if(a>=1000)return Math.round(v).toLocaleString('en-US');if(a>=100)return v.toFixed(0);if(a>=10)return v.toFixed(1);if(a>=1)return v.toFixed(2);if(a>=.1)return v.toFixed(3);return v.toPrecision(2)}
 function fmtT(v){return Number(v.toPrecision(3)).toLocaleString('en-US',{maximumSignificantDigits:3})}
 const devName=r=>r.dev.replace(' (estimate)','');
-function name(r){return r.chip+' '+devName(r)+(r.model?', '+r.model:'')+(r.game&&!r.ow?', '+r.game:'')}
+const isBl=r=>!r.ow&&(r.w==='bl-cpu'||r.w==='bl-gpu');
+function name(r){return r.chip+' '+devName(r)+(r.model?', '+r.model:'')+(r.game&&!r.ow?', '+r.game:'')+(isBl(r)?(r.w==='bl-cpu'?', CPU':', GPU')+(r.scene?', '+r.scene+' scene':''):'')+(r.lib&&!r.ow?', '+r.lib:'')}
+const LIBAB={'Accelerate':'Acc.','OpenBLAS':'OpenBLAS','Accelerate (CPU)':'CPU','MPS (GPU)':'GPU','DGEMM fp64':'fp64'},SETAB={'julia-sgemm':'Julia fp32','arxiv-sgemm':'arXiv fp32','julia-dgemm':'Julia fp64'};
 const gsuf=r=>r.game&&S.w==='gpu'&&!S.lgame?', '+GAB[r.game]:'';
-function shortName(r){if(r.ow)return shortName(r.o)+', '+WL[r.ow].short;if(r.mode)return r.mode;const d=devName(r).replace('MacBook Pro ','MBP ').replace('MacBook Air ','Air ').replace('Mac mini','mini').replace('Mac Studio','Studio').replace(/ \(.*\)/,'');
+function shortName(r){if(r.ow)return shortName(r.o)+', '+WL[r.ow].short;if(r.mode)return r.mode;
+  if(r.sl){if(isBl(r)&&S.w==='blender')return r.sl+(r.w==='bl-cpu'?' CPU':' GPU');return r.sl+' '+r.sd+(r.model?', '+r.model.replace('Llama ','').replace('DeepSeek ',''):'')+(r.est?' est.':'')+gsuf(r)}
+  const d=devName(r).replace('MacBook Pro ','MBP ').replace('MacBook Air ','Air ').replace('Mac mini','mini').replace('Mac Studio','Studio').replace(/ \(.*\)/,'');
   if(r.set==='mlx')return r.chip+', '+r.model.replace(' 4-bit','')+', '+(r.eng==='MLX'?'MLX':'GGUF');
   if(r.set==='cluster')return r.chip+(r.nodes>1?' x'+r.nodes:'')+', '+r.model.split(' ').slice(0,2).join(' ')+', '+(r.eng.startsWith('exo')?'exo':'RPC');
   if(r.sweep)return r.chip+', '+r.model.replace('Llama ','L')+', '+(r.ctx>=1024?r.ctx/1024+'k':r.ctx);
+  if(isBl(r)&&S.w==='blender')return r.chip+(r.w==='bl-cpu'?' CPU':' GPU');
+  if(r.lib)return r.chip+', '+LIBAB[r.lib];
   if(r.game&&r.pe)return r.chip+' '+d+gsuf(r);if(r.est)return r.chip+' est.'+gsuf(r);return r.model?r.chip+', '+r.model.replace('Llama ','').replace('DeepSeek ',''):r.chip+' '+d+gsuf(r)}
-const sameMachine=(a,b)=>a&&b&&a.chip===b.chip&&a.dev===b.dev&&(a.model||'')===(b.model||'')&&(a.mode||'')===(b.mode||'')&&(a.game||'')===(b.game||'');
+const sameMachine=(a,b)=>a&&b&&a.chip===b.chip&&a.dev===b.dev&&(a.model||'')===(b.model||'')&&(a.mode||'')===(b.mode||'')&&(a.game||'')===(b.game||'')&&a.w===b.w&&(a.scene||'')===(b.scene||'')&&(a.set||'')===(b.set||'')&&(a.lib||'')===(b.lib||'');
 
 /* ---------- data selection ---------- */
 const WS5=['cpu-all','cpu-one','hpl','bl-cpu','gpu','bl-gpu','llm'],WSHAPE={'cpu-all':'laptop','cpu-one':'fanless','hpl':'desktop','gpu':'diamond','llm':'down','bl-cpu':'plus','bl-gpu':'cross'},DER=new Map();
 const DEFBASE={chip:'M4',dev:'Mac mini'};
-const vk=r=>{const o=r.o||r,w=r.ow||r.w;return w==='llm'?o.model:w==='gpu'?o.game:undefined}, tsub=()=>S.w==='gpu'?S.lgame||undefined:undefined;
-function xref(w){const r=ALL.find(r=>r.w===w&&r.chip==='M4'&&devName(r)==='Mac mini'&&(w!=='llm'||r.model==='Llama 2 7B Q4_0')&&(w!=='gpu'||r.game===CP));return r?r.x:1}
+const vk=r=>{const o=r.o||r,w=r.ow||r.w;return w==='llm'?o.model:w==='gpu'?o.game:w==='bl-cpu'||w==='bl-gpu'?o.scene:w==='blas'?o.set+'|'+o.lib:undefined}, tsub=()=>S.w==='gpu'?S.lgame||undefined:S.w==='blender'?S.lscene||undefined:undefined;
+/* a tab can pool several workloads (Blender: CPU and GPU); r.w stays the workload */
+const tabWs=k=>WL[k||S.w].pool||[k||S.w], inTab=r=>!!r&&tabWs().includes(r.w);
+/* weaker measurement: a measured row below grade A, or a speed-measured row whose speed is itself thin (grade B or C) */
+const weak=r=>r.q!=='A'&&(!r.est||r.q!=='E');
+const glab=r=>r.ow?WL[r.ow].short:WL[S.w].pool?WL[r.w].short:r.lib?(S.lset?'':SETAB[r.set]+' ')+r.lib:(r.model||(r.game?GAB[r.game]:''));
+function xref(w){const r=ALL.find(r=>r.w===w&&r.chip==='M4'&&devName(r)==='Mac mini'&&(w!=='llm'||r.model==='Llama 2 7B Q4_0')&&(w!=='gpu'||r.game===CP)&&!r.scene);return r?r.x:1}
 const absAll=()=>S.w==='all'&&!curBase();
 function derive(){const abs=!curBase(),b=curBase(),out=[];const q=(v,d)=>v==null?undefined:v/d;
-  if(abs){for(const w of WS5){const xr=xref(w);for(const r of ALL.filter(r=>r.w===w&&!r.set&&(w!=='gpu'||r.game===CP)&&(S.est||!r.est||r.pe))){let d=DER.get(r);if(!d){d={o:r};DER.set(r,d)}
+  if(abs){for(const w of WS5){const xr=xref(w);for(const r of ALL.filter(r=>r.w===w&&!r.set&&!r.scene&&(w!=='gpu'||r.game===CP)&&(S.est||!r.est||r.pe))){let d=DER.get(r);if(!d){d={o:r};DER.set(r,d)}
     Object.assign(d,{w:'all',ow:w,chip:r.chip,dev:r.dev,model:r.model,game:r.game,mode:r.mode,tier:r.tier,form:r.form,ck:r.ck,gen:r.gen,q:r.q,est:r.est,resc:r.resc,ex:r.ex,seen:r.seen,clip:r.clip,note:r.note,src:r.src,bench:r.bench,
       x:r.x/xr,e:r.e/xr,xlo:q(r.xlo,xr),xhi:q(r.xhi,xr),elo:q(r.elo,xr),ehi:q(r.ehi,xr),p:r.p,br:null,xr});out.push(d)}}return out}
-  for(const w of WS5)for(const r of ALL.filter(r=>r.w===w&&!r.set&&(w!=='gpu'||r.game===CP)&&(S.est||!r.est||r.pe))){const br=baseRow(w,b,r.model);if(!br)continue;let d=DER.get(r);if(!d){d={o:r};DER.set(r,d)}
+  for(const w of WS5)for(const r of ALL.filter(r=>r.w===w&&!r.set&&!r.scene&&(w!=='gpu'||r.game===CP)&&(S.est||!r.est||r.pe))){const br=baseRow(w,b,r.model);if(!br)continue;let d=DER.get(r);if(!d){d={o:r};DER.set(r,d)}
     Object.assign(d,{w:'all',ow:w,chip:r.chip,dev:r.dev,model:r.model,game:r.game,mode:r.mode,tier:r.tier,form:r.form,ck:r.ck,gen:r.gen,q:r.q,est:r.est,resc:r.resc,ex:r.ex,seen:r.seen,clip:r.clip,note:r.note,src:r.src,bench:r.bench,
       x:r.x/br.x,e:r.e/br.e,xlo:q(r.xlo,br.x),xhi:q(r.xhi,br.x),elo:q(r.elo,br.e),ehi:q(r.ehi,br.e),p:r.p/br.p,br});out.push(d)}return out}
-function pool(w){return w==='all'?derive():ALL.filter(r=>r.w===w&&(S.est||!r.est||r.pe))}
+function pool(w){const ws=tabWs(w);return w==='all'?derive():ALL.filter(r=>ws.includes(r.w)&&(S.est||!r.est||r.pe))}
 const mshape=r=>S.w==='all'&&r.ow?WSHAPE[r.ow]:r.form;
 const SIZES=[['XS',0,2,'under 2B'],['S',2,5,'2–5B'],['M',5,12,'5–12B'],['L',12,50,'12–50B'],['XL',50,150,'50–150B'],['XXL',150,500,'150–500B'],['XXXL',500,1e9,'500B and up']];
 function pcount(r){const m=/(\d+(?:\.\d+)?)\s*([BT])\b/.exec(r.model||'');return m?+m[1]*(m[2]==='T'?1000:1):null}
 function psize(r){const b=pcount(r);if(b==null)return null;const z=SIZES.find(z=>b>=z[1]&&b<z[2]);return z?z[0]:null}
 function sizeOK(r){if(S.w!=='llm')return true;const z=psize(r);return !z||S.lsize.has(z)}
-function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||r.q==='A'||r.est)&&(S.w!=='llm'||!S.lmod||(S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):r.model===S.lmod&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='gpu'||!S.lgame||r.game===S.lgame))}
+function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||!S.lmod||(S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):r.model===S.lmod&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='gpu'||!S.lgame||r.game===S.lgame)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&(!S.ldev||r.w===S.ldev)))&&(S.w!=='blas'||!S.lset||r.set===S.lset))}
 function curBase(){return S.preview||S.base}
 // baseline value for workload w (and LLM model)
 function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S.est:allowEst;let c=ALL.filter(r=>r.w===w&&r.ck===ck(b.chip)&&!r.ex&&!r.mode&&(!r.est||ae||r.pe));
   if(w==='llm'){c=c.filter(r=>r.model===(model||'Llama 2 7B Q4_0'))}
   if(w==='gpu'){c=c.filter(r=>(r.game||CP)===(model||CP))}
+  if(w==='bl-cpu'||w==='bl-gpu'){c=c.filter(r=>(r.scene||'')===(model||''))}
+  if(w==='blas'){c=c.filter(r=>r.set+'|'+r.lib===(model||'julia-sgemm|Accelerate'))}
   if(!c.length)return null;const exact=c.filter(r=>(!r.est||(w==='gpu'&&r.pe))&&b.dev&&devName(r)===b.dev);if(exact.length)return exact[0];
   const meas=c.filter(r=>!r.est);return (meas.length?meas:c).sort((a,b2)=>b2.e-a.e)[0]}
 function relOf(r){const b=baseRow(r.w,curBase(),vk(r));return b?{v:r.e/b.e,b}:null}
 function perGame(){if(S.w!=='gpu'||S.lgame)return null;const b=curBase();if(!b)return null;const g={};let any=false;
   for(const r of ALL)if(r.w==='gpu'&&r.game&&!(r.game in g)){const br=baseRow('gpu',b,r.game);g[r.game]=br?1/br.e:0;any=any||!!br}return any?g:null}
+/* the baseline's rows in the current tab, one per pooled workload */
+function tabBase(b){if(S.w==='blas')return b?pool('blas').filter(r=>r.ck===ck(b.chip)&&(!S.lset||r.set===S.lset)):[];return tabWs().map(w=>baseRow(w,b,tsub())).filter(Boolean)}
 function axisRel(){const w=WL[S.w];if(w.absAxis)return null;const b=baseRow(S.w,curBase(),tsub());return b?{k:1/b.e,b}:null}
 
 /* ---------- shapes ---------- */
@@ -518,8 +546,8 @@ function shape(form,cls,x,y,k){k=k||1;
   if(form==='down')return el('path',{d:`M${x},${y+6.6*k}L${x+6.2*k},${y-4.6*k}L${x-6.2*k},${y-4.6*k}Z`,class:cls});
   return el('circle',{cx:x,cy:y,r:5.4*k,class:cls})}
 function glyph(form,tier,kind){const s=el('svg',{width:16,height:16,viewBox:'-8 -8 16 16',class:'t-'+tier,'aria-hidden':'true'});const m=shape(form,'',0,0,.95);
-  m.setAttribute('style',kind==='hollow'?'fill:var(--surface);stroke:var(--c);stroke-width:2':kind==='est'?'fill:var(--surface);stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2':'fill:var(--c)');s.appendChild(m);return s}
-const kindOf=r=>r.est?'est':r.resc?'hollow':'solid';
+  m.setAttribute('style',kind==='hollow'?'fill:var(--surface);stroke:var(--c);stroke-width:2':kind==='est'?'fill:var(--surface);stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2':kind==='gfill'?'fill:color-mix(in srgb,var(--c) 55%,var(--surface));stroke:var(--c);stroke-width:1.6;stroke-dasharray:2.4 2':'fill:var(--c)');s.appendChild(m);return s}
+const kindOf=r=>(S.w==='blender'&&r.w==='bl-gpu')||(r.w==='blas'&&r.ord===1)?'gfill':r.est?'est':r.resc?'hollow':'solid';
 
 function ticks(lo,hi){const out=[];const span=Math.log10(hi/lo);const steps=span<.12?[1,1.05,1.1,1.15,1.2,1.25,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,2.1,2.2,2.4,2.6,2.8,3,3.2,3.4,3.6,3.8,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5]:span<.35?[1,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,2.2,2.5,2.8,3,3.5,4,4.5,5,6,7,8,9]:span<.9?[1,1.2,1.5,2,2.5,3,4,5,6,8]:(span<2.2?[1,2,3,5]:[1,2,5]);
   for(let p=Math.floor(Math.log10(lo))-1;p<=Math.ceil(Math.log10(hi));p++)for(const s of steps){const v=s*Math.pow(10,p);if(v>=lo*.999&&v<=hi*1.001)out.push(v)}return out}
@@ -590,33 +618,35 @@ function render(){
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(r.x),py:Y(r.e*kr(r))}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();let fi=0;
-    for(const p of pts){const key=(p.r.ow||'')+'|'+(vk(p.r)||'');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
+    for(const p of pts){const key=(p.r.ow||p.r.w)+'|'+(vk(p.r)||'');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
     for(const g of grp.values()){if(g.length<3)continue;const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);let best=-1;const f=[];
       for(const p of by){if(p.r.e>best*1.0000001){f.push(p);best=p.r.e}}f.reverse();for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
       fg.appendChild(el('path',{d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
-      if(grp.size>1&&f.length>=2){const z=f[f.length-1],r0=z.r,lab=r0.ow?WL[r0.ow].short:(r0.model||(r0.game?GAB[r0.game]:''));if(lab){const t=el('text',{x:z.px+12,y:z.py-10,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:10.5)+'px;font-style:italic;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'frontier: '+lab);fg.appendChild(t);try{const tl=t.getComputedTextLength();if(z.px+12+tl>W-m.r){t.setAttribute('x',Math.max(m.l+tl+4,z.px-12));t.setAttribute('text-anchor','end')}}catch(_){}}}
+      if(grp.size>1&&grp.size<=(narrow0?3:4)&&f.length>=2){const z=f[f.length-1],r0=z.r,lab=glab(r0);if(lab){const t=el('text',{x:z.px+12,y:z.py-10,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:10.5)+'px;font-style:italic;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'frontier: '+lab);fg.appendChild(t);try{const tl=t.getComputedTextLength();if(z.px+12+tl>W-m.r){t.setAttribute('x',Math.max(m.l+tl+4,z.px-12));t.setAttribute('text-anchor','end')}}catch(_){}}}
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
         const a=f[0];fg.appendChild(el('path',{d:'M'+X(x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),class:'front ftail',style:op}));
-        if(S.w!=='all')fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'One point is both fastest and most efficient, so the frontier is its corner'));continue}
+        if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+' point is both fastest and most efficient, so the frontier is its corner'));continue}
       const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*kr(p.r)]),S.ffit);if(!fit)continue;
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{d:'M'+pts2.join('L'),class:'front ftail',style:op}))};
       const a=f[0],z=f[f.length-1];tail(a.r.x,x0,[a.r.x,a.r.e*kr(a.r)]);tail(z.r.x,x1,[z.r.x,z.r.e*kr(z.r)]);
-      if(S.w!=='all'&&f.length>=2&&(grp.size===1||(grp.size<=4&&!narrow0))){const r0=f[0].r,pre=grp.size>1?(r0.game?GAB[r0.game]:r0.model||'')+': ':'';const t=el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},pre+fit.label);fg.appendChild(t)}}}
+      if(S.w!=='all'&&f.length>=2&&(grp.size===1||(grp.size<=4&&!narrow0))){const r0=f[0].r,pre=grp.size>1?glab(r0)+': ':'';const t=el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},pre+fit.label);fg.appendChild(t)}}}
   {const tg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(tg,under);const tr=new Map();for(const p of pts)if(p.r.grp){const key=p.r.grp;if(!tr.has(key))tr.set(key,[]);tr.get(key).push(p)}
-    for(const g of tr.values()){if(g.length<2)continue;g.sort((a,b)=>a.r.ord-b.r.ord);const l=el('path',{d:'M'+g.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'t-'+g[0].r.tier,style:'fill:none;stroke:var(--c);stroke-width:1.4;opacity:.55'});tg.appendChild(l);
+    for(const g of tr.values()){if(g.length<2)continue;g.sort((a,b)=>a.r.ord-b.r.ord);const d='M'+g.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L');
+      if(isBl(g[0].r)){tg.appendChild(el('path',{d,class:'pairl t-'+g[0].r.tier}));continue}
+      tg.appendChild(el('path',{d,class:'t-'+g[0].r.tier,style:'fill:none;stroke:var(--c);stroke-width:1.4;opacity:.55'}));
       const z=g[g.length-1];tg.appendChild(el('circle',{cx:z.px,cy:z.py,r:2,class:'t-'+z.r.tier,style:'fill:var(--c)'}))}}
   const gm=el('g',S.zoom?{'clip-path':'url(#cp)'}:{});svg.appendChild(gm);
   for(const p of pts){const r=p.r,gg=el('g',{class:'m t-'+r.tier});p.g=gg;
     if(S.err&&r.elo){const a=Y(r.elo*kr(r)),b=Y(r.ehi*kr(r)),c='eb'+(r.est?' est':'');gg.appendChild(el('line',{x1:p.px,x2:p.px,y1:a,y2:b,class:c}));
       gg.appendChild(el('line',{x1:p.px-3,x2:p.px+3,y1:a,y2:a,class:c}));gg.appendChild(el('line',{x1:p.px-3,x2:p.px+3,y1:b,y2:b,class:c}));
       if(r.xlo&&r.xhi&&r.xhi>r.xlo*1.001)gg.appendChild(el('line',{x1:X(r.xlo),x2:X(r.xhi),y1:p.py,y2:p.py,class:c}))}
-    if(r.q!=='A'&&!r.est)gg.appendChild(el('circle',{cx:p.px,cy:p.py,r:10,class:'flag'}));
+    if(weak(r))gg.appendChild(el('circle',{cx:p.px,cy:p.py,r:10,class:'flag'}));
     if(p.front)gg.appendChild(el('circle',{cx:p.px,cy:p.py,r:9.5,class:'fring'}));
     gg.appendChild(shape(mshape(r),'mk '+kindOf(r),p.px,p.py));gm.appendChild(gg)}
-  const bRow=baseRow(S.w,curBase(),tsub());let bp=bRow&&pts.find(p=>p.r===bRow);if(w.combined&&1>x0&&1<x1&&1>y0&&1<y1)bp={px:X(1),py:Y(1)};
-  if(bp)gm.appendChild(el('circle',{cx:bp.px,cy:bp.py,r:13,class:'baseline-ring'}));
+  const bRows=tabBase(curBase());let bps=pts.filter(p=>bRows.includes(p.r));if(w.combined&&1>x0&&1<x1&&1>y0&&1<y1)bps=[{px:X(1),py:Y(1)}];
+  for(const bp of bps)gm.appendChild(el('circle',{cx:bp.px,cy:bp.py,r:13,class:'baseline-ring'}));
   svg.appendChild(el('g',{id:'labels'}));svg.appendChild(el('g',{id:'over'}));
   drawFocus();
 }
@@ -638,14 +668,14 @@ function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;con
     delete p._lab}}
 function defaultLabels(cls,skip){const pts=S.pts,k=G.k;const by=f=>[...pts].sort(f);
   const order=by((a,b)=>b.r.e-a.r.e),fast=by((a,b)=>b.r.x-a.r.x),slow=by((a,b)=>a.r.e-b.r.e);const pri=[];const push=p=>{if(p&&!pri.includes(p))pri.push(p)};
-  const bRow=baseRow(S.w,curBase(),tsub());push(pts.find(p=>p.r===bRow));push(order[0]);push(fast[0]);push(slow[0]);
+  const bRows=tabBase(curBase());for(const p of pts)if(bRows.includes(p.r))push(p);push(order[0]);push(fast[0]);push(slow[0]);
   for(let i=0;i<pts.length;i++){if(!pts[i])break;push(order[i]);push(fast[i])}
-  placeLabels(pri.filter(p=>(!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&p.r.game))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60))}
+  placeLabels(pri.filter(p=>(!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&(p.r.game||S.w==='blender'||S.w==='blas')))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60))}
 function relatives(r){if(S.hmode!=='rel'){const sameDev=q=>devName(q)===devName(r);
     const list=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&(S.hmode==='chip'||sameDev(p.r)));return {gen:list,tier:[]}}
   if(r.ow){const same=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&p.r.ow!==r.ow);const m=new Map();for(const p of same){const k=p.r.ow+'|'+(vk(p.r)||'');const o=m.get(k);if(!o||(o.r.est&&!p.r.est)||(devName(p.r)===devName(r)&&devName(o.r)!==devName(r)))m.set(k,p)}return {gen:[...m.values()],tier:[]}}
-  const sg=[],st=[];for(const p of S.pts){const q=p.r;if(sameMachine(q,r))continue;if((r.w==='llm'||r.w==='gpu')&&(vk(q)||'')!==(vk(r)||''))continue;
-    if(r.gen&&q.gen===r.gen&&q.ck!==r.ck)sg.push(p);else if(q.tier===r.tier&&q.gen&&r.gen&&q.gen!==r.gen)st.push(p)}
+  const sg=[],st=[];for(const p of S.pts){const q=p.r;if(sameMachine(q,r))continue;if(q.w!==r.w||(vk(q)||'')!==(vk(r)||''))continue;
+    if(r.gen===0&&q.gen===0&&q.tier===r.tier&&q.ck!==r.ck)sg.push(p);else if(r.gen&&q.gen===r.gen&&q.ck!==r.ck)sg.push(p);else if(q.tier===r.tier&&q.gen&&r.gen&&q.gen!==r.gen)st.push(p)}
   const score=p=>(p.r.est?0:2)+(p.r.q==='A'?1:0);const best=list=>{const m=new Map();for(const p of list){const k=p.r.ck,o=m.get(k);if(!o||score(p)>score(o)||(score(p)===score(o)&&o.r.e<p.r.e))m.set(k,p)}return [...m.values()]};
   return {gen:best(sg),tier:best(st).sort((a,b)=>a.r.gen-b.r.gen)}}
 function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)return;lg.textContent='';ov.textContent='';un.textContent='';
@@ -706,7 +736,7 @@ function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');t
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
   for(const [a,b] of detailRows(r)){const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
   {const s0=SRC[r.src];if(s0)tip.appendChild(h('div',{class:'srcl'},(r.pe?'Speed: ':'Source: ')+s0.name))}
-  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
+  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':r.gen===0?'Solid lines: other '+r.tier+' chips.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
   if(S.front&&S.fset&&S.fset.has(r))tip.appendChild(h('div',{class:'hint'},'On the efficiency frontier: no point shown is both faster and more efficient.'));
   tip.appendChild(h('div',{class:'hint'},mode==='touch'?'Tap empty plot space to close. Full details are under the chart.':mode==='key'?(S.pin===r?'Pinned: full details are under the chart. Esc clears.':'Enter or Space pins it. Esc clears.'):'Click to pin.'));
   tip.hidden=false;const wrap=$('wrap'),wb=wrap.getBoundingClientRect(),svg=$('chart'),sb=svg.getBoundingClientRect(),k=sb.width/svg.viewBox.baseVal.width,ox=sb.left-wb.left+wrap.scrollLeft,oy=sb.top-wb.top+wrap.scrollTop,tw=tip.offsetWidth,th=tip.offsetHeight,{m,W,H}=G;
@@ -716,7 +746,7 @@ function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');t
     const d=Math.hypot(x+tw/2-(ox+p.px*k),y+th/2-(oy+p.py*k));if(!best||n<best.n||(n===best.n&&d>best.d))best={x,y,n,d}}
   tip.style.left=Math.max(4,Math.min(wrap.clientWidth-tw-4,best.x))+'px';tip.style.top=Math.max(4,Math.min(wrap.scrollHeight-th-4,best.y))+'px'}
 function hideTip(){$('tip').hidden=true}
-function readout(){const R=$('readout');R.textContent='';const r=S.pin&&S.pin.w===S.w?S.pin:null,w=WL[S.w],b=curBase();
+function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.pin:null,w=WL[S.w],b=curBase();
   if(!r)return;
   const head=h('div',{class:'head'});head.appendChild(h('h2',null,name(r)+(r.est&&!r.mode?' (estimate)':'')));
   const big=h('span',{class:'big'},r.ow&&!r.br?fmt(r.o.e):fmt(r.e)+(r.ow?'×':''));big.appendChild(h('small',null,r.ow&&!r.br?WL[r.ow].eu:r.ow?'baseline':w.eu));head.appendChild(big);R.appendChild(head);
@@ -726,13 +756,13 @@ function readout(){const R=$('readout');R.textContent='';const r=S.pin&&S.pin.w=
   const relList=(title,list)=>{if(!list.length)return;const d=h('div',{class:'rel'});d.appendChild(h('span',{class:'rh'},title));
     for(const q of list){const bt=h('button',{type:'button'},shortName(q.r)+' '+(q.r.e/r.e).toFixed(2)+'×');
       bt.addEventListener('click',()=>pin(q.r));bt.addEventListener('mouseenter',()=>{S.hover=q.r;drawFocus()});bt.addEventListener('mouseleave',()=>{S.hover=null;drawFocus()});d.appendChild(bt)}R.appendChild(d)};
-  if(S.hmode!=='rel')relList(S.hmode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',rel.gen);else if(r.ow)relList('Same chip, other work:',rel.gen);else{relList('Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}
+  if(S.hmode!=='rel')relList(S.hmode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',rel.gen);else if(r.ow)relList('Same chip, other work:',rel.gen);else{relList(r.gen===0?'Other '+r.tier+' chips:':'Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}
   const acts=h('div',{class:'acts'});const isB=b&&ck(b.chip)===r.ck&&(!b.dev||b.dev===devName(r));
   const bb=h('button',{type:'button',class:'btn'},isB?'This is the baseline':'Use as baseline');if(isB)bb.disabled=true;
   bb.addEventListener('click',()=>{S.base={chip:r.ck,dev:r.est&&!(r.pe&&r.game)?null:devName(r)};DER.clear();S.pin=null;S.preview=null;syncBaseSel();all()});acts.appendChild(bb);
   const ub=h('button',{type:'button',class:'btn ghost'},'Unpin');ub.addEventListener('click',()=>{S.pin=null;drawFocus();readout();table()});acts.appendChild(ub);R.appendChild(acts);
   const notes=[];if(r.note)notes.push(r.note);
-  if(r.est&&!r.mode&&!(r.pe&&r.game))notes.push('The bar is ±1 leave-one-out standard deviation'+(r.seen?'':', widened 1.5 times because this chip has no measurements')+(r.clip?', with the lower end clipped at throughput divided by Apple\'s rated maximum power':'')+'.');
+  if(r.est&&!r.mode&&!r.pe)notes.push('The bar is ±1 leave-one-out standard deviation'+(r.seen?'':', widened 1.5 times because this chip has no measurements')+(r.clip?', with the lower end clipped at throughput divided by Apple\'s rated maximum power':'')+'.');
   if(notes.length)R.appendChild(h('div',{class:'estnote'},notes.join(' ')))
 }
 function pin(r){if(r.ow&&r.ow!==S.scaleW){S.scaleW=r.ow;if(absAll()&&$('wrap').clientWidth<772){S.pin=r;render();readout();table();return}}S.pin=r;S.hover=null;hideTip();drawFocus();readout();table();live('Pinned '+name(r)+'. Details are under the chart.')}
@@ -743,7 +773,7 @@ $('chart').addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;
 $('chart').addEventListener('pointerleave',e=>{if(e.pointerType==='touch')return;const kp=S.kbd&&S.pts.find(q=>q.r===S.kf);S.hover=kp?kp.r:null;kp?showTip(kp,'key'):hideTip();drawFocus()});
 $('chart').addEventListener('pointerdown',e=>{S.ptype=e.pointerType},true);
 document.addEventListener('pointerdown',e=>{if(!$('wrap').contains(e.target))hideTip()});
-function viewKey(){const b=curBase();return S.w+'|'+(b?b.chip+'|'+(b.dev||''):'')+'|'+(S.lmod||'')+'|'+S.lgame+'|'+[...S.lsize].join()}
+function viewKey(){const b=curBase();return S.w+'|'+(b?b.chip+'|'+(b.dev||''):'')+'|'+(S.lmod||'')+'|'+S.lgame+'|'+S.lscene+'|'+S.ldev+'|'+S.lset+'|'+[...S.lsize].join()}
 function zoomBy(f,cx,cy){const {x0,x1,y0,y1}=G,{m,W,H}=G;const fx=cx==null?.5:(cx-m.l)/(W-m.l-m.r),fy=cy==null?.5:(H-m.b-cy)/(H-m.t-m.b);
   const lx0=Math.log(x0),lx1=Math.log(x1),ly0=Math.log(y0),ly1=Math.log(y1),px=lx0+fx*(lx1-lx0),py=ly0+fy*(ly1-ly0);
   const a=S.auto,lim=(lo,hi,alo,ahi)=>{const span=Math.min(hi-lo,(ahi-alo)*1.6);return [lo,lo+span]};
@@ -801,19 +831,19 @@ $('chart').addEventListener('keydown',e=>{const k=e.key;
 
 /* ---------- baseline selector ---------- */
 function chipList(){const m=new Map();for(const r of ALL){if(r.gen==null||r.mode)continue;if(r.est&&!S.est&&!ROWS.some(q=>q.ck===r.ck))continue;m.set(r.ck,r.tier)}
-  return [...m.entries()].sort((a,b)=>gen(a[0])-gen(b[0])||TIERS.indexOf(a[1])-TIERS.indexOf(b[1]))}
+  const g=c=>gen(c)||99;return [...m.entries()].sort((a,b)=>g(a[0])-g(b[0])||TIERS.indexOf(a[1])-TIERS.indexOf(b[1])||(g(a[0])===99?a[0].localeCompare(b[0]):0))}
 function syncBaseSel(){const s=$('base'),isAll=S.w==='all';s.textContent='';const no=h('option',{value:''},isAll?'None (absolute units, one scale per workload)':'None (absolute units)');s.appendChild(no);
   const ms=ROWS.filter(r=>r.gen!=null&&!r.mode);const machines=new Map();for(const r of ms){const k=r.ck+'|'+devName(r);machines.set(k,r)}
-  const gens=[...new Set(chipList().map(c=>gen(c[0])))];
-  for(const g of gens){const og=h('optgroup',{label:g===0?'Intel, 2019':'M'+g+' generation'});
-    for(const [c] of chipList().filter(c=>gen(c[0])===g)){og.appendChild(h('option',{value:c+'|'},c+', best machine'));
+  const grpOf=([c,t])=>gen(c)?'M'+gen(c)+' generation':t+' (comparison)',groups=[...new Set(chipList().map(grpOf))];
+  for(const g of groups){const og=h('optgroup',{label:g});
+    for(const [c] of chipList().filter(c=>grpOf(c)===g)){og.appendChild(h('option',{value:c+'|'},c+', best machine'));
       for(const [k,r] of machines)if(r.ck===c)og.appendChild(h('option',{value:k},c+' '+devName(r)))}s.appendChild(og)}
   const b=S.base;s.value=b?(ck(b.chip)+'|'+(b.dev||'')):'';if(s.value===''&&b){s.appendChild(h('option',{value:ck(b.chip)+'|'+(b.dev||'')},b.chip));s.value=ck(b.chip)+'|'+(b.dev||'')}baseTitle()}
 /* the plot title reads 'Relative to X' only where the axes really are ratios to X */
 function baseTitle(){const s=$('base'),o=s.options[s.selectedIndex],w=WL[S.w],x=$('basex');$('basev').textContent=o?o.text:'';
-  const br=S.base&&baseRow(S.w,S.base,tsub()),rel=!!S.base&&(w.combined||!!perGame()||(!w.absAxis&&!!br));
+  const br=S.base&&tabBase(S.base).find(r=>visible().includes(r))||S.base&&tabBase(S.base)[0],rel=!!S.base&&(w.combined||!!perGame()||(!w.absAxis&&!!br));
   $('basel').textContent=rel?'Relative to':'Baseline';x.hidden=!S.base||rel;if(x.hidden)return;
-  x.textContent=!br?'no reading on this workload; axes in absolute units':!visible().includes(br)?(S.w==='llm'&&S.lmod?'not in this model set':S.w==='gpu'&&S.lgame?'not in this game':'hidden by the current filters')+'; axes in absolute units':'ringed on the plot; these axes stay in absolute units'}
+  x.textContent=!br?'no reading on this workload; axes in absolute units':!visible().includes(br)?(S.w==='llm'&&S.lmod?'not in this model set':S.w==='gpu'&&S.lgame?'not in this game':S.w==='blender'&&S.ldev?'not on this device':S.w==='blas'?'not in this set':'hidden by the current filters')+'; axes in absolute units':'ringed on the plot; these axes stay in absolute units'}
 $('base').addEventListener('change',e=>{const v=e.target.value;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;all()});
 
 /* ---------- matrix ---------- */
@@ -823,7 +853,8 @@ function mbest(c,k){let c2=ALL.filter(r=>r.w===k&&r.ck===c&&!r.ex&&!r.mode&&(k!=
 function matrix(){const ae=document.activeElement,fk=ae&&ae.closest&&ae.closest('#matrix tbody tr')?ae._k:null;const thead=$('matrix').tHead,tb=$('matrix').tBodies[0];thead.textContent='';tb.textContent='';MROWS=[];
   const tr=h('tr');tr.appendChild(h('th',{scope:'col'},'Chip'));const ths=[];
   for(const k of MWS){const th=h('th',{class:'num',scope:'col'},WL[k].tab+(k==='llm'?' (7B, est. power)':k==='gpu'?' (Cyberpunk)':k.startsWith('bl-')?' (est. power)':''));ths.push(th);tr.appendChild(th)}thead.appendChild(tr);MROWS.ths=ths;
-  for(const [c,tier] of chipList()){const rs=MWS.map(k=>mbest(c,k));if(!rs.some(Boolean))continue;
+  let sep=false;for(const [c,tier] of chipList()){const rs=MWS.map(k=>mbest(c,k));if(!rs.some(Boolean))continue;
+    if(!gen(c)&&!sep){sep=true;const st=h('tr',{class:'msep'});st.appendChild(h('td',{colspan:MWS.length+1},'Comparison chips: Intel, AMD, Qualcomm and NVIDIA'));tb.appendChild(st)}
     const t=h('tr',{tabindex:0});t._k=c;const td=h('td');const s=glyph('laptop',tier,'solid');s.setAttribute('class','dot t-'+tier);td.appendChild(s);td.appendChild(document.createTextNode(c));t.appendChild(td);
     const cells=MWS.map((k,i)=>{const cell=h('td',{class:'num cell'});t.appendChild(cell);return {td:cell,r:rs[i],k}});
     const set=()=>{S.base={chip:c,dev:null};S.preview=null;syncBaseSel();all()};
@@ -891,7 +922,7 @@ function table(){const ae=document.activeElement,fs=ae&&ae.closest&&ae.closest('
       else if(k==='e')td.textContent=fmt(r.e)+(r.elo?'  ('+fmt(r.elo)+'–'+fmt(r.ehi)+')':'');
       else if(k==='rel'){const v=relOf(r);td.textContent=v?v.v.toFixed(2)+'×':'–'}
       else if(k==='src'){const s=SRC[r.src]||{name:'',url:'#'};td.appendChild(document.createTextNode(r.bench+'. '));td.appendChild(h('a',{href:s.url,target:s.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s.name));
-        if(r.q!=='A'&&!r.est)td.appendChild(h('span',{class:'pill',title:r.note||''},r.q==='C'?'method not stated':'weaker power figure'))}
+        if(weak(r))td.appendChild(h('span',{class:'pill',title:r.note||''},r.q==='C'?'method not stated':r.est?'few runs':'weaker power figure'))}
       else td.textContent=fmt(val(r,k));t.appendChild(td)}
     t.addEventListener('mouseenter',()=>{S.hover=r;drawFocus()});t.addEventListener('mouseleave',()=>{S.hover=null;drawFocus()});
     t.addEventListener('focus',()=>{S.hover=r;drawFocus()});t.addEventListener('blur',()=>{if(S.hover===r){S.hover=null;drawFocus()}});
@@ -908,8 +939,15 @@ function legend(){const L=$('legend');L.textContent='';const add=(node,t)=>{cons
   for(const t of TIERS)if(vis.some(r=>r.tier===t))add(glyph('laptop',t,'solid'),t==='base'?'Base chip':t);
   if(S.w==='all'){const ws=WS5.filter(k=>vis.some(r=>r.ow===k));if(ws.length){br();L.appendChild(h('span',{class:'lgh'},'Shape is the workload:'));for(const k of ws)add(glyph(WSHAPE[k],'key','solid'),WL[k].tab)}br()}
   if(S.w.startsWith('cpu')){add(glyph('laptop','key','solid'),'Cinebench 2024');add(glyph('laptop','key','hollow'),'Cinebench R23, converted')}
-  if(vis.some(r=>r.est))add(glyph('laptop','key','est'),'estimate');
-  if(vis.some(r=>r.q!=='A'&&!r.est)){const s=el('svg',{width:22,height:22,viewBox:'-11 -11 22 22',class:'t-key','aria-hidden':'true'});const c=el('circle',{r:9});c.setAttribute('style','fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5');s.appendChild(c);add(s,'weaker power figure')}
+  if(S.w==='blender'){if(vis.some(r=>r.w==='bl-cpu'))add(glyph('laptop','key','est'),'CPU render');if(vis.some(r=>r.w==='bl-gpu'))add(glyph('laptop','key','gfill'),'GPU render');
+    if(vis.some(r=>r.grp&&r.w==='bl-gpu')&&vis.some(r=>r.w==='bl-cpu')){const s=el('svg',{width:26,height:10,'aria-hidden':'true',class:'t-key'});const l=el('line',{x1:0,x2:26,y1:5,y2:5});l.setAttribute('style','stroke:var(--c);opacity:.6');s.appendChild(l);add(s,'same chip, CPU to GPU')}}
+  else if(S.w==='blas'){const has=k=>vis.some(r=>r.set===k);
+    if(has('julia-sgemm')){add(glyph('laptop','key','est'),'OpenBLAS (cores)');add(glyph('laptop','key','gfill'),'Accelerate (matrix units)')}
+    if(has('arxiv-sgemm')){add(glyph('laptop','key','est'),'Accelerate on the CPU');add(glyph('laptop','key','gfill'),'Metal (MPS) on the GPU')}
+    if(has('julia-dgemm'))add(glyph('laptop','key','est'),'fp64 DGEMM');
+    if(vis.some(r=>r.grp)){const s=el('svg',{width:26,height:10,'aria-hidden':'true',class:'t-key'});s.appendChild(el('line',{x1:0,x2:22,y1:5,y2:5,style:'stroke:var(--c);stroke-width:1.4;opacity:.7'}));s.appendChild(el('circle',{cx:22,cy:5,r:2,style:'fill:var(--c)'}));add(s,'same machine, ending at the filled point')}}
+  else if(vis.some(r=>r.est))add(glyph('laptop','key','est'),'estimate');
+  if(vis.some(weak)){const s=el('svg',{width:22,height:22,viewBox:'-11 -11 22 22',class:'t-key','aria-hidden':'true'});const c=el('circle',{r:9});c.setAttribute('style','fill:none;stroke:var(--c);stroke-width:1.2;stroke-dasharray:2.5 2.5');s.appendChild(c);add(s,S.w==='blender'?'three runs or fewer':'weaker power figure')}
   const s=el('svg',{width:26,height:10,'aria-hidden':'true'});const l=el('line',{x1:0,x2:26,y1:5,y2:5});l.setAttribute('style','stroke:var(--ink3);opacity:.5');s.appendChild(l);add(s,S.w==='all'?'constant power ratio':'constant wall power')}
 function looPlot(){const big=S.looBig,svg=$('loo'),L=DATA.loo.e,W=big?900:340,H=big?560:300,m={l:52,r:16,t:14,b:42};svg.textContent='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   looFz();
@@ -979,13 +1017,13 @@ $('loo').addEventListener('pointermove',looTip);$('loo').addEventListener('point
 $('loo').addEventListener('pointerleave',()=>{$('lootip').hidden=true;const hl=$('loohl');if(hl)hl.textContent='';$('loo').querySelectorAll('.loolbl').forEach(t=>t.style.display='')});
 $('looBig').addEventListener('click',()=>{S.looBig=!S.looBig;$('loofig').parentNode.classList.toggle('wide',S.looBig);$('looBig').textContent=S.looBig?'Shrink plot':'Enlarge plot';looPlot()});
 /* ---------- wiring ---------- */
-function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lgamew').hidden=S.w!=='gpu';$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();
+function all(){const w=WL[S.w];syncBaseSel();$('lmodw').hidden=S.w!=='llm';$('lgamew').hidden=S.w!=='gpu';$('lscenew').hidden=$('ldevw').hidden=S.w!=='blender';$('lsetw').hidden=S.w!=='blas';$('lset').value=S.lset;$('lscene').value=S.lscene;$('ldev').value=S.ldev;$('lsizew').hidden=S.w!=='llm';if(S.w==='llm')syncSizes();const cb=curBase();
   $('finding').textContent=S.w==='all'&&cb?'Every workload as a ratio to the '+cb.chip+(cb.dev?' '+cb.dev:'')+' on the same workload: right is faster, up is more work per joule, and each diagonal is a constant ratio of wall power. Against the last Intel MacBook Pro 16, Apple Silicon does roughly 2 to 7 times the CPU work per joule, 3 to 8 times on one thread and 5 to 11 times on LLM generation, while running from about as fast to roughly 25 times faster. Hover a point to draw lines to the same chip on its other workloads; choose None as the baseline for absolute units with one scale per workload.':w.finding;$('wnote').textContent=w.note;
-  {const b=curBase();if(b){const miss=(S.w==='all'?WS5:[S.w]).filter(k=>!baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':k==='gpu'?tsub():null));if(miss.length)$('wnote').textContent+=' Not shown against '+b.chip+': '+miss.map(k=>WL[k].tab).join(', ')+', which have no reading for it. Pick an Apple baseline or None to see them.'}}
+  {const b=curBase();if(b){const miss=(S.w==='all'?WS5:tabWs()).filter(k=>k==='blas'?!tabBase(b).length:!baseRow(k,b,k==='llm'?'Llama 2 7B Q4_0':S.w===k||WL[S.w].pool?tsub():null));if(miss.length)$('wnote').textContent+=' Not shown against '+b.chip+': '+miss.map(k=>WL[k].tab).join(', ')+', which have no reading for it. Pick an Apple baseline or None to see them.'}}
   document.querySelectorAll('.tab').forEach(t=>{const on=t.dataset.w===S.w;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;
     if(on){$('panel').setAttribute('aria-labelledby',t.id);const s=$('tabs');if(t.offsetLeft<s.scrollLeft||t.offsetLeft+t.offsetWidth>s.scrollLeft+s.clientWidth)s.scrollLeft=t.offsetLeft-(t.offsetLeft<s.scrollLeft?16:s.clientWidth-t.offsetWidth-48)}});
-  if(S.pin&&(S.pin.w!==S.w||(!S.est&&S.pin.est)))S.pin=null;render();readout();table();legend();matrix()}
-for(const k in WL){const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k,id:'tab-'+k,'aria-controls':'panel'});
+  if(S.pin&&(!inTab(S.pin)||(!S.est&&S.pin.est&&!S.pin.pe)))S.pin=null;render();readout();table();legend();matrix()}
+for(const k in WL){if(WL[k].notab)continue;const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k,id:'tab-'+k,'aria-controls':'panel'});
   b.addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tab')],i=ts.indexOf(b);const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i-1+ts.length)%ts.length:e.key==='Home'?0:e.key==='End'?ts.length-1:null;if(j==null)return;e.preventDefault();ts[j].focus();ts[j].click()});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
   b.addEventListener('click',()=>{S.w=k;S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
 for(const t of TIERS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph('laptop',t,'solid'));b.appendChild(document.createTextNode(t==='base'?'Base':t));
@@ -998,6 +1036,9 @@ $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
 $('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;all()});
 $('lgame').addEventListener('change',e=>{S.lgame=e.target.value;S.pin=null;all()});
+$('lscene').addEventListener('change',e=>{S.lscene=e.target.value;S.pin=null;all()});
+$('ldev').addEventListener('change',e=>{S.ldev=e.target.value;S.pin=null;all()});
+$('lset').addEventListener('change',e=>{S.lset=e.target.value;S.pin=null;all()});
 {const ab=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':'all',title:'Show every size'},'All');ab.addEventListener('click',()=>{S.lsize=new Set(SIZES.map(z=>z[0]));S.pin=null;all()});$('lsizew').appendChild(ab)}
 for(const [z,,,t] of SIZES){const b=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':z,title:t+' parameters (total, so mixture-of-experts models count all experts). With every size shown, a click shows only this size; after that, clicks add or remove sizes.'},z);b.appendChild(h('small',null,t));
   b.addEventListener('click',()=>{const allOn=S.lsize.size===SIZES.length;if(allOn)S.lsize=new Set([z]);else if(S.lsize.has(z)){S.lsize.delete(z);if(!S.lsize.size)S.lsize=new Set(SIZES.map(z=>z[0]))}else S.lsize.add(z);S.pin=null;all()});$('lsizew').appendChild(b)}
@@ -1007,8 +1048,10 @@ function syncSizes(){const all7=new Set(SIZES.map(z=>z[0])),keep=S.lsize;S.lsize
 $('ffit').addEventListener('change',e=>{S.ffit=e.target.value;if(!S.front){S.front=true;$('front').checked=true}render();readout()});
 $('est').addEventListener('change',e=>{S.est=e.target.checked;syncBaseSel();all()});
 $('st1').textContent=DATA.stitch.all;$('st2').textContent=DATA.stitch.one;
-window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(WL[k]&&k!==S.w){S.w=k;all()}});
-if(WL[location.hash.slice(1)])S.w=location.hash.slice(1);
+/* old links to the separate Blender tabs open the Blender tab on that device */
+function fromHash(){const k=location.hash.slice(1);if(WL[k]&&WL[k].notab){S.ldev=k;return 'blender'}return WL[k]?k:null}
+window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.w=k;all()}});
+{const k=fromHash();if(k)S.w=k}
 {const mq=matchMedia('(min-width:1000px)');if(mq.matches)$('opts').open=true;const f=e=>{if(e.matches)$('opts').open=true};mq.addEventListener?mq.addEventListener('change',f):mq.addListener(f)}
 syncBaseSel();looPlot();all();
 if(window.ResizeObserver){new ResizeObserver(()=>{hideTip();render()}).observe($('wrap'));new ResizeObserver(looFz).observe($('loofig'))}else window.addEventListener('resize',render);
