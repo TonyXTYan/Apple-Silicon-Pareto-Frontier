@@ -78,6 +78,6 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload, each LLM model and each game.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
-- **Game menu (gaming tab):** every game, or one. Frontiers are drawn per game; with one game chosen a baseline turns the axes into ratios to that machine in the same game.
+- **Game menu (gaming tab):** every game, or one. Frontiers are drawn per game. A baseline divides each game by that machine in the same game, so the baseline sits at 1× in every game; with every game shown, frame rate stays absolute and the constant-power lines are hidden (they differ per game). Games the baseline has no reading for are dropped while it is set.
 - **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters. **Model size** chips filter by total parameters: XS <2B, S 2–5B, M 5–12B, L 12–50B, XL 50–150B, XXL 150–500B, XXXL ≥500B.
 - **Palette:** colours come from the dataviz skill's validated palette. Intel is #c2418f in light mode and #b84a8c in dark; the light-mode Max green is darkened to #16a372 for 3:1 contrast on the white plot field.

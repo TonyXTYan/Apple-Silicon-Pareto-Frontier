@@ -448,7 +448,7 @@ const WL={
    finding:'The M4 Mac mini delivers 7.6 GFLOP per joule, about 132 pJ per double-precision operation at the wall. The M3 Ultra Mac Studio runs 4.3 times faster at 6.0 GFLOP per joule. The estimates put the base chips of each generation at the top, as in the all-core CPU view.',
    note:'High Performance Linpack solves a dense linear system in double precision on the CPU. Jeff Geerling records average wall power over the run. Several entries ran inside a Linux container.'},
  'gpu':{tab:'Gaming',short:'Gaming',sub:'Cyberpunk, BG3, ACS',x:'Frame rate (frames per second)',xu:'fps',e:'Frames per joule',eu:'frames/J',per:['J per frame',e=>1/e],get absAxis(){return !S.lgame},
-   finding:'Three demanding games at 1080p on the highest preset, frame rates from Notebookcheck. Only Cyberpunk 2077 has wall power measured while it ran: the fanless M5 MacBook Air 13 renders 1.1 frames per joule and the M6 Mac mini 0.94 at nearly twice the frame rate, while the M5 Max MacBook Pro 16 is the fastest at 93 fps and still returns 0.68. Baldur\'s Gate 3 and Assassin\'s Creed Shadows points reuse each machine\'s Cyberpunk wall power, so they are drawn as estimates with a wider range. Per frame, Baldur\'s Gate 3 is the lightest (1 to 1.6 frames per joule on M5 and M6 machines) and Assassin\'s Creed Shadows the heaviest (0.3 to 0.6). With Draw frontier on, each game gets its own frontier. Use the Game menu to show one game on its own, where a baseline turns the axes into ratios to that machine in the same game. GPU estimates are the least reliable on this page: leave-one-out error is about 40%.',
+   finding:'Three demanding games at 1080p on the highest preset, frame rates from Notebookcheck. Only Cyberpunk 2077 has wall power measured while it ran: the fanless M5 MacBook Air 13 renders 1.1 frames per joule and the M6 Mac mini 0.94 at nearly twice the frame rate, while the M5 Max MacBook Pro 16 is the fastest at 93 fps and still returns 0.68. Baldur\'s Gate 3 and Assassin\'s Creed Shadows points reuse each machine\'s Cyberpunk wall power, so they are drawn as estimates with a wider range. Per frame, Baldur\'s Gate 3 is the lightest (1 to 1.6 frames per joule on M5 and M6 machines) and Assassin\'s Creed Shadows the heaviest (0.3 to 0.6). With Draw frontier on, each game gets its own frontier. Use the Game menu to show one game on its own. A baseline divides each game by that machine in the same game, so it sits at 1× in every game. GPU estimates are the least reliable on this page: leave-one-out error is about 40%.',
    note:'Settings: Cyberpunk 2077 ultra without upscaling, Baldur\'s Gate 3 Ultra with TAA, Assassin\'s Creed Shadows Ultra High, all 1920×1080; wall power with an external monitor. Power was measured in Cyberpunk only: the other two games are assumed to draw the same wall power, with the range widened by about 12%, so their frames per joule are only as good as that assumption (on the M5 Air the chip drew slightly more in Baldur\'s Gate 3). The M5 Max MacBook Pro 14 is capped by its 97 W adapter, with the battery covering the rest, so its efficiency is overstated in every game. M4-era results are older reviews and may be translated builds (Notebookcheck called the M4 Mac mini\'s Cyberpunk run emulated; Baldur\'s Gate 3 was native), so compare generations with care. Frame rate is efficiency times power; ratios to the baseline use the baseline in the same game. The matrix and the All workloads view use Cyberpunk only.'},
  'bl-cpu':{tab:'Blender, CPU',short:'Blender CPU',hs:'Bl. CPU',sub:'Cycles path tracing',x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
    finding:'All points are estimates: render speed is measured (Blender Open Data medians), wall power is taken from the same machine running Cinebench, which is the same kind of all-core path-tracing load. They span 0.06 to 0.13 samples per joule. The M6 Mac mini leads at 0.13, then the M5 and M4 base chips near 0.11. Max and Ultra chips cluster near 0.085: more cores at similar clocks buy speed, not efficiency.',
@@ -504,6 +504,8 @@ function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S
   if(!c.length)return null;const exact=c.filter(r=>(!r.est||(w==='gpu'&&r.pe))&&b.dev&&devName(r)===b.dev);if(exact.length)return exact[0];
   const meas=c.filter(r=>!r.est);return (meas.length?meas:c).sort((a,b2)=>b2.e-a.e)[0]}
 function relOf(r){const b=baseRow(r.w,curBase(),vk(r));return b?{v:r.e/b.e,b}:null}
+function perGame(){if(S.w!=='gpu'||S.lgame)return null;const b=curBase();if(!b)return null;const g={};let any=false;
+  for(const r of ALL)if(r.w==='gpu'&&r.game&&!(r.game in g)){const br=baseRow('gpu',b,r.game);g[r.game]=br?1/br.e:0;any=any||!!br}return any?g:null}
 function axisRel(){const w=WL[S.w];if(w.absAxis)return null;const b=baseRow(S.w,curBase(),tsub());return b?{k:1/b.e,b}:null}
 
 /* ---------- shapes ---------- */
@@ -533,7 +535,7 @@ function frontFit(P,type){if(P.length<2)return null;const n=P.length,L=Math.log;
   if(type==='lin')return {mul:false,g:x=>a+b*x,label:`Frontier fit: y = ${f2(a)}${sg(b)}·x`};
   return {mul:true,g:x=>Math.exp(a)*Math.pow(x,b),label:`Frontier fit: work per joule ∝ x^${f2(b)}, so power ∝ x^${f2(1-b)}`}}
 function render(){
-  const w=WL[S.w], rows=visible(), ax=axisRel(), svg=$('chart');baseTitle();
+  const w=WL[S.w], kg=perGame(), rows=visible().filter(r=>!kg||kg[r.game]), ax=axisRel(), svg=$('chart');baseTitle();
   while(svg.childNodes.length>1)svg.removeChild(svg.lastChild);
   $('charttitle').textContent=w.tab+': work per joule against throughput for '+rows.length+' machines'+(rows.length?'. Highest work per joule: '+name(rows.reduce((a,b)=>b.e>a.e?b:a))+'.':'');
   const FS=$('wrap').classList.contains('fs'),W=Math.max(260,$('wrap').clientWidth-(FS?20:12)), H=FS?Math.max(360,window.innerHeight-24-$('wrap').querySelector('.ctop').offsetHeight):Math.round(Math.max(400,Math.min(660,W*.6)));
@@ -542,15 +544,15 @@ function render(){
   if(!rows.length){$('empty').textContent='No machines match these filters. Turn a chip tier or machine type back on.';return}
   const AB=absAll(),AW0=AB?WS5.filter(k=>rows.some(r=>r.ow===k)):[],AW=AB&&W-(24+AW0.length*(W<560?46:62))<520?[AW0.includes(S.scaleW)?S.scaleW:AW0[0]].filter(Boolean):AW0,colW=W<560?46:62,rowH=17;
   svg.classList.toggle('nar',W<560);
-  const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=ax?ax.k:1, narrow=narrow0;
+  const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=ax?ax.k:1, kr=r=>kg?kg[r.game]:k, narrow=narrow0;
   let x0=Infinity,x1=0,y0=Infinity,y1=0;
   for(const r of rows){x0=Math.min(x0,S.err&&r.xlo?r.xlo:r.x);x1=Math.max(x1,S.err&&r.xhi?r.xhi:r.x);
-    y0=Math.min(y0,(S.err&&r.elo?r.elo:r.e)*k);y1=Math.max(y1,(S.err&&r.ehi?r.ehi:r.e)*k)}
+    y0=Math.min(y0,(S.err&&r.elo?r.elo:r.e)*kr(r));y1=Math.max(y1,(S.err&&r.ehi?r.ehi:r.e)*kr(r))}
   const pad=(a,b,f)=>{const g=Math.max(Math.pow(b/a,f),1.12);return [a/g,b*g]};
   [x0,x1]=pad(x0,x1,.08);[y0,y1]=pad(y0,y1,.09);S.auto={x0,x1,y0,y1};
   if(S.zoom&&S.zoom.key===viewKey()){({x0,x1,y0,y1}=S.zoom)}else S.zoom=null;$('zreset').disabled=!S.zoom;
   const X=v=>m.l+(Math.log(v/x0)/Math.log(x1/x0))*(W-m.l-m.r), Y=v=>H-m.b-(Math.log(v/y0)/Math.log(y1/y0))*(H-m.t-m.b);
-  G={X,Y,x0,x1,y0,y1,m,W,H,k,narrow};
+  G={X,Y,x0,x1,y0,y1,m,W,H,k,kr,kg,narrow};
   const g=el('g',{});svg.appendChild(g);
   if(AB){const mini=(gg,k2,x,y)=>{const s2=shape(WSHAPE[k2],'',x,y,.72);s2.setAttribute('style','fill:var(--ink2)');gg.appendChild(s2)};const g0=g;
     AW.forEach((k2,i)=>{const g=el('g',{class:'scale','data-w':k2});g0.appendChild(g);const xr=xref(k2),wl=WL[k2],yy=H-m.b+14+i*rowH;
@@ -564,7 +566,7 @@ function render(){
 }
   else{
   let lastR=-1e9;for(const t of ticks(x0,x1)){g.appendChild(el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'}));lastR=xTick(g,X(t),H-m.b+16,fmtT(t)+(w.combined?'×':''),lastR)}
-  for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end',class:'tk'},fmtT(t)+(ax||w.combined?'×':'')))}}
+  for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end',class:'tk'},fmtT(t)+(ax||kg||w.combined?'×':'')))}}
   g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axis'}));g.appendChild(el('line',{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:'axis'}));
   const bN=w.combined?(()=>{const b=curBase()||DEFBASE;return b.chip+(b.dev?' '+b.dev:'')})():'';
   const sc=AW.length<AW0.length&&AW[0]?WL[AW[0]]:null,bL=ax?ax.b.chip+' '+devName(ax.b):'';
@@ -572,6 +574,7 @@ function render(){
     :w.combined?['Throughput relative to '+bN+' on the same workload, faster to the right','Throughput relative to the baseline, faster to the right','Throughput vs baseline']:[w.x+', faster to the right',w.x,'Throughput ('+w.xu+')'];
   const yc=AB?(sc?[sc.short+' work per joule ('+sc.eu+')',sc.short+' ('+sc.eu+')']:['Work per joule, one scale per workload, more efficient upward','Work per joule, one scale per workload','Work per joule'])
     :w.combined?['Work per joule relative to '+bN+', more efficient upward','Work per joule relative to the baseline','Work per joule vs baseline']
+    :kg?['Frames per joule relative to '+(curBase().chip)+' in the same game, more efficient upward','Frames per joule relative to the baseline, same game','Frames/J vs baseline']
     :ax?['Work per joule relative to '+bL+', more efficient upward','Work per joule relative to '+bL,'Work per joule vs '+ax.b.chip,'Work per joule vs baseline']:[w.e+' ('+w.eu+'), more efficient upward',w.e+' ('+w.eu+')'];
   const fitT=(t,c,av)=>{for(const s of c){t.textContent=s;let n=0;try{n=t.getComputedTextLength()}catch(_){}if(n<=av)return}};
   {const cx=(m.l+W-m.r)/2,cy=(m.t+H-m.b)/2;const xt=el('text',{x:cx,y:H-9,'text-anchor':'middle',class:'axt'});g.appendChild(xt);fitT(xt,xc,2*Math.min(cx,W-cx)-8);
@@ -581,11 +584,11 @@ function render(){
   const pmin=x0/(y1/k), pmax=x1/(y0/k);let pw=[];
   for(let p=Math.floor(Math.log10(pmin));p<=Math.ceil(Math.log10(pmax));p++)for(const s of [1,2,5]){const v=s*Math.pow(10,p);if(v>pmin*1.15&&v<pmax/1.15)pw.push(v)}
   if(pw.length>6)pw=pw.filter((_,i)=>i%2===0);
-  for(const P of pw){const f=x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
+  if(!kg)for(const P of pw){const f=x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
     const lx=Math.min(x1,y1*P/k), px=X(lx)-6, py=Y(f(lx))+13;
     if(px>m.l+40&&py<H-m.b-6)iso.appendChild(el('text',{x:px,y:py,'text-anchor':'end',class:'isot isol'},fmtT(P)+(w.combined&&!AB?'× power':' W')))}
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
-  const pts=rows.map(r=>({r,px:X(r.x),py:Y(r.e*k)}));S.pts=pts;
+  const pts=rows.map(r=>({r,px:X(r.x),py:Y(r.e*kr(r))}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();let fi=0;
     for(const p of pts){const key=(p.r.ow||'')+'|'+(vk(p.r)||'');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
     for(const g of grp.values()){if(g.length<3)continue;const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);let best=-1;const f=[];
@@ -596,17 +599,17 @@ function render(){
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
         const a=f[0];fg.appendChild(el('path',{d:'M'+X(x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),class:'front ftail',style:op}));
         if(S.w!=='all')fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},'One point is both fastest and most efficient, so the frontier is its corner'));continue}
-      const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*k]),S.ffit);if(!fit)continue;
+      const fit=S.w==='all'?null:frontFit(f.map(p=>[p.r.x,p.r.e*kr(p.r)]),S.ffit);if(!fit)continue;
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{d:'M'+pts2.join('L'),class:'front ftail',style:op}))};
-      const a=f[0],z=f[f.length-1];tail(a.r.x,x0,[a.r.x,a.r.e*k]);tail(z.r.x,x1,[z.r.x,z.r.e*k]);
+      const a=f[0],z=f[f.length-1];tail(a.r.x,x0,[a.r.x,a.r.e*kr(a.r)]);tail(z.r.x,x1,[z.r.x,z.r.e*kr(z.r)]);
       if(S.w!=='all'&&f.length>=2&&(grp.size===1||(grp.size<=4&&!narrow0))){const r0=f[0].r,pre=grp.size>1?(r0.game?GAB[r0.game]:r0.model||'')+': ':'';const t=el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},pre+fit.label);fg.appendChild(t)}}}
   {const tg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(tg,under);const tr=new Map();for(const p of pts)if(p.r.grp){const key=p.r.grp;if(!tr.has(key))tr.set(key,[]);tr.get(key).push(p)}
     for(const g of tr.values()){if(g.length<2)continue;g.sort((a,b)=>a.r.ord-b.r.ord);const l=el('path',{d:'M'+g.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'t-'+g[0].r.tier,style:'fill:none;stroke:var(--c);stroke-width:1.4;opacity:.55'});tg.appendChild(l);
       const z=g[g.length-1];tg.appendChild(el('circle',{cx:z.px,cy:z.py,r:2,class:'t-'+z.r.tier,style:'fill:var(--c)'}))}}
   const gm=el('g',S.zoom?{'clip-path':'url(#cp)'}:{});svg.appendChild(gm);
   for(const p of pts){const r=p.r,gg=el('g',{class:'m t-'+r.tier});p.g=gg;
-    if(S.err&&r.elo){const a=Y(r.elo*k),b=Y(r.ehi*k),c='eb'+(r.est?' est':'');gg.appendChild(el('line',{x1:p.px,x2:p.px,y1:a,y2:b,class:c}));
+    if(S.err&&r.elo){const a=Y(r.elo*kr(r)),b=Y(r.ehi*kr(r)),c='eb'+(r.est?' est':'');gg.appendChild(el('line',{x1:p.px,x2:p.px,y1:a,y2:b,class:c}));
       gg.appendChild(el('line',{x1:p.px-3,x2:p.px+3,y1:a,y2:a,class:c}));gg.appendChild(el('line',{x1:p.px-3,x2:p.px+3,y1:b,y2:b,class:c}));
       if(r.xlo&&r.xhi&&r.xhi>r.xlo*1.001)gg.appendChild(el('line',{x1:X(r.xlo),x2:X(r.xhi),y1:p.py,y2:p.py,class:c}))}
     if(r.q!=='A'&&!r.est)gg.appendChild(el('circle',{cx:p.px,cy:p.py,r:10,class:'flag'}));
@@ -652,8 +655,8 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   const {X,Y,x0,x1,y0,y1,m,W,H,k}=G,r=p.r,rel=relatives(r),keep=new Set([p,...rel.gen,...rel.tier]);
   for(const q of S.pts)if(!keep.has(q))q.g.classList.add('dim');
   // exact iso-power line through the point
-  const P=r.x/r.e,f2=x=>x/P*k;un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
-  let lx=Math.min(x1/1.04,y1*P/k/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
+  const P=r.x/r.e,kp=G.kr?G.kr(r):k,f2=x=>x/P*kp;un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
+  let lx=Math.min(x1/1.04,y1*P/kp/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
   un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},(r.ow&&r.br?fmt(P)+'× baseline power ('+fmt(r.o.p)+' W)':fmt(r.ow?r.o.p:P)+' W')+(r.est?' (estimated)':'')));
   // crosshair to axes with value chips
   un.appendChild(el('line',{x1:p.px,x2:p.px,y1:p.py,y2:H-m.b,class:'cross'}));un.appendChild(el('line',{x1:m.l,x2:p.px,y1:p.py,y2:p.py,class:'cross'}));
@@ -661,7 +664,7 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
     c.appendChild(el('rect',{x:rx,y:y-9,width:tw,height:18,rx:4}));c.appendChild(el('text',{x:rx+tw/2,y:y+4,'text-anchor':'middle'},t));ov.appendChild(c)};
   // the y chip sits in the left margin, right-aligned to the axis; the unit is dropped when the margin is too narrow for it
   const ychip=(n,u)=>{const cw=t=>t.length*(G.narrow?6.9:6.6)+10,t=cw(n+u)<=m.l-5?n+u:n;chipAt(Math.max(m.l-3,cw(t)+2),p.py,t,'end')};
-  const wl=WL[r.ow||S.w];if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');k!==1||r.ow?ychip(fmt(r.e*k)+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
+  const wl=WL[r.ow||S.w];if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');(G.kg||k!==1)||r.ow?ychip(fmt(r.e*(G.kr?G.kr(r):k))+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
   // spokes
   for(const q of rel.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-gen'}));
   for(const q of rel.tier)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-tier'}));
@@ -783,7 +786,7 @@ function kInView(p){const {m,W,H}=G;return p.px>=m.l-1&&p.px<=W-m.r+1&&p.py>=m.t
 function kOrder(ax){return S.pts.slice().sort(ax==='x'?(a,b)=>a.r.x-b.r.x||a.r.e-b.r.e:(a,b)=>a.r.e-b.r.e||a.r.x-b.r.x)}
 function kSay(p,i,n){const r=p.r,w=WL[S.w],v=r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?' times the baseline':' '+w.eu);const t=detailRows(r).find(d=>d[0]==='Throughput');
   return name(r)+(r.est&&!r.mode?' (estimate)':'')+': '+v+(t?', throughput '+t[1]:'')+(n?'. Point '+(i+1)+' of '+n+'.':'.')}
-function kGo(p,i,n){if(S.zoom&&!kInView(p)){const {x0,x1,y0,y1,k}=G,r=p.r,fx=Math.sqrt(x1/x0),fy=Math.sqrt(y1/y0),cy=r.e*k;S.zoom={key:viewKey(),x0:r.x/fx,x1:r.x*fx,y0:cy/fy,y1:cy*fy};render();readout();p=S.pts.find(q=>q.r===r)||p}
+function kGo(p,i,n){if(S.zoom&&!kInView(p)){const {x0,x1,y0,y1,k}=G,r=p.r,fx=Math.sqrt(x1/x0),fy=Math.sqrt(y1/y0),cy=r.e*(G.kr?G.kr(r):k);S.zoom={key:viewKey(),x0:r.x/fx,x1:r.x*fx,y0:cy/fy,y1:cy*fy};render();readout();p=S.pts.find(q=>q.r===r)||p}
   S.kbd=true;S.kf=p.r;S.hover=p.r;drawFocus();showTip(p,'key');live(kSay(p,i,n))}
 $('chart').addEventListener('focus',()=>{const c=$('chart');if(!c.matches(':focus-visible'))return;const list=kOrder('x');if(!list.length)return;
   let p=S.kf&&list.find(q=>q.r===S.kf);if(!p&&S.pin)p=list.find(q=>q.r===S.pin);if(!p)p=list[0];kGo(p,list.indexOf(p),list.length)});
@@ -808,7 +811,7 @@ function syncBaseSel(){const s=$('base'),isAll=S.w==='all';s.textContent='';cons
   const b=S.base;s.value=b?(ck(b.chip)+'|'+(b.dev||'')):'';if(s.value===''&&b){s.appendChild(h('option',{value:ck(b.chip)+'|'+(b.dev||'')},b.chip));s.value=ck(b.chip)+'|'+(b.dev||'')}baseTitle()}
 /* the plot title reads 'Relative to X' only where the axes really are ratios to X */
 function baseTitle(){const s=$('base'),o=s.options[s.selectedIndex],w=WL[S.w],x=$('basex');$('basev').textContent=o?o.text:'';
-  const br=S.base&&baseRow(S.w,S.base,tsub()),rel=!!S.base&&(w.combined||(!w.absAxis&&!!br));
+  const br=S.base&&baseRow(S.w,S.base,tsub()),rel=!!S.base&&(w.combined||!!perGame()||(!w.absAxis&&!!br));
   $('basel').textContent=rel?'Relative to':'Baseline';x.hidden=!S.base||rel;if(x.hidden)return;
   x.textContent=!br?'no reading on this workload; axes in absolute units':!visible().includes(br)?(S.w==='llm'&&S.lmod?'not in this model set':S.w==='gpu'&&S.lgame?'not in this game':'hidden by the current filters')+'; axes in absolute units':'ringed on the plot; these axes stay in absolute units'}
 $('base').addEventListener('change',e=>{const v=e.target.value;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;all()});
