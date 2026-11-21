@@ -1,6 +1,6 @@
 # Apple Silicon work per joule
 
-An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, Cyberpunk GPU, Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (the page opens on LLM generation with no baseline, in absolute units).
+An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, gaming (Cyberpunk 2077, Baldur's Gate 3, Assassin's Creed Shadows), Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (the page opens on LLM generation with no baseline, in absolute units).
 
 **Live page:** https://tonyxtyan.github.io/Apple-Silicon-Pareto-Frontier/
 
@@ -8,9 +8,9 @@ An interactive, single-file page that compares how much computing each Apple Sil
 
 ```
 explorer/
-  template.html        page: HTML + CSS + JS; the literal /*DATA*/ is replaced by data7.json
+  template.html        page: HTML + CSS + JS; the literal /*DATA*/ is replaced by data8.json
   index.html           built page (self-contained, open it directly)
-  data7.json           final data (rows = measured, est = estimates, sources, loo, apple specs)
+  data8.json           final data (rows = measured, est = estimates, sources, loo, apple specs)
   build.py             runs the whole data chain and rebuilds index.html
   gen_data.py          -> data.json   measured rows (Cinebench, HPL, Cyberpunk, metered LLM), reusing plot/all.py rows
   model.py             -> data2.json  hierarchical ridge model in log space, leave-one-out errors, estimates, Apple power specs, power modes
@@ -19,6 +19,7 @@ explorer/
   i9.py                -> data5.json  Intel i9-9880H MacBook Pro 16 (2019) baseline rows
   llm2.py              -> data6.json  XiongjieDai llama-bench sweeps (Llama 3 8B/70B, Q4_K_M/F16, tg512..8192)
   llm3.py              -> data7.json  MLX vs GGUF pairs; 4x M3 Ultra cluster (exo RDMA vs llama.cpp RPC)
+  games.py             -> data8.json  Baldur's Gate 3 and AC Shadows frame rates; `game` field on gpu rows
   tests/*.py           Playwright smoke tests; screenshots go to tests/shots/
 plot/
   all.py               original static plot + the measured-row table used by gen_data.py
@@ -30,7 +31,7 @@ plot/
 ```
 cd explorer
 pip install -r ../requirements.txt   # numpy, matplotlib, adjustText
-python3 build.py                  # regenerates data*.json and index.html (reproduces the shipped data7.json exactly)
+python3 build.py                  # regenerates data*.json and index.html (reproduces the shipped data8.json exactly)
 pip install playwright && python3 -m playwright install chromium   # or set CHROME=/path/to/chrome
 python3 tests/i9_baseline.py      # every test prints "errors []" when the page has no JS errors
 ```
@@ -43,6 +44,7 @@ Quick syntax check of the page script:
 - `w`: workload (`cpu-all`, `cpu-one`, `hpl`, `gpu`, `bl-cpu`, `bl-gpu`, `llm`).
 - `x`: throughput. `e`: work per joule. `p`: wall power in W. Bounds are given by `xlo/xhi`, `elo/ehi`, `plo/phi`.
 - `est`: an estimate. Hidden unless the "Model estimates" switch is on, except rows with `pe` (speed measured, power estimated), which always show.
+- `game` (gpu rows only): `Cyberpunk 2077`, `Baldur's Gate 3` or `Assassin's Creed Shadows`. The matrix and the All view use Cyberpunk only.
 - `resc`: the score was converted from Cinebench R23 (drawn hollow). `q`: quality grade; anything below 'A' gets a "weaker measurement" ring.
 - LLM extras:
   - `model`: model name.
@@ -65,6 +67,7 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
   - exo (tensor parallel): N × 110–240 W.
   - llama.cpp RPC (layer split): one busy node plus (N−1) idle nodes.
 - **MLX vs GGUF:** equal power is assumed, so the efficiency ratio equals the speed ratio.
+- **Other games (gaming tab):** Notebookcheck frame rates for Baldur's Gate 3 (Ultra, TAA) and Assassin's Creed Shadows (Ultra High), 1080p, on the nine machines with a metered Cyberpunk row (AC Shadows has no M4 Pro or M4 Mac mini result). No wall power was published in these games, so each point borrows that machine's Cyberpunk wall power, with 12% added in quadrature to the log power spread and 3% for the frame rate; they are `pe` rows (speed measured, power estimated). On the M5 Air the chip drew slightly more in BG3 than in Cyberpunk. The M5 Max MacBook Pro 14 is adapter-capped (97 W), so it keeps its `ex` flag. Older M4 reviews may have used translated builds (the M4 Mac mini's Cyberpunk run was emulated; BG3 is native). Left out: Total War: Pharaoh, which is engine-limited near 50 to 56 fps from the M4 Pro to the M5 Max and so says little about the GPU; Shadow of the Tomb Raider, which has no M5, M5 Pro or M5 Max results; machines without a Cyberpunk row on the page (M4 MacBook Air 13 and MacBook Pro 14, M5 Pro MacBook Pro 14); and MetalFX or frame-generation results and Geekerwan's chip-power figures.
 
 ## Page features
 
@@ -72,8 +75,9 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **All workloads with None:** stacked per-workload scales.
 - **Hover:** shows relatives and the exact power line. Click a point to pin it.
 - **Chart navigation:** zoom, pan and pinch; full screen.
-- **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload and each LLM model.
+- **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload, each LLM model and each game.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
 - **Leave-one-out plot:** shows both error bars and can be enlarged.
+- **Game menu (gaming tab):** every game, or one. Frontiers are drawn per game; with one game chosen a baseline turns the axes into ratios to that machine in the same game.
 - **LLM Model menu:** 7B all-chip set, context sweeps, MLX vs GGUF, clusters. **Model size** chips filter by total parameters: XS <2B, S 2–5B, M 5–12B, L 12–50B, XL 50–150B, XXL 150–500B, XXXL ≥500B.
 - **Palette:** colours come from the dataviz skill's validated palette. Intel is #c2418f in light mode and #b84a8c in dark; the light-mode Max green is darkened to #16a372 for 3:1 contrast on the white plot field.
