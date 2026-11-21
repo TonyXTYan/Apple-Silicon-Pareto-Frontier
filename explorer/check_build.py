@@ -1,9 +1,9 @@
-"""CI check: index.html matches template.html + data12.json, and the data chain reproduces data12.json.
+"""CI check: index.html matches template.html + data14.json, and the data chain reproduces data14.json.
 Rebuilt numbers may differ from the committed ones in the last few digits across CPUs and maths libraries,
 so they are compared with a relative tolerance. Run from anywhere: python3 explorer/check_build.py"""
 import json, math, os, subprocess, sys
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-committed_data = open('data12.json').read()
+committed_data = open('data14.json').read()
 committed_page = open('index.html').read()
 if committed_page != open('template.html').read().replace('/*DATA*/', committed_data):
     sys.exit('index.html is stale: run python3 explorer/build.py and commit the result')
@@ -19,8 +19,8 @@ def cmp(a, b, path):
     elif isinstance(a, (int, float)) and isinstance(b, (int, float)) and not isinstance(a, bool):
         if not math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-12): bad.append(f'{path}: {a} vs {b}')
     elif a != b: bad.append(f'{path}: {a!r} vs {b!r}')
-cmp(json.loads(committed_data), json.loads(open('data12.json').read()), 'data')
+cmp(json.loads(committed_data), json.loads(open('data14.json').read()), 'data')
 # leave the committed files in place so the deployed page is exactly what was committed
-open('data12.json', 'w').write(committed_data); open('index.html', 'w').write(committed_page)
-if bad: sys.exit('data chain no longer reproduces data12.json:\n' + '\n'.join(bad[:30]))
-print('ok: index.html is current and the data chain reproduces data12.json')
+open('data14.json', 'w').write(committed_data); open('index.html', 'w').write(committed_page)
+if bad: sys.exit('data chain no longer reproduces data14.json:\n' + '\n'.join(bad[:30]))
+print('ok: index.html is current and the data chain reproduces data14.json')
