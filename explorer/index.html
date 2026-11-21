@@ -122,6 +122,13 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .axchip text{fill:var(--surface);font-size:11.5px;font-weight:600}
 #chart .spoke-gen{stroke:var(--ink);stroke-width:1.3;opacity:.55}
 #chart .spoke-tier{stroke:var(--ink);stroke-width:1.3;stroke-dasharray:5 4;opacity:.55}
+#chart .spoke-chip,.hsw .spoke-chip{stroke:var(--ink);stroke-width:1.8;stroke-dasharray:1.5 3;stroke-linecap:round;opacity:.75}
+#chart .spoke-mach,.hsw .spoke-mach{stroke:var(--ink);stroke-width:3.2;opacity:.3}
+#chart .spoke-bench,.hsw .spoke-bench{stroke:var(--focus);stroke-width:1.2;opacity:.7}
+.hsw .spoke-gen{stroke:var(--ink);stroke-width:1.3;opacity:.7}
+.hsw{flex:none;overflow:visible}
+.chip.hm[aria-pressed="true"]{border-color:var(--ink)}
+#hml small{color:var(--ink3);font-size:11.5px}
 #chart .baseline-ring{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-dasharray:1.5 2.5}
 #chart .kring{fill:none;stroke:var(--focus);stroke-width:2.5}
 .t-Intel{--c:var(--s-intel)} .t-AMD{--c:var(--s-amd)} .t-Qualcomm{--c:var(--s-qcom)} .t-NVIDIA{--c:var(--s-nv)} .t-base{--c:var(--s-base)} .t-Pro{--c:var(--s-pro)} .t-Max{--c:var(--s-max)} .t-Ultra{--c:var(--s-ultra)} .t-key{--c:var(--ink3)}
@@ -358,11 +365,11 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
       <label class="basesel sub" for="ffit">Ends <span class="selw"><select id="ffit"><option value="pow">power-law fit</option><option value="exp" selected>exponential fit</option><option value="log">logarithmic fit</option><option value="lin">linear fit</option></select></span></label>
     </div>
     <div class="rg">
-      <div class="group" role="radiogroup" aria-labelledby="hml" style="width:100%"><span class="gl" id="hml">Hover highlights</span>
-        <button type="button" class="chip seg" data-hmode="rel" role="radio" aria-checked="true">Related chips</button>
-        <button type="button" class="chip seg" data-hmode="chip" role="radio" aria-checked="false">Same chip</button>
-        <button type="button" class="chip seg" data-hmode="machine" role="radio" aria-checked="false">Same chip and machine</button>
-        <button type="button" class="chip seg" data-hmode="bench" role="radio" aria-checked="false" title="Every point running the same benchmark: the same model on the LLM tab, the same game on Gaming, the same scene and device on Blender, the same set and library on Linear algebra sets, the same workload on All workloads">Same benchmark</button></div>
+      <div class="group" role="group" aria-labelledby="hml" style="width:100%"><span class="gl" id="hml">Hover highlights <small>(any combination)</small></span>
+        <button type="button" class="chip hm" data-hmode="rel" aria-pressed="true"><svg class="hsw" width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" class="spoke-gen"/></svg>Related chips</button>
+        <button type="button" class="chip hm" data-hmode="chip" aria-pressed="false"><svg class="hsw" width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" class="spoke-chip"/></svg>Same chip</button>
+        <button type="button" class="chip hm" data-hmode="machine" aria-pressed="false"><svg class="hsw" width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" class="spoke-mach"/></svg>Same chip and machine</button>
+        <button type="button" class="chip hm" data-hmode="bench" aria-pressed="false" title="Every point running the same benchmark: the same model on the LLM tab, the same game on Gaming, the same scene and device on Blender, the same set and library on Linear algebra sets, the same workload on All workloads"><svg class="hsw" width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" class="spoke-bench"/></svg>Same benchmark</button></div>
     </div>
   </div></details>
 
@@ -486,7 +493,7 @@ const WL={
 function bmText(w,i){return S.lbm===CB24?(i?w.n0:w.f0):w.bm[S.lbm][i]}
 const TIERS=['base','Pro','Max','Ultra','Intel','AMD','Qualcomm','NVIDIA'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
 const CB24='Cinebench 2024',isCpu=w=>w==='cpu-all'||w==='cpu-one',CP='Cyberpunk 2077',GAB={'Cyberpunk 2077':'CP2077',"Baldur's Gate 3":'BG3',"Assassin's Creed Shadows":'ACS'};
-const S={lbm:CB24,lgame:'',lscene:'',ldev:'',lset:'julia-sgemm',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
+const S={hm:new Set(['rel']),lbm:CB24,lgame:'',lscene:'',ldev:'',lset:'julia-sgemm',lsize:new Set(['XS','S','M','L','XL','XXL','XXXL']),hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
   base:null,ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -695,9 +702,12 @@ function defaultLabels(cls,skip){const pts=S.pts,k=G.k;const by=f=>[...pts].sort
   for(let i=0;i<pts.length;i++){if(!pts[i])break;push(order[i]);push(fast[i])}
   placeLabels(pri.filter(p=>(!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&(p.r.game||p.r.bm||S.w==='blender'||S.w==='blas'||(S.lmod&&/^omlx/.test(p.r.set||'')))))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60))}
 const bkey=r=>(r.ow||r.w)+'|'+(vk(r)||''),bname=r=>{const w=r.ow||r.w;return S.w==='all'?'workload':w==='llm'?'model':w==='gpu'?'game':w==='bl-cpu'||w==='bl-gpu'?'scene and device':w==='blas'?'set and library':'benchmark'};
-function relatives(r){if(S.hmode==='bench'){const k=bkey(r);return {gen:S.pts.filter(p=>p.r!==r&&bkey(p.r)===k),tier:[]}}
-  if(S.hmode!=='rel'){const sameDev=q=>devName(q)===devName(r);
-    const list=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&(S.hmode==='chip'||sameDev(p.r)));return {gen:list,tier:[]}}
+const HM=['rel','chip','machine','bench'];
+function relGroups(r){return HM.filter(m=>S.hm.has(m)).map(m=>Object.assign({mode:m},relMode(r,m)))}
+function relatives(r){const g=relGroups(r),gen=new Set(),tier=new Set();for(const x of g){x.gen.forEach(p=>gen.add(p));x.tier.forEach(p=>tier.add(p))}return {gen:[...gen],tier:[...tier].filter(p=>!gen.has(p))}}
+function relMode(r,mode){if(mode==='bench'){const k=bkey(r);return {gen:S.pts.filter(p=>p.r!==r&&bkey(p.r)===k),tier:[]}}
+  if(mode!=='rel'){const sameDev=q=>devName(q)===devName(r);
+    const list=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&(mode==='chip'||sameDev(p.r)));return {gen:list,tier:[]}}
   if(r.ow){const same=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&p.r.ow!==r.ow);const m=new Map();for(const p of same){const k=p.r.ow+'|'+(vk(p.r)||'');const o=m.get(k);if(!o||(o.r.est&&!p.r.est)||(devName(p.r)===devName(r)&&devName(o.r)!==devName(r)))m.set(k,p)}return {gen:[...m.values()],tier:[]}}
   const sg=[],st=[];for(const p of S.pts){const q=p.r;if(sameMachine(q,r))continue;if(q.w!==r.w||(vk(q)||'')!==(vk(r)||''))continue;
     if(r.gen===0&&q.gen===0&&q.tier===r.tier&&q.ck!==r.ck)sg.push(p);else if(r.gen&&q.gen===r.gen&&q.ck!==r.ck)sg.push(p);else if(q.tier===r.tier&&q.gen&&r.gen&&q.gen!==r.gen)st.push(p)}
@@ -721,8 +731,9 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   const ychip=(n,u)=>{const cw=t=>t.length*(G.narrow?6.9:6.6)+10,t=cw(n+u)<=m.l-5?n+u:n;chipAt(Math.max(m.l-3,cw(t)+2),p.py,t,'end')};
   const wl=WL[r.ow||S.w];if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');(G.kg||k!==1)||r.ow?ychip(fmt(r.e*(G.kr?G.kr(r):k))+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
   // spokes
-  for(const q of rel.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-gen'}));
-  for(const q of rel.tier)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-tier'}));
+  for(const gq of relGroups(r)){const c={rel:'spoke-gen',chip:'spoke-chip',machine:'spoke-mach',bench:'spoke-bench'}[gq.mode];
+    for(const q of gq.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:c}));
+    for(const q of gq.tier)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:'spoke-tier'}))}
   ov.appendChild(el('circle',{cx:p.px,cy:p.py,r:11.5,class:'ring'}));
   placeLabels([p,...rel.gen,...rel.tier],'rel',40,p);defaultLabels('faint',keep);
   kRing();declutter();
@@ -773,7 +784,9 @@ function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');t
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
   for(const [a,b] of detailRows(r)){if(a==='Apple'){tip.appendChild(h('div',{class:'apl'},'Apple: '+b));continue}const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
   {const s0=SRC[r.src];if(s0)tip.appendChild(h('div',{class:'srcl'},(r.pe?'Speed: ':'Source: ')+s0.name))}
-  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='bench'?'Lines join every other point on the same '+bname(r)+'.':S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':r.gen===0?'Solid lines: other '+r.tier+' chips.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
+  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length)){const hs=[];for(const gq of relGroups(r)){if(!gq.gen.length&&!gq.tier.length)continue;
+    hs.push(gq.mode==='bench'?'Thin blue lines: same '+bname(r)+'.':gq.mode==='chip'?'Dotted lines: same chip, any machine.':gq.mode==='machine'?'Thick pale lines: same chip in the same machine.':r.ow?'Solid lines: same chip on its other workloads.':r.gen===0?'Solid lines: other '+r.tier+' chips.':'Solid lines: same generation. Dashed: same tier in other generations.')}
+    if(hs.length)tip.appendChild(h('div',{class:'hint'},hs.join(' ')))}
   if(S.front&&S.fset&&S.fset.has(r))tip.appendChild(h('div',{class:'hint'},'On the efficiency frontier: no point shown is both faster and more efficient.'));
   tip.appendChild(h('div',{class:'hint'},mode==='touch'?'Tap empty plot space to close. Full details are under the chart.':mode==='key'?(S.pin===r?'Pinned: full details are under the chart. Esc clears.':'Enter or Space pins it. Esc clears.'):'Click to pin.'));
   tip.hidden=false;const wrap=$('wrap'),wb=wrap.getBoundingClientRect(),svg=$('chart'),sb=svg.getBoundingClientRect(),k=sb.width/svg.viewBox.baseVal.width,ox=sb.left-wb.left+wrap.scrollLeft,oy=sb.top-wb.top+wrap.scrollTop,tw=tip.offsetWidth,th=tip.offsetHeight,{m,W,H}=G;
@@ -795,7 +808,7 @@ function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.
   const relList=(title,list)=>{if(!list.length)return;const d=h('div',{class:'rel'});d.appendChild(h('span',{class:'rh'},title));
     for(const q of list){const bt=h('button',{type:'button'},shortName(q.r)+' '+(q.r.e/r.e).toFixed(2)+'×');
       bt.addEventListener('click',()=>pin(q.r));bt.addEventListener('mouseenter',()=>{S.hover=q.r;drawFocus()});bt.addEventListener('mouseleave',()=>{S.hover=null;drawFocus()});d.appendChild(bt)}R.appendChild(d)};
-  if(S.hmode!=='rel')relList(S.hmode==='bench'?'Same '+bname(r)+':':S.hmode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',rel.gen);else if(r.ow)relList('Same chip, other work:',rel.gen);else{relList(r.gen===0?'Other '+r.tier+' chips:':'Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}
+  for(const gq of relGroups(r)){if(gq.mode!=='rel')relList(gq.mode==='bench'?'Same '+bname(r)+':':gq.mode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',gq.gen);else if(r.ow)relList('Same chip, other work:',gq.gen);else{const rel=gq;relList(r.gen===0?'Other '+r.tier+' chips:':'Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}}
   const acts=h('div',{class:'acts'});const isB=b&&ck(b.chip)===r.ck&&(!b.dev||b.dev===devName(r));
   const bb=h('button',{type:'button',class:'btn'},isB?'This is the baseline':'Use as baseline');if(isB)bb.disabled=true;
   bb.addEventListener('click',()=>{S.base={chip:r.ck,dev:r.est&&!(r.pe&&(r.game||r.bm))?null:devName(r)};DER.clear();S.pin=null;S.preview=null;syncBaseSel();all()});acts.appendChild(bb);
@@ -1071,7 +1084,7 @@ for(const t of TIERS){const b=h('button',{class:'chip',type:'button','aria-press
   b.addEventListener('click',()=>{S.tiers.has(t)?S.tiers.delete(t):S.tiers.add(t);b.setAttribute('aria-pressed',S.tiers.has(t));hideTip();render();table();legend()});$('tiers').appendChild(b)}
 for(const [f,t] of FORMS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph(f,'key','solid'));b.appendChild(document.createTextNode(t));
   b.addEventListener('click',()=>{S.forms.has(f)?S.forms.delete(f):S.forms.add(f);b.setAttribute('aria-pressed',S.forms.has(f));hideTip();render();table();legend()});$('forms').appendChild(b)}
-radios('[data-hmode]',b=>{S.hmode=b.dataset.hmode;drawFocus();readout()});
+document.querySelectorAll('[data-hmode]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.hmode;if(S.hm.has(m))S.hm.delete(m);else S.hm.add(m);b.setAttribute('aria-pressed',S.hm.has(m));drawFocus();readout()}));
 $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()});
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
