@@ -1,0 +1,840 @@
+{
+ "source": "Blender Open Data snapshot opendata-latest.zip (CC0), file opendata-2026-11-21-000000+0000.jsonl, read 2026-11-21",
+ "method": "For each three-scene Blender row of a comparison or server chip, the runs that give it were selected again with the same Blender version, compute type, device name and filters (a run is one submission with all three scenes on that device). sum_spm is the median over runs of monster+junkshop+classroom, which reproduces the existing three-scene point; scenes_median_spm is the median of each scene over the same runs. A median of sums is not the sum of medians, so blscenes.py scales the three scene medians by sum_spm/(their sum).",
+ "rows": [
+  {
+   "id": 0,
+   "w": "bl-cpu",
+   "chip": "Intel i9-9880H",
+   "dev": "MacBook Pro 16 (2019) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Core i9-9880H CPU @ 2.30GHz",
+   "filter": "also spelt \"Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz\"",
+   "system": "Darwin and Windows",
+   "n": 35,
+   "sum_spm": 127.15,
+   "min_spm": 58.3,
+   "max_spm": 140.95,
+   "scenes_median_spm": {
+    "monster": 60.79,
+    "junkshop": 39.36,
+    "classroom": 28.16
+   },
+   "dates": [
+    "2025-07-18",
+    "2026-10-19"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 1,
+   "w": "bl-cpu",
+   "chip": "AMD Ryzen AI Max+ 395",
+   "dev": "Asus ROG Flow Z13 (2025) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 64,
+   "sum_spm": 492.37,
+   "min_spm": 299.56,
+   "max_spm": 616.22,
+   "scenes_median_spm": {
+    "monster": 221.81,
+    "junkshop": 146.96,
+    "classroom": 117.96
+   },
+   "dates": [
+    "2025-07-30",
+    "2026-03-09"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 2,
+   "w": "bl-cpu",
+   "chip": "AMD Ryzen AI 9 HX 370",
+   "dev": "Asus ProArt P16 (RTX 5090 Laptop) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD Ryzen AI 9 HX 370 w/ Radeon 890M",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 76,
+   "sum_spm": 300.16,
+   "min_spm": 122.23,
+   "max_spm": 382.16,
+   "scenes_median_spm": {
+    "monster": 136.19,
+    "junkshop": 93.14,
+    "classroom": 71.71
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-03-09"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 3,
+   "w": "bl-cpu",
+   "chip": "AMD Ryzen 7 8845HS",
+   "dev": "Schenker VIA 14 Pro (M24) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 46,
+   "sum_spm": 216.83,
+   "min_spm": 123.91,
+   "max_spm": 286.72,
+   "scenes_median_spm": {
+    "monster": 97.03,
+    "junkshop": 66.5,
+    "classroom": 52.96
+   },
+   "dates": [
+    "2025-07-18",
+    "2026-03-03"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 4,
+   "w": "bl-cpu",
+   "chip": "Intel Core Ultra 7 155H",
+   "dev": "Schenker XMG Evo 15 (M24) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Core Ultra 7 155H",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 59,
+   "sum_spm": 151.38,
+   "min_spm": 57.4,
+   "max_spm": 259.33,
+   "scenes_median_spm": {
+    "monster": 71.57,
+    "junkshop": 47.17,
+    "classroom": 34.38
+   },
+   "dates": [
+    "2025-07-23",
+    "2026-03-04"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 5,
+   "w": "bl-cpu",
+   "chip": "Intel Core Ultra 7 258V",
+   "dev": "Asus Zenbook S 14 UX5406 (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Core Ultra 7 258V",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 35,
+   "sum_spm": 123.81,
+   "min_spm": 64.15,
+   "max_spm": 172.26,
+   "scenes_median_spm": {
+    "monster": 62.42,
+    "junkshop": 37.08,
+    "classroom": 26.03
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-05-24"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 6,
+   "w": "bl-cpu",
+   "chip": "Intel Core Ultra X7 358H",
+   "dev": "Minisforum M2 Pro mini PC (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Core Ultra X7 358H",
+   "filter": "",
+   "system": "Windows",
+   "n": 12,
+   "sum_spm": 281.4,
+   "min_spm": 227.28,
+   "max_spm": 286.94,
+   "scenes_median_spm": {
+    "monster": 128.37,
+    "junkshop": 89.26,
+    "classroom": 63.59
+   },
+   "dates": [
+    "2026-01-20",
+    "2026-03-01"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 7,
+   "w": "bl-cpu",
+   "chip": "Intel Core Ultra 9 275HX",
+   "dev": "Schenker XMG Neo 16 E25 (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Core Ultra 9 275HX",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 229,
+   "sum_spm": 456.48,
+   "min_spm": 187.54,
+   "max_spm": 639.66,
+   "scenes_median_spm": {
+    "monster": 214.31,
+    "junkshop": 140.62,
+    "classroom": 102.25
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-06-13"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 8,
+   "w": "bl-cpu",
+   "chip": "Intel Core Ultra 7 265K",
+   "dev": "Desktop PC (Core Ultra 7 265K, RTX 4090) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Core Ultra 7 265K",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 277,
+   "sum_spm": 478.04,
+   "min_spm": 237.85,
+   "max_spm": 558.52,
+   "scenes_median_spm": {
+    "monster": 219.5,
+    "junkshop": 146.04,
+    "classroom": 111.21
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-06-04"
+   ],
+   "n_sum_row": 279,
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 9,
+   "w": "bl-gpu",
+   "chip": "AMD Ryzen AI Max+ 395",
+   "dev": "Asus ROG Flow Z13 (2025) (estimate)",
+   "blender": "4.5.0",
+   "backend": "HIP",
+   "device": "AMD Radeon(TM) 8060S Graphics",
+   "filter": "also spelt \"Radeon 8060S Graphics\"",
+   "system": "Linux and Windows",
+   "n": 45,
+   "sum_spm": 1346.12,
+   "min_spm": 1024.71,
+   "max_spm": 1459.18,
+   "scenes_median_spm": {
+    "monster": 669.13,
+    "junkshop": 349.6,
+    "classroom": 327.55
+   },
+   "dates": [
+    "2025-07-26",
+    "2026-03-10"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 10,
+   "w": "bl-gpu",
+   "chip": "AMD Ryzen AI 9 HX 370",
+   "dev": "Asus Zenbook S 16 UM5606 (estimate)",
+   "blender": "4.5.0",
+   "backend": "HIP",
+   "device": "AMD Radeon(TM) 890M Graphics",
+   "filter": "",
+   "system": "Windows",
+   "n": 31,
+   "sum_spm": 300.55,
+   "min_spm": 231.85,
+   "max_spm": 346.92,
+   "scenes_median_spm": {
+    "monster": 157.38,
+    "junkshop": 75.48,
+    "classroom": 71.06
+   },
+   "dates": [
+    "2025-07-29",
+    "2026-03-11"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 11,
+   "w": "bl-gpu",
+   "chip": "AMD Ryzen 7 8845HS",
+   "dev": "Schenker VIA 14 Pro (M24) (estimate)",
+   "blender": "4.5.0",
+   "backend": "HIP",
+   "device": "AMD Radeon 780M Graphics",
+   "filter": "also spelt \"AMD Radeon(TM) 780M Graphics\"",
+   "system": "Linux and Windows",
+   "n": 39,
+   "sum_spm": 242.63,
+   "min_spm": 154.76,
+   "max_spm": 308.48,
+   "scenes_median_spm": {
+    "monster": 126.09,
+    "junkshop": 58.94,
+    "classroom": 61.76
+   },
+   "dates": [
+    "2025-07-20",
+    "2026-03-04"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 12,
+   "w": "bl-gpu",
+   "chip": "Intel Core Ultra 7 258V",
+   "dev": "Asus Zenbook S 14 UX5406 (estimate)",
+   "blender": "4.5.0",
+   "backend": "oneAPI",
+   "device": "Intel(R) Arc(TM) 140V GPU (16GB)",
+   "filter": "",
+   "system": "Windows",
+   "n": 22,
+   "sum_spm": 624.31,
+   "min_spm": 344.34,
+   "max_spm": 688.64,
+   "scenes_median_spm": {
+    "monster": 320.0,
+    "junkshop": 152.0,
+    "classroom": 160.09
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-03-22"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 13,
+   "w": "bl-gpu",
+   "chip": "Intel Core Ultra X7 358H",
+   "dev": "Minisforum M2 Pro mini PC (estimate)",
+   "blender": "4.5.0",
+   "backend": "oneAPI",
+   "device": "Intel(R) Arc(TM) B390 GPU",
+   "filter": "",
+   "system": "Windows",
+   "n": 16,
+   "sum_spm": 1265.03,
+   "min_spm": 744.44,
+   "max_spm": 1369.57,
+   "scenes_median_spm": {
+    "monster": 602.38,
+    "junkshop": 315.17,
+    "classroom": 357.66
+   },
+   "dates": [
+    "2026-01-20",
+    "2026-10-07"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 14,
+   "w": "bl-gpu",
+   "chip": "NVIDIA GeForce RTX 5090 Laptop",
+   "dev": "Asus ProArt P16 (RTX 5090 Laptop) (estimate)",
+   "blender": "4.5.0",
+   "backend": "OptiX",
+   "device": "NVIDIA GeForce RTX 5090 Laptop GPU",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 154,
+   "sum_spm": 7887.03,
+   "min_spm": 1817.89,
+   "max_spm": 8850.52,
+   "scenes_median_spm": {
+    "monster": 3836.75,
+    "junkshop": 2094.72,
+    "classroom": 1962.15
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-11-09"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 15,
+   "w": "bl-gpu",
+   "chip": "NVIDIA GeForce RTX 4090",
+   "dev": "Desktop PC with Ryzen 7 9800X3D (Notebookcheck GPU test system) (estimate)",
+   "blender": "4.5.0",
+   "backend": "OptiX",
+   "device": "NVIDIA GeForce RTX 4090",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 527,
+   "sum_spm": 11061.46,
+   "min_spm": 3247.95,
+   "max_spm": 12408.02,
+   "scenes_median_spm": {
+    "monster": 5537.04,
+    "junkshop": 2749.8,
+    "classroom": 2788.7
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-10-15"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 16,
+   "w": "bl-gpu",
+   "chip": "Intel Core Ultra 7 155H",
+   "dev": "Schenker XMG Evo 15 (M24) (estimate)",
+   "blender": "4.5.0",
+   "backend": "oneAPI",
+   "device": "Intel(R) Arc(TM) Graphics",
+   "filter": "Windows only, runs whose CPU name contains \"155H\"",
+   "system": "Windows",
+   "n": 16,
+   "sum_spm": 476.76,
+   "min_spm": 282.61,
+   "max_spm": 541.7,
+   "scenes_median_spm": {
+    "monster": 217.03,
+    "junkshop": 123.75,
+    "classroom": 143.96
+   },
+   "dates": [
+    "2025-07-28",
+    "2026-02-23"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 17,
+   "w": "bl-gpu",
+   "chip": "NVIDIA GeForce RTX 4060",
+   "dev": "Desktop PC (Core i9-13900KS, RTX 4060; KitGuru test system) (estimate)",
+   "blender": "4.5.0",
+   "backend": "OptiX",
+   "device": "NVIDIA GeForce RTX 4060",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 439,
+   "sum_spm": 3181.92,
+   "min_spm": 179.59,
+   "max_spm": 3445.64,
+   "scenes_median_spm": {
+    "monster": 1520.78,
+    "junkshop": 812.11,
+    "classroom": 845.55
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-08-25"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 18,
+   "w": "bl-cpu",
+   "chip": "NVIDIA GB10",
+   "dev": "Dell Pro Max with GB10 (estimate)",
+   "blender": "5.2.0 LTS",
+   "backend": "CPU",
+   "device": "GB10",
+   "filter": "",
+   "system": "Windows",
+   "n": 1,
+   "sum_spm": 405.39,
+   "min_spm": 405.39,
+   "max_spm": 405.39,
+   "scenes_median_spm": {
+    "monster": 181.9,
+    "junkshop": 133.25,
+    "classroom": 90.24
+   },
+   "dates": [
+    "2026-10-23",
+    "2026-10-23"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 19,
+   "w": "bl-cpu",
+   "chip": "AMD EPYC 9965",
+   "dev": "Asus RS720A-E13-RS8U (2 sockets) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD EPYC 9965 192-Core Processor",
+   "filter": "Linux only, 2 sockets",
+   "system": "Linux",
+   "n": 2,
+   "sum_spm": 9671.4,
+   "min_spm": 9653.88,
+   "max_spm": 9688.91,
+   "scenes_median_spm": {
+    "monster": 4451.8,
+    "junkshop": 2993.42,
+    "classroom": 2226.18
+   },
+   "dates": [
+    "2025-07-25",
+    "2025-07-25"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 20,
+   "w": "bl-cpu",
+   "chip": "AMD EPYC 9965",
+   "dev": "xFusion FusionServer 2158H V8 (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD EPYC 9965 192-Core Processor",
+   "filter": "Linux only, 1 socket",
+   "system": "Linux",
+   "n": 2,
+   "sum_spm": 4077.55,
+   "min_spm": 4044.43,
+   "max_spm": 4110.68,
+   "scenes_median_spm": {
+    "monster": 1861.77,
+    "junkshop": 1292.37,
+    "classroom": 923.41
+   },
+   "dates": [
+    "2025-08-11",
+    "2025-08-11"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 21,
+   "w": "bl-cpu",
+   "chip": "AMD EPYC 9755",
+   "dev": "Quanta S44NL-1U (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD EPYC 9755 128-Core Processor",
+   "filter": "Linux only, 1 socket",
+   "system": "Linux",
+   "n": 4,
+   "sum_spm": 3687.72,
+   "min_spm": 3669.23,
+   "max_spm": 3702.1,
+   "scenes_median_spm": {
+    "monster": 1695.57,
+    "junkshop": 1170.04,
+    "classroom": 822.66
+   },
+   "dates": [
+    "2026-01-16",
+    "2026-03-04"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 22,
+   "w": "bl-cpu",
+   "chip": "AMD EPYC 9754",
+   "dev": "Lenovo ThinkSystem SR655 V3 (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD EPYC 9754 128-Core Processor",
+   "filter": "Linux only, 1 socket",
+   "system": "Linux",
+   "n": 4,
+   "sum_spm": 2626.83,
+   "min_spm": 2579.26,
+   "max_spm": 2660.09,
+   "scenes_median_spm": {
+    "monster": 1208.81,
+    "junkshop": 828.26,
+    "classroom": 591.7
+   },
+   "dates": [
+    "2025-09-09",
+    "2025-11-25"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 23,
+   "w": "bl-cpu",
+   "chip": "AMD EPYC 9654",
+   "dev": "Lenovo ThinkSystem SR655 V3 (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD EPYC 9654 96-Core Processor",
+   "filter": "Linux only, 1 socket",
+   "system": "Linux",
+   "n": 6,
+   "sum_spm": 2052.59,
+   "min_spm": 2007.1,
+   "max_spm": 2146.59,
+   "scenes_median_spm": {
+    "monster": 950.86,
+    "junkshop": 645.23,
+    "classroom": 456.49
+   },
+   "dates": [
+    "2025-09-21",
+    "2025-10-31"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 24,
+   "w": "bl-cpu",
+   "chip": "AMD EPYC 4584PX",
+   "dev": "Supermicro AS-3015A-i (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "AMD EPYC 4584PX 16-Core Processor",
+   "filter": "Linux only, 1 socket",
+   "system": "Linux",
+   "n": 1,
+   "sum_spm": 615.7,
+   "min_spm": 615.7,
+   "max_spm": 615.7,
+   "scenes_median_spm": {
+    "monster": 290.69,
+    "junkshop": 183.94,
+    "classroom": 141.07
+   },
+   "dates": [
+    "2025-09-19",
+    "2025-09-19"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 25,
+   "w": "bl-cpu",
+   "chip": "Intel Xeon 6980P",
+   "dev": "Dell PowerEdge R770AP (2 sockets) (estimate)",
+   "blender": "4.5.0",
+   "backend": "CPU",
+   "device": "Intel Xeon 6980P",
+   "filter": "Linux only, 2 sockets",
+   "system": "Linux",
+   "n": 1,
+   "sum_spm": 5685.22,
+   "min_spm": 5685.22,
+   "max_spm": 5685.22,
+   "scenes_median_spm": {
+    "monster": 2695.53,
+    "junkshop": 1706.01,
+    "classroom": 1283.67
+   },
+   "dates": [
+    "2026-03-05",
+    "2026-03-05"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 26,
+   "w": "bl-cpu",
+   "chip": "NVIDIA N1X (RTX Spark)",
+   "dev": "Microsoft Surface Laptop Ultra (2026) (estimate)",
+   "blender": "5.2.0 LTS",
+   "backend": "CPU",
+   "device": "NVIDIA RTX Spark N1X (6144-core GPU, 20-core CPU)",
+   "filter": "",
+   "system": "Windows",
+   "n": 20,
+   "sum_spm": 397.51,
+   "min_spm": 173.26,
+   "max_spm": 410.97,
+   "scenes_median_spm": {
+    "monster": 179.32,
+    "junkshop": 131.35,
+    "classroom": 87.45
+   },
+   "dates": [
+    "2026-10-13",
+    "2026-11-10"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 27,
+   "w": "bl-cpu",
+   "chip": "Intel Core 5 320",
+   "dev": "Dell XPS 13 (2026) (estimate)",
+   "blender": "5.2.0 LTS",
+   "backend": "CPU",
+   "device": "Intel Core 5 320",
+   "filter": "",
+   "system": "Windows",
+   "n": 2,
+   "sum_spm": 73.5,
+   "min_spm": 63.54,
+   "max_spm": 83.45,
+   "scenes_median_spm": {
+    "monster": 36.06,
+    "junkshop": 18.93,
+    "classroom": 18.5
+   },
+   "dates": [
+    "2026-08-19",
+    "2026-11-04"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 28,
+   "w": "bl-gpu",
+   "chip": "NVIDIA GeForce RTX 4060 Laptop",
+   "dev": "RTX 4060 Laptop machines on this page (estimate)",
+   "blender": "4.5.0",
+   "backend": "OptiX",
+   "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 579,
+   "sum_spm": 3275.91,
+   "min_spm": 201.47,
+   "max_spm": 3869.06,
+   "scenes_median_spm": {
+    "monster": 1507.57,
+    "junkshop": 932.16,
+    "classroom": 841.77
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-07-20"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 29,
+   "w": "bl-gpu",
+   "chip": "NVIDIA GeForce RTX 5090",
+   "dev": "Desktop PC with Ryzen 7 9800X3D (Notebookcheck GPU test system) (estimate)",
+   "blender": "4.5.0",
+   "backend": "OptiX",
+   "device": "NVIDIA GeForce RTX 5090",
+   "filter": "",
+   "system": "Linux and Windows",
+   "n": 1555,
+   "sum_spm": 14965.98,
+   "min_spm": 7044.96,
+   "max_spm": 17876.97,
+   "scenes_median_spm": {
+    "monster": 7310.95,
+    "junkshop": 3932.82,
+    "classroom": 3721.85
+   },
+   "dates": [
+    "2025-07-17",
+    "2026-10-15"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 30,
+   "w": "bl-gpu",
+   "chip": "NVIDIA N1X (RTX Spark)",
+   "dev": "Microsoft Surface Laptop Ultra (2026) (estimate)",
+   "blender": "5.3.0",
+   "backend": "OptiX",
+   "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)",
+   "filter": "",
+   "system": "Windows",
+   "n": 9,
+   "sum_spm": 4075.67,
+   "min_spm": 2239.65,
+   "max_spm": 4426.66,
+   "scenes_median_spm": {
+    "monster": 1659.7,
+    "junkshop": 1276.33,
+    "classroom": 1158.94
+   },
+   "dates": [
+    "2026-11-12",
+    "2026-11-20"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  },
+  {
+   "id": 31,
+   "w": "bl-gpu",
+   "chip": "Intel Core 5 320",
+   "dev": "Dell XPS 13 (2026) (estimate)",
+   "blender": "5.2.0 LTS",
+   "backend": "oneAPI",
+   "device": "Intel(R) Graphics",
+   "filter": "runs whose CPU name contains \"Core 5 320\"",
+   "system": "Windows",
+   "n": 1,
+   "sum_spm": 183.17,
+   "min_spm": 183.17,
+   "max_spm": 183.17,
+   "scenes_median_spm": {
+    "monster": 82.01,
+    "junkshop": 56.13,
+    "classroom": 45.03
+   },
+   "dates": [
+    "2026-11-04",
+    "2026-11-04"
+   ],
+   "src_name": "Blender Open Data snapshot (opendata-latest.zip, 2026-11-21), per-run scene results",
+   "url": "https://opendata.blender.org/snapshots/opendata-latest.zip"
+  }
+ ],
+ "exceptions": {}
+}
