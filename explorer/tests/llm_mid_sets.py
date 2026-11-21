@@ -1,4 +1,4 @@
-"""Mid-size oMLX sets: each Model-menu entry isolates its set, oMLX points are speed measured / power estimated with the chip's
+"""Mid-size oMLX sets: each Collection-menu entry isolates its set, oMLX points are speed measured / power estimated with the chip's
 Llama 2 7B power, the gpt-oss entry also shows the llama.cpp #15396 set and the metered gpt-oss runs, oMLX gpt-oss shares one
 frontier with them, the other mid-size sets stay out of the default every-model view, and the new metered M3 Ultra / M4 Pro rows are there."""
 import asyncio, os, pathlib

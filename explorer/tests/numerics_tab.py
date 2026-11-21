@@ -1,4 +1,4 @@
-"""Linear algebra tab (HPL and the GEMM sets merged): the Set menu opens on HPL, isolates each set, OpenBLAS and Accelerate are
+"""Linear algebra tab (HPL and the GEMM sets merged): the Sets chips open on HPL, isolate each set, OpenBLAS and Accelerate are
 joined per chip, frontiers are drawn per set and library, baselines compare the same set and library, old #hpl and #blas links
 open the right set, and only HPL reaches All workloads and the matrix."""
 import asyncio, os, pathlib
@@ -6,6 +6,11 @@ HERE=pathlib.Path(__file__).resolve().parent
 INDEX=(HERE.parent/'index.html').as_uri()
 CHROME=os.environ.get('CHROME','/usr/bin/google-chrome')
 from playwright.async_api import async_playwright
+async def pick(pg,box,v):
+    """choose v in a filter chip group as a user would: a single-choice row is clicked; a multi-select group is reset with Show all, then v alone is clicked ('' leaves every option on)"""
+    if await pg.locator(f'#{box} [role=radio]').count(): await pg.click(f'#{box} [data-opt="{v}"]'); return
+    if await pg.locator(f'#{box} .showall.on').count(): await pg.click(f'#{box} .showall')
+    if v!='': await pg.click(f'#{box} [data-opt="{v}"]')
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox'])
@@ -17,12 +22,12 @@ async def main():
         sub=await pg.evaluate("document.querySelector('.tab[data-w=\"hpl\"] small').textContent"); print('tab sub-label',sub)
         if 'GEMM' not in sub or 'HPL' not in sub: errs.append('tab sub-label')
         await pg.click('.tab[data-w="hpl"]'); await pg.wait_for_timeout(300)
-        print('set menu visible',await pg.is_visible('#lset'),'default',await pg.evaluate("S.lset"))
+        print('set chips visible',await pg.is_visible('#lsetw'),'default',await pg.evaluate("S.lset"))
         if await pg.evaluate("S.lset")!='hpl': errs.append('Linear algebra should open on HPL')
         nh=await pg.evaluate("ALL.filter(r=>r.w==='hpl'&&(!r.est||r.pe)).length")
         await pg.select_option('#base','M4|')
         for st,n,lines in (('hpl',nh,0),('julia-sgemm',20,10),('arxiv-sgemm',8,4),('julia-dgemm',3,0),('',31+nh,14)):
-            await pg.select_option('#lset',st); await pg.wait_for_timeout(250)
+            await pick(pg,'lsetw',st); await pg.wait_for_timeout(250)
             r=await pg.evaluate("""()=>({n:S.pts.length,sets:[...new Set(S.pts.map(p=>p.r.set||p.r.w))],pe:S.pts.filter(p=>p.r.w==='blas').every(p=>p.r.pe&&p.r.plo&&/No wall power was metered/.test(p.r.note)),
               vend:S.pts.some(p=>p.r.w==='hpl'&&p.r.gen===0),solid:S.pts.filter(p=>p.r.w==='hpl'&&!p.r.est&&!p.r.sys).every(p=>kindOf(p.r)==='solid'),
               lines:document.querySelectorAll('#chart path[style*="stroke-width:1.4"]').length,abs:!axisRel(),

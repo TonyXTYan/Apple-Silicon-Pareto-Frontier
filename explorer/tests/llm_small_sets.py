@@ -1,4 +1,4 @@
-"""oMLX small-model sets: each Model-menu entry isolates its set, every point is speed measured / power estimated with the chip's
+"""oMLX small-model sets: each Collection-menu entry isolates its set, every point is speed measured / power estimated with the chip's
 Llama 2 7B power, baselines compare the same model, and the Qwen sets stay out of the default every-model view."""
 import asyncio, os, pathlib
 HERE=pathlib.Path(__file__).resolve().parent

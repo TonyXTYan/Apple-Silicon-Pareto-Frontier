@@ -1,5 +1,5 @@
 """N1X (RTX Spark) LLM generation (n1xllm.py): the seven N1X LLM points from n1xllm_rows.json are on the LLM tab, each under its
-own model in the Model menu next to the other chips running that model; the one run with its own power (Frandroid's ProArt P16 on
+own model chip in the Models panel next to the other chips running that model; the one run with its own power (Frandroid's ProArt P16 on
 battery) is measured, the others are dashed est+pe points with power borrowed from the laptop's Cyberpunk wall power and a source
 for both; every point is grade B, none uses a GB10 source, and none is a Llama 2 7B Q4_0 point, so the matrix LLM cell of the N1X
 stays '–' (a documented gap in mxfill_rows.json). The page does not overflow at 390px."""
@@ -12,6 +12,12 @@ N1='NVIDIA N1X (RTX Spark)'; PA,SU='Asus ProArt P16 H7607 (RTX Spark)','Microsof
 # model -> [(device, measured power?)]; the model names are those already on the page, so each joins other chips' points
 WANT={'Qwen3.6 35B-A3B':[(PA,True),(PA,False),(SU,False)],'Qwen3 8B':[(PA,False)],'Qwen3.8 27B':[(PA,False)],
       'gpt-oss 120B':[(PA,False)],'gpt-oss 20B (Ollama)':[(SU,False)]}
+async def only_model(pg,m):
+    """show one LLM model as a user would: Show all if needed, open its maker's list, click the model (with every model on, that shows it alone)"""
+    if await pg.locator('#lml .showall.on').count(): await pg.click('#lml .showall')
+    gid=await pg.evaluate("m=>[...document.querySelectorAll('#lmodsw [data-model]')].find(b=>b.dataset.model===m).closest('.mkg').id",m)
+    if await pg.is_hidden('#'+gid): await pg.click(f'.mkx[aria-controls="{gid}"]')
+    await pg.click(f'#{gid} [data-model="{m}"]')
 async def main():
     rows=json.load(open(HERE.parent/'n1xllm_rows.json'))['rows']
     gaps=json.load(open(HERE.parent/'mxfill_rows.json'))['gaps']
@@ -33,16 +39,16 @@ async def main():
             if not (x['elo']<x['e']<x['ehi']): errs.append(f"{x['m']} on {x['d']}: e outside its range")
             if x['pe'] and not (x['est'] and x['pss'].startswith('https://www.notebookcheck.net/')): errs.append(f"{x['m']} on {x['d']}: borrowed power without a Notebookcheck power source")
             if x['m']=='Llama 2 7B Q4_0': errs.append('an N1X Llama 2 7B Q4_0 point appeared; update the matrix gap')
-        # each model in the Model menu: the N1X points sit with the other chips of that model (they share a frontier)
-        opts=await pg.evaluate("[...document.querySelectorAll('#lmod option')].map(o=>o.value)")
+        # each model's chip in the Models panel: the N1X points sit with the other chips of that model (they share a frontier)
+        opts=await pg.evaluate("[...document.querySelectorAll('#lmodsw [data-model]')].map(o=>o.dataset.model)")
         for m,v in WANT.items():
-            if 'model:'+m not in opts: errs.append(f'Model menu lacks {m}'); continue
-            await pg.select_option('#lmod','model:'+m); await pg.wait_for_timeout(250)
+            if m not in opts: errs.append(f'Models panel lacks {m}'); continue
+            await only_model(pg,m); await pg.wait_for_timeout(250)
             pts=await pg.evaluate("S.pts.map(p=>[p.r.chip,p.r.dev])"); mine=[d for c,d in pts if c==N1]; others={c for c,d in pts if c!=N1}
             print(f'  {m}: {len(mine)} N1X points, {len(others)} other chips')
             if sorted(mine)!=sorted(d for d,_ in v): errs.append(f'{m}: N1X points on the plot {mine}')
             if not others: errs.append(f'{m}: no other chip shares the plot')
-        await pg.select_option('#lmod','other'); await pg.wait_for_timeout(250)
+        await pg.click('#lml .showall'); await pg.select_option('#lmod','other'); await pg.wait_for_timeout(250)
         k=await pg.evaluate(f"S.pts.filter(p=>p.r.chip==='{N1}').length"); print('Other metered runs, N1X points',k)
         if k!=8: errs.append(f'Other metered runs: {k} N1X points, expected 8 (7 from n1xllm.py and the MLPerf Client run)')
         # the matrix: no Llama 2 7B Q4_0 run, so the LLM cell stays an empty, documented gap

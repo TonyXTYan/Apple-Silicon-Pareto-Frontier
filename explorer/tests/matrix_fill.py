@@ -16,6 +16,11 @@ FILLED={'llm':['AMD Ryzen AI Max+ 395','AMD Ryzen AI 9 HX 370','AMD Ryzen 7 8845
                'NVIDIA GB10','NVIDIA GeForce RTX 4060 Laptop','NVIDIA GeForce RTX 4090','NVIDIA GeForce RTX 5090','NVIDIA GeForce RTX 5090 Laptop'],
         'bl-cpu':['NVIDIA N1X (RTX Spark)','Intel Core 5 320'],
         'bl-gpu':['NVIDIA GeForce RTX 4060 Laptop','NVIDIA GeForce RTX 5090','NVIDIA N1X (RTX Spark)','Intel Core 5 320']}
+async def pick(pg,box,v):
+    """choose v in a filter chip group as a user would: a single-choice row is clicked; a multi-select group is reset with Show all, then v alone is clicked ('' leaves every option on)"""
+    if await pg.locator(f'#{box} [role=radio]').count(): await pg.click(f'#{box} [data-opt="{v}"]'); return
+    if await pg.locator(f'#{box} .showall.on').count(): await pg.click(f'#{box} .showall')
+    if v!='': await pg.click(f'#{box} [data-opt="{v}"]')
 async def main():
     rows_gaps={tuple(k.split('|')) for k in json.load(open(HERE.parent/'mxfill_rows.json'))['gaps']}
     async with async_playwright() as p:
@@ -49,7 +54,7 @@ async def main():
         if miss: errs.append('missing on the Llama 2 7B Q4_0 plot: '+', '.join(miss))
         for k in ('bl-cpu','bl-gpu'):
             await pg.click('.tab[data-w="blender"]'); await pg.wait_for_timeout(200)
-            await pg.select_option('#ldev',k); await pg.wait_for_timeout(300)
+            await pick(pg,'ldevw',k); await pg.wait_for_timeout(300)
             got=set(await pg.evaluate("S.pts.map(p=>p.r.chip)")); miss=[c for c in FILLED[k] if c not in got]
             if miss: errs.append(f'missing on the Blender {k} plot: '+', '.join(miss))
         # phone width: the matrix scrolls inside its box, the page does not
