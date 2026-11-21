@@ -10,7 +10,8 @@ async def main():
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox'])
         pg=await b.new_page(viewport={'width':1360,'height':1150}); errs=[]
         pg.on('pageerror',lambda e:errs.append(str(e)))
-        await pg.goto(''+INDEX+''); await pg.wait_for_timeout(600)
+        await pg.goto(''+INDEX+'#all'); await pg.wait_for_timeout(600)
+        await pg.select_option('#base','Intel i9-9880H|MacBook Pro 16 (2019)'); await pg.wait_for_timeout(300)  # page opens on LLM with no baseline
         print('base',await pg.evaluate("JSON.stringify(S.base)"),'sel',await pg.evaluate("document.getElementById('base').value"),'pts',await pg.evaluate("S.pts.length"))
         print(await pg.evaluate("document.getElementById('wnote').textContent.slice(-220)"))
         await pg.locator('#wrap').screenshot(path=OUT+'i1.png')

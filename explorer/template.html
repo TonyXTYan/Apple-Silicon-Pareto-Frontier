@@ -202,6 +202,9 @@ main:has(.tab[data-w="all"][aria-selected="true"]) #forms .chip svg,main:has(.ta
 .btn.ghost:hover{border-color:var(--ink3)}
 .btn[disabled]{opacity:.45;cursor:default}
 .readout .src{font-size:12.5px;color:var(--ink2)}
+.readout .cite{flex-basis:100%;margin:0;font-size:13px;color:var(--ink2)}
+.readout .cite a{color:var(--ink)}
+.tip .srcl{margin-top:6px;font-size:12px;opacity:.85}
 .readout .estnote{font-size:12.5px;color:var(--ink2);flex-basis:100%}
 
 /* lower sections */
@@ -293,7 +296,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
 
 <div class="tabs" role="tablist" aria-label="Workload" id="tabs"></div>
 
-<div class="layout" role="tabpanel" id="panel" aria-labelledby="tab-all">
+<div class="layout" role="tabpanel" id="panel" aria-labelledby="tab-llm">
   <div class="vs">
     <label class="basesel vsbase" for="base"><span class="vsl" id="basel">Relative to</span> <span class="selw"><span class="selv" id="basev" aria-hidden="true"></span><select id="base"></select></span><span class="vsx" id="basex" hidden></span></label>
     <label class="basesel vsmod" for="lmod" id="lmodw" hidden>Model <span class="selw"><select id="lmod"><option value="">Every model and context</option><option value="Llama 2 7B Q4_0">Llama 2 7B Q4_0, every chip</option><option value="Llama 3 8B Q4_K_M">Llama 3 8B Q4_K_M, by context</option><option value="Llama 3 8B F16">Llama 3 8B F16, by context</option><option value="Llama 3 70B Q4_K_M">Llama 3 70B Q4_K_M, by context</option><option value="Llama 3 70B F16">Llama 3 70B F16, by context</option><option value="set:mlx">MLX vs GGUF, same machine</option><option value="set:cluster">Mac Studio clusters (exo vs llama.cpp RPC)</option><option value="other">Other metered runs</option></select></span></label>
@@ -414,6 +417,9 @@ const WL={
  'all':{tab:'All workloads',sub:'one scale per workload',combined:true,absAxis:true,x:'Throughput',xu:'×',e:'Work per joule',eu:'×',
    finding:'All seven kinds of work on one chart in absolute units. Each workload keeps its own physical scale, shown as a row of ticks under the plot and a column beside it, marked with the workload\'s shape. Its points are slid along the constant-power diagonals so the M4 Mac mini lands at the same place on every workload; because both axes move together, the diagonals are true wall power in watts for every point. Hover a point to draw lines to the same chip on its other workloads. Pick a baseline to switch to ratios instead.',
    note:'Read a value off the scale with the matching shape: a circle is read on the CPU all-cores row, a square on the linear-algebra row, and so on. Height can be compared within a workload, not across workloads, because work units differ; horizontal position is likewise per workload. Distance along the diagonals, i.e. power, is directly comparable across everything. With a baseline chosen, both axes become ratios to that machine on the same workload.'},
+ 'llm':{tab:'LLM generation',short:'LLM',sub:'tokens out',x:'Generation speed (tokens per second)',xu:'tok/s',e:'Tokens per joule',eu:'tok/J',per:['J per token',e=>1/e],absAxis:true,
+   finding:'Dashed points are every chip from the llama.cpp benchmark thread generating with Llama 2 7B (Q4_0), with wall power estimated from each chip\'s measured or modelled power under full GPU load. They land between 0.5 and 1.0 tokens per joule, about 1 to 2 J per token. The ranges overlap, so the ordering is not resolved. Ultras sit at the bottom: they are fastest but carry two dies and a 150 W-plus platform. Solid points are the few runs metered at the wall. Lines join one chip running one model as the generated length grows from 512 to 8,192 tokens (XiongjieDai\'s llama-bench sweep): speed falls as the KV cache grows while power stays roughly fixed, so each line slides down along a constant-power diagonal. Paired points join the same model on the same machine under llama.cpp (GGUF) and MLX, ending at the MLX point; with power assumed equal, the efficiency gain is the speed gain, largest for small models where llama.cpp\'s per-token overhead dominates. Cluster lines join 1, 2 and 4 M3 Ultra Mac Studios (Geerling, RDMA over Thunderbolt 5): exo gets faster with nodes but every node draws power, so joules per token roughly double from 1 to 4 nodes; llama.cpp RPC gets slower. Use the Model menu to isolate any of these sets.',
+   note:'Generation is memory-bandwidth bound, so speed tracks bandwidth while power tracks how much silicon is lit. Decode wall power is taken as 0.75 to 1.1 times GPU-load wall power, calibrated on the two machines with both readings. M5 and M6 speeds come from a newer llama.cpp build than older chips, which flatters them somewhat. Compare points that share a model; ratios to the baseline use the baseline running the same model.'},
  'cpu-all':{tab:'CPU, all cores',short:'CPU all',sub:'Cinebench render',x:'Throughput (Cinebench 2024 points)',xu:'pts',e:'Points per joule',eu:'pts/J',
    finding:'Fanless MacBook Airs do the most all-core work per joule, led by the M4 Air 13 at 39 points per joule. The M6 Mac mini is the one machine that is both fast and efficient. Turn on estimates to see the Ultra chips and the M4 Pro Mac mini in its three power modes, where Low Power gives about a fifth more work per joule at less than half the speed.',
    note:'Notebookcheck measures the whole machine at the wall with an external monitor and divides the Cinebench score by the average power. Points per watt and points per joule are the same number.'},
@@ -432,13 +438,10 @@ const WL={
  'bl-gpu':{tab:'Blender, GPU',short:'Blender GPU',hs:'Bl. GPU',sub:'Cycles on Metal',x:'Render speed (samples per second)',xu:'samples/s',e:'Samples per joule',eu:'samples/J',per:['J per 100 samples',e=>100/e],absAxis:true,
    finding:'The same render on the GPU costs 5 to 15 times less energy than on the CPU of the same chip. M3 is the step change: hardware ray tracing more than doubles samples per joule from M2 Max (about 0.5) to M3 Max (about 1.1). The M6 Mac mini and the M3 Ultra reach about 1.7, the M5 Ultra about 1.9, but every GPU range here spans a factor of 2 to 3 and overlaps its neighbours.',
    note:'Render speed is the Blender Open Data median for the GPU configuration named in the details. Wall power is 0.45 to 0.95 times the machine\'s Cyberpunk 2077 wall power, because Cycles keeps the GPU busy while the CPU idles, unlike a game. Ultra and older-chip power comes from the model and carries its 40% error on top.'},
- 'llm':{tab:'LLM generation',short:'LLM',sub:'tokens out',x:'Generation speed (tokens per second)',xu:'tok/s',e:'Tokens per joule',eu:'tok/J',per:['J per token',e=>1/e],absAxis:true,
-   finding:'Dashed points are every chip from the llama.cpp benchmark thread generating with Llama 2 7B (Q4_0), with wall power estimated from each chip\'s measured or modelled power under full GPU load. They land between 0.5 and 1.0 tokens per joule, about 1 to 2 J per token. The ranges overlap, so the ordering is not resolved. Ultras sit at the bottom: they are fastest but carry two dies and a 150 W-plus platform. Solid points are the few runs metered at the wall. Lines join one chip running one model as the generated length grows from 512 to 8,192 tokens (XiongjieDai\'s llama-bench sweep): speed falls as the KV cache grows while power stays roughly fixed, so each line slides down along a constant-power diagonal. Paired points join the same model on the same machine under llama.cpp (GGUF) and MLX, ending at the MLX point; with power assumed equal, the efficiency gain is the speed gain, largest for small models where llama.cpp\'s per-token overhead dominates. Cluster lines join 1, 2 and 4 M3 Ultra Mac Studios (Geerling, RDMA over Thunderbolt 5): exo gets faster with nodes but every node draws power, so joules per token roughly double from 1 to 4 nodes; llama.cpp RPC gets slower. Use the Model menu to isolate any of these sets.',
-   note:'Generation is memory-bandwidth bound, so speed tracks bandwidth while power tracks how much silicon is lit. Decode wall power is taken as 0.75 to 1.1 times GPU-load wall power, calibrated on the two machines with both readings. M5 and M6 speeds come from a newer llama.cpp build than older chips, which flatters them somewhat. Compare points that share a model; ratios to the baseline use the baseline running the same model.'}
 };
 const TIERS=['Intel','base','Pro','Max','Ultra'], FORMS=[['laptop','Laptop with fan'],['fanless','Fanless laptop'],['desktop','Desktop']];
-const S={hmode:'rel',mshow:'both',munc:true,mest:true,w:'all',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
-  base:{chip:'M4 Max',dev:'MacBook Pro 16'},ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
+const S={hmode:'rel',mshow:'both',munc:true,mest:true,w:'llm',tiers:new Set(TIERS),forms:new Set(FORMS.map(f=>f[0])),est:false,err:true,flg:true,
+  base:null,ffit:'exp',preview:null,pin:null,hover:null,sort:['e',-1],pts:[]};
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 function el(n,a,t){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
 function h(n,a,t){const e=document.createElement(n);if(a)for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -662,6 +665,7 @@ function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');t
   tip.appendChild(h('b',null,name(r)+(r.pe?' (speed measured, power estimated)':r.est&&!r.mode?' (model estimate)':'')));
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
   for(const [a,b] of detailRows(r)){const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
+  {const s0=SRC[r.src];if(s0)tip.appendChild(h('div',{class:'srcl'},(r.pe?'Speed: ':'Source: ')+s0.name))}
   const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
   if(S.front&&S.fset&&S.fset.has(r))tip.appendChild(h('div',{class:'hint'},'On the efficiency frontier: no point shown is both faster and more efficient.'));
   tip.appendChild(h('div',{class:'hint'},mode==='touch'?'Tap empty plot space to close. Full details are under the chart.':mode==='key'?(S.pin===r?'Pinned: full details are under the chart. Esc clears.':'Enter or Space pins it. Esc clears.'):'Click to pin.'));
@@ -676,6 +680,7 @@ function readout(){const R=$('readout');R.textContent='';const r=S.pin&&S.pin.w=
   if(!r)return;
   const head=h('div',{class:'head'});head.appendChild(h('h2',null,name(r)+(r.est&&!r.mode?' (estimate)':'')));
   const big=h('span',{class:'big'},r.ow&&!r.br?fmt(r.o.e):fmt(r.e)+(r.ow?'×':''));big.appendChild(h('small',null,r.ow&&!r.br?WL[r.ow].eu:r.ow?'baseline':w.eu));head.appendChild(big);R.appendChild(head);
+  {const s0=SRC[r.src];if(s0){const c=h('p',{class:'cite'},r.pe?'Speed from ':'Source: ');c.appendChild(h('a',{href:s0.url,target:s0.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s0.name));R.appendChild(c)}}
   const dl=h('dl');for(const [a,bb] of detailRows(r)){const d=h('div');d.appendChild(h('dt',null,a));d.appendChild(h('dd',null,bb));dl.appendChild(d)}R.appendChild(dl);
   const rel=relatives(r);
   const relList=(title,list)=>{if(!list.length)return;const d=h('div',{class:'rel'});d.appendChild(h('span',{class:'rh'},title));
@@ -688,8 +693,7 @@ function readout(){const R=$('readout');R.textContent='';const r=S.pin&&S.pin.w=
   const ub=h('button',{type:'button',class:'btn ghost'},'Unpin');ub.addEventListener('click',()=>{S.pin=null;drawFocus();readout();table()});acts.appendChild(ub);R.appendChild(acts);
   const notes=[];if(r.note)notes.push(r.note);
   if(r.est&&!r.mode)notes.push('The bar is ±1 leave-one-out standard deviation'+(r.seen?'':', widened 1.5 times because this chip has no measurements')+(r.clip?', with the lower end clipped at throughput divided by Apple\'s rated maximum power':'')+'.');
-  const s2=SRC[r.src];const n=h('div',{class:'estnote'},(notes.length?notes.join(' ')+' ':'')+(s2?'Source: ':''));
-  if(s2)n.appendChild(h('a',{href:s2.url,target:s2.url.startsWith('#')?'_self':'_blank',rel:'noopener'},s2.name));R.appendChild(n)
+  if(notes.length)R.appendChild(h('div',{class:'estnote'},notes.join(' ')))
 }
 function pin(r){if(r.ow&&r.ow!==S.scaleW){S.scaleW=r.ow;if(absAll()&&$('wrap').clientWidth<772){S.pin=r;render();readout();table();return}}S.pin=r;S.hover=null;hideTip();drawFocus();readout();table();live('Pinned '+name(r)+'. Details are under the chart.')}
 function live(t){const l=$('live');if(!l)return;l.textContent='';setTimeout(()=>{l.textContent=t},40)}

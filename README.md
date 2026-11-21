@@ -1,6 +1,6 @@
 # Apple Silicon work per joule
 
-An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, Cyberpunk GPU, Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (by default the M4 Max MacBook Pro 16).
+An interactive, single-file page that compares how much computing each Apple Silicon Mac gets out of a joule taken from the wall. It covers seven workloads: CPU all cores, CPU one thread, HPL, Cyberpunk GPU, Blender CPU, Blender GPU and LLM generation. Every point carries uncertainties, and every point can be compared against a chosen baseline machine (the page opens on LLM generation with no baseline, in absolute units).
 
 **Live page:** https://tonyxtyan.github.io/Apple-Silicon-Pareto-Frontier/
 
