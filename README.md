@@ -8,9 +8,9 @@ An interactive, single-file page that compares how much computing each Apple Sil
 
 ```
 explorer/
-  template.html        page: HTML + CSS + JS; the literal /*DATA*/ is replaced by data19.json
+  template.html        page: HTML + CSS + JS; the literal /*DATA*/ is replaced by data20.json
   index.html           built page (self-contained, open it directly)
-  data19.json          final data (rows = measured, est = estimates, sources, loo, apple specs)
+  data20.json          final data (rows = measured, est = estimates, sources, loo, apple specs)
   build.py             runs the whole data chain and rebuilds index.html
   gen_data.py          -> data.json   measured rows (Cinebench, HPL, Cyberpunk, metered LLM), reusing plot/all.py rows
   model.py             -> data2.json  hierarchical ridge model in log space, leave-one-out errors, estimates, Apple power specs (from apple_power.json), power modes
@@ -35,6 +35,8 @@ explorer/
   cpubench2.py         -> data18.json Geekbench 6 and Cinebench 2026 rows for the Intel, AMD, Qualcomm and NVIDIA comparison machines (CPU Benchmark menu), from cpubench2_rows.json
   blender_arm.py       -> data19.json Blender for the Arm comparison chips: Snapdragon X Elite X1E-84-100 per-scene CPU rows; nothing for Ampere or Adreno (reasons in blender_arm_rows.json)
   blender_arm_rows.json the Open Data values read for blender_arm.py (`id` is the position used by blender_arm.py) and the `skipped` list with reasons
+  mxfill.py            -> data20.json fills empty LLM (Llama 2 7B Q4_0, tg128) and Blender cells of the comparison chips in the matrix, with power borrowed from each machine's LLM, gaming, Cinebench or HPL rows (est+pe)
+  mxfill_rows.json     the llama.cpp scoreboard/discussion runs and Open Data medians read for mxfill.py (`id` is the position used by mxfill.py), Blender 5.x version checks, and `gaps` with the reason for every cell left empty
   server_rows.json     the researched server rows for server.py (71 rows with source URLs, sockets, cores and per-source extras; `id` is the position used by server.py)
   omlx_more_rows.json  the researched rows for llm6.py (oMLX per chip and GPU-core bin medians with run URLs)
   omlx_mid_rows.json   the researched mid-size rows for llm5.py (oMLX per chip and GPU-core bin medians with run URLs, llama.cpp #15396 posts, Geerling issue #42, single readings)
@@ -52,7 +54,7 @@ plot/
 ```
 cd explorer
 pip install -r ../requirements.txt   # numpy, matplotlib, adjustText
-python3 build.py                  # regenerates data*.json and index.html (reproduces the shipped data19.json exactly)
+python3 build.py                  # regenerates data*.json and index.html (reproduces the shipped data20.json exactly)
 pip install playwright && python3 -m playwright install chromium   # or set CHROME=/path/to/chrome
 python3 tests/i9_baseline.py      # every test prints "errors []" when the page has no JS errors
 ```
