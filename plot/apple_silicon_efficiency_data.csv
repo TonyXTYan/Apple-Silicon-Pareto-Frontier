@@ -1,0 +1,65 @@
+chip,device,tier,form,benchmark,job,raw_score,wall_power_W,throughput_CB24eq_pts,work_per_joule_rel_M4mini,wpj_lo,wpj_hi
+M1,Air 13,base,fanless,R23,all-core,7409,22,512.7,0.805,0.698,0.948
+M1,Air 13,base,fanless,R23,single-thread,1496,9.06,116.7,0.458,0.218,0.498
+M2,Air 13 8c-GPU,base,fanless,R23,all-core,8667,25.3,599.7,0.819,0.745,0.893
+M2,Air 13 8c-GPU,base,fanless,R23,single-thread,1585,8.84,123.6,0.498,0.441,0.54
+M2,Air 13 10c-GPU,base,fanless,R23,all-core,8517,24.9,589.3,0.818,0.695,0.922
+M2,Air 13 10c-GPU,base,fanless,R23,single-thread,1580,9.13,123.3,0.48,0.427,0.518
+M2,MBP13,base,laptop,R23,all-core,8745,25.3,605.1,0.826,0.758,0.874
+M2,MBP13,base,laptop,R23,single-thread,1581,9.78,123.3,0.449,0.387,0.489
+M1 Pro,MBP16,Pro,laptop,R23,all-core,12370,42.7,855.9,0.693,0.586,1.153
+M1 Pro,MBP16,Pro,laptop,R23,single-thread,1534,13.9,119.7,0.306,0.192,0.33
+M2 Pro 10c,MBP14,Pro,laptop,R23,all-core,11811,47.2,817.3,0.598,0.567,0.63
+M2 Pro 10c,MBP14,Pro,laptop,R23,single-thread,1643,13.9,128.2,0.328,0.273,0.366
+M2 Pro 12c,MBP14,Pro,laptop,R23,all-core,14787,53.7,1023.2,0.658,0.577,0.703
+M2 Pro 12c,MBP14,Pro,laptop,R23,single-thread,1647,11.7,128.5,0.391,0.332,0.435
+M2 Max,MBP16,Max,laptop,R23,all-core,14767,63.5,1021.8,0.556,0.513,0.585
+M2 Max,MBP16,Max,laptop,R23,single-thread,1625,22.6,126.8,0.2,0.151,0.25
+M3,MBP14,base,laptop,R23,all-core,10454,27.9,723.4,0.896,0.822,0.948
+M3,MBP14,base,laptop,R23,single-thread,1904,10.0,148.5,0.528,0.41,0.57
+M3 Pro 11c,MBP14,Pro,laptop,R23,all-core,13315,33.8,921.3,0.942,0.865,0.991
+M3 Pro 11c,MBP14,Pro,laptop,R23,single-thread,1942,9.78,151.5,0.551,0.49,0.611
+M3 Pro 12c,MBP16,Pro,laptop,R23,all-core,15106,42.2,1045.3,0.856,0.809,0.899
+M3 Pro 12c,MBP16,Pro,laptop,R23,single-thread,1977,13.9,154.2,0.395,0.342,0.456
+M3 Max,MBP14,Max,laptop,R23,all-core,24020,78.3,1662.1,0.733,0.689,0.774
+M3 Max,MBP14,Max,laptop,R23,single-thread,1950,15.5,152.1,0.349,0.238,0.403
+M3 Max,MBP16,Max,laptop,R23,all-core,24024,78.6,1662.3,0.731,0.695,0.794
+M3 Max,MBP16,Max,laptop,R23,single-thread,1968,17.3,153.5,0.316,0.253,0.345
+M1 Max,Studio,Max,desktop,R23,all-core,12396,46.6,857.7,0.636,0.598,0.669
+M1 Max,Studio,Max,desktop,R23,single-thread,1536,18.9,119.8,0.226,0.208,0.245
+M2,mini,base,desktop,R23,all-core,8772,23.6,607.0,0.889,0.833,0.939
+M2,mini,base,desktop,R23,single-thread,1638,10.1,127.8,0.45,0.35,0.486
+M2 Max,Studio,Max,desktop,R23,all-core,14738,50.7,1019.8,0.695,0.648,0.736
+M2 Max,Studio,Max,desktop,R23,single-thread,1662,19.4,129.6,0.238,0.199,0.298
+M4 Pro 12c,mini,Pro,desktop,R23,all-core,19844,60.1,1373.1,0.789,0.672,0.832
+M4 Pro 12c,mini,Pro,desktop,R23,single-thread,2254,15.1,175.8,0.414,0.235,0.448
+M3,Air 13,base,fanless,CB24,all-core,601,21.2,601.0,1.042,0.669,1.248
+M3,Air 13,base,fanless,CB24,single-thread,141,11.1,141.0,0.467,0.37,0.498
+M4,Air 13,base,fanless,CB24,all-core,815,20.9,815.0,1.433,0.975,1.701
+M4,Air 13,base,fanless,CB24,single-thread,173,13.3,173.0,0.478,0.41,0.509
+M4,Air 15,base,fanless,CB24,all-core,874,25.9,874.0,1.24,0.863,1.427
+M4,Air 15,base,fanless,CB24,single-thread,173,12.8,173.0,0.497,0.415,0.543
+M4,MBP14,base,laptop,CB24,all-core,986,39.8,986.0,0.91,0.854,0.993
+M4,MBP14,base,laptop,CB24,single-thread,174,12.8,174.0,0.499,0.444,0.556
+M4 Pro 12c,MBP14,Pro,laptop,CB24,all-core,1435,65.7,1435.0,0.803,0.721,0.876
+M4 Pro 12c,MBP14,Pro,laptop,CB24,single-thread,176,18.4,176.0,0.351,0.176,0.385
+M4 Pro 14c,MBP14,Pro,laptop,CB24,all-core,1662,73.6,1662.0,0.83,0.699,0.889
+M4 Pro 14c,MBP14,Pro,laptop,CB24,single-thread,177,16,177.0,0.406,0.353,0.471
+M4 Pro 14c,MBP16,Pro,laptop,CB24,all-core,1729,85.8,1729.0,0.74,0.709,0.818
+M4 Pro 14c,MBP16,Pro,laptop,CB24,single-thread,178,18.7,178.0,0.35,0.319,0.374
+M4 Max,MBP16,Max,laptop,CB24,all-core,2069,92.2,2069.0,0.825,0.721,0.873
+M4 Max,MBP16,Max,laptop,CB24,single-thread,178,21.6,178.0,0.303,0.282,0.325
+M5,MBP14,base,laptop,CB24,all-core,1172,42.6,1172.0,1.011,0.816,1.087
+M5,MBP14,base,laptop,CB24,single-thread,200,15.3,200.0,0.48,0.391,0.51
+M5,Air 15,base,fanless,CB24,all-core,962,27.6,962.0,1.281,0.955,1.408
+M5,Air 15,base,fanless,CB24,single-thread,199,15.6,199.0,0.469,0.362,0.501
+M5 Pro,MBP16,Pro,laptop,CB24,all-core,2347,102,2347.0,0.845,0.698,0.991
+M5 Pro,MBP16,Pro,laptop,CB24,single-thread,201,21,201.0,0.352,0.317,0.369
+M5 Max,MBP14,Max,laptop,CB24,all-core,2073,84.1,2073.0,0.906,0.789,1.154
+M5 Max,MBP14,Max,laptop,CB24,single-thread,200,21.9,200.0,0.336,0.277,0.36
+M5 Max,MBP16,Max,laptop,CB24,all-core,2437,117.5,2437.0,0.762,0.691,0.823
+M5 Max,MBP16,Max,laptop,CB24,single-thread,201,21.5,201.0,0.344,0.294,0.391
+M4,mini,base,desktop,CB24,all-core,958,35.2,958.0,1.0,0.964,1.117
+M4,mini,base,desktop,CB24,single-thread,177,12.6,177.0,0.516,0.332,0.591
+M6,mini,base,desktop,CB24,all-core,1468,45.2,1468.0,1.193,1.143,1.278
+M6,mini,base,desktop,CB24,single-thread,221,14.5,221.0,0.56,0.461,0.588

@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    paths: ["explorer/**", "plot/**", "requirements.txt", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check index.html is up to date with template.html and the data chain
+        run: |
+          pip install -r requirements.txt
+          python3 explorer/build.py
+          git diff --exit-code explorer/index.html explorer/data7.json || { echo "::error::Run python3 explorer/build.py and commit the result"; exit 1; }
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp explorer/index.html _site/index.html
+          cp -r plot _site/plot
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
