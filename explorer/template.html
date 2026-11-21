@@ -153,6 +153,8 @@ header.top{display:flex;flex-direction:column;gap:8px}
 
 .finding{max-width:38em;font-size:15px;color:var(--ink);margin:4px 0 0;text-wrap:pretty}
 .note{color:var(--ink2);font-size:13.5px;max-width:37em}
+.prose{display:flex;flex-direction:column;gap:12px}
+@media (min-width:1000px){.prose{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0 36px;align-items:start}.prose .finding,.prose .note{max-width:none}.prose .note{margin-top:6px}}
 
 /* rail ("Display options") */
 .rail{min-width:0}
@@ -352,8 +354,10 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     </div>
   </div></details>
 
-  <p class="finding" id="finding"></p>
-  <p class="note" id="wnote"></p>
+  <div class="prose">
+    <p class="finding" id="finding"></p>
+    <p class="note" id="wnote"></p>
+  </div>
 </div>
 
 <section>
@@ -983,10 +987,12 @@ $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
 $('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;all()});
-for(const [z,,,t] of SIZES){const b=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':z,title:t+' parameters (total, so mixture-of-experts models count all experts)'},z);b.appendChild(h('small',null,t));
-  b.addEventListener('click',()=>{if(S.lsize.has(z))S.lsize.delete(z);else S.lsize.add(z);S.pin=null;all()});$('lsizew').appendChild(b)}
+{const ab=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':'all',title:'Show every size'},'All');ab.addEventListener('click',()=>{S.lsize=new Set(SIZES.map(z=>z[0]));S.pin=null;all()});$('lsizew').appendChild(ab)}
+for(const [z,,,t] of SIZES){const b=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':z,title:t+' parameters (total, so mixture-of-experts models count all experts). With every size shown, a click shows only this size; after that, clicks add or remove sizes.'},z);b.appendChild(h('small',null,t));
+  b.addEventListener('click',()=>{const allOn=S.lsize.size===SIZES.length;if(allOn)S.lsize=new Set([z]);else if(S.lsize.has(z)){S.lsize.delete(z);if(!S.lsize.size)S.lsize=new Set(SIZES.map(z=>z[0]))}else S.lsize.add(z);S.pin=null;all()});$('lsizew').appendChild(b)}
 function syncSizes(){const all7=new Set(SIZES.map(z=>z[0])),keep=S.lsize;S.lsize=all7;const n={};for(const r of visible()){const z=psize(r);if(z)n[z]=(n[z]||0)+1}S.lsize=keep;
-  document.querySelectorAll('#lsizew [data-size]').forEach(b=>{const z=b.dataset.size;b.setAttribute('aria-pressed',S.lsize.has(z));b.disabled=!n[z];b.setAttribute('aria-label',z+', '+(SIZES.find(x=>x[0]===z)[3])+', '+(n[z]||0)+' points')})}
+  const allOn=S.lsize.size===SIZES.length;document.querySelector('#lsizew [data-size=all]').setAttribute('aria-pressed',allOn);
+  document.querySelectorAll('#lsizew [data-size]:not([data-size=all])').forEach(b=>{const z=b.dataset.size;b.setAttribute('aria-pressed',S.lsize.has(z));b.disabled=!n[z];b.setAttribute('aria-label',z+', '+(SIZES.find(x=>x[0]===z)[3])+', '+(n[z]||0)+' points')})}
 $('ffit').addEventListener('change',e=>{S.ffit=e.target.value;if(!S.front){S.front=true;$('front').checked=true}render();readout()});
 $('est').addEventListener('change',e=>{S.est=e.target.checked;syncBaseSel();all()});
 $('st1').textContent=DATA.stitch.all;$('st2').textContent=DATA.stitch.one;
