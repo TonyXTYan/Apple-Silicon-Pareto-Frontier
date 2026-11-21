@@ -32,7 +32,7 @@ for s in O:
               f"No power was measured: wall power is this chip's Llama 2 7B decode-power estimate ({P:.0f} W, {b['plo']:g} to {b['phi']:g} W), widened by 10%, as for the context sweeps. "
               "A small model streams fewer bytes per token, so the GPU may draw less than with the 7B model and the efficiency here is more likely understated than overstated"
               +(", most of all for 1B on the big chips, which are limited by per-token latency rather than memory bandwidth" if '1B' in model or '0.' in model else '')+'.')
-        if gc!=want: note+=f" Only a {gc}-core GPU bin exists for this chip, while the power estimate is for the {want}-core GPU, so the power may be a little high."
+        if gc!=want: note+=f" Only a {gc}-core GPU bin exists for this chip, while the power estimate is for the {want}-core GPU, so the power may be a little {'low' if gc>want else 'high'}."
         if others: note+=' Left out: the '+', '.join(f"{v['gpu_cores']}-core GPU bin ({v['tok_s_robust']:g} tok/s, {v['n_robust']} run{'s' if v['n_robust']>1 else ''})" for v in others)+f", because this chip's power estimate is for the {want}-core GPU."
         if (setk,c) in VERSION and '3B' in model and 'Llama' in model: note+=' '+VERSION[(setk,c)]
         rows.append(dict(w='llm',chip=c,ck=c,gen=b['gen'],dev=b['dev'],tier=b['tier'],form=b['form'],model=model,set=setk,
