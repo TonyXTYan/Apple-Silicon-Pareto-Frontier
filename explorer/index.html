@@ -358,7 +358,8 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
       <div class="group" role="radiogroup" aria-labelledby="hml" style="width:100%"><span class="gl" id="hml">Hover highlights</span>
         <button type="button" class="chip seg" data-hmode="rel" role="radio" aria-checked="true">Related chips</button>
         <button type="button" class="chip seg" data-hmode="chip" role="radio" aria-checked="false">Same chip</button>
-        <button type="button" class="chip seg" data-hmode="machine" role="radio" aria-checked="false">Same chip and machine</button></div>
+        <button type="button" class="chip seg" data-hmode="machine" role="radio" aria-checked="false">Same chip and machine</button>
+        <button type="button" class="chip seg" data-hmode="bench" role="radio" aria-checked="false" title="Every point running the same benchmark: the same model on the LLM tab, the same game on Gaming, the same scene and device on Blender, the same set and library on Linear algebra sets, the same workload on All workloads">Same benchmark</button></div>
     </div>
   </div></details>
 
@@ -678,7 +679,9 @@ function defaultLabels(cls,skip){const pts=S.pts,k=G.k;const by=f=>[...pts].sort
   const bRows=tabBase(curBase());for(const p of pts)if(bRows.includes(p.r))push(p);push(order[0]);push(fast[0]);push(slow[0]);
   for(let i=0;i<pts.length;i++){if(!pts[i])break;push(order[i]);push(fast[i])}
   placeLabels(pri.filter(p=>(!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&(p.r.game||S.w==='blender'||S.w==='blas')))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60))}
-function relatives(r){if(S.hmode!=='rel'){const sameDev=q=>devName(q)===devName(r);
+const bkey=r=>(r.ow||r.w)+'|'+(vk(r)||''),bname=r=>{const w=r.ow||r.w;return S.w==='all'?'workload':w==='llm'?'model':w==='gpu'?'game':w==='bl-cpu'||w==='bl-gpu'?'scene and device':w==='blas'?'set and library':'benchmark'};
+function relatives(r){if(S.hmode==='bench'){const k=bkey(r);return {gen:S.pts.filter(p=>p.r!==r&&bkey(p.r)===k),tier:[]}}
+  if(S.hmode!=='rel'){const sameDev=q=>devName(q)===devName(r);
     const list=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&(S.hmode==='chip'||sameDev(p.r)));return {gen:list,tier:[]}}
   if(r.ow){const same=S.pts.filter(p=>p.r!==r&&p.r.ck===r.ck&&p.r.ow!==r.ow);const m=new Map();for(const p of same){const k=p.r.ow+'|'+(vk(p.r)||'');const o=m.get(k);if(!o||(o.r.est&&!p.r.est)||(devName(p.r)===devName(r)&&devName(o.r)!==devName(r)))m.set(k,p)}return {gen:[...m.values()],tier:[]}}
   const sg=[],st=[];for(const p of S.pts){const q=p.r;if(sameMachine(q,r))continue;if(q.w!==r.w||(vk(q)||'')!==(vk(r)||''))continue;
@@ -743,7 +746,7 @@ function showTip(p,mode){mode=mode||'hover';const r=p.r,w=WL[S.w],tip=$('tip');t
   tip.appendChild(h('div',{class:'v'},r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?'× baseline':' '+w.eu)));
   for(const [a,b] of detailRows(r)){const d=h('div',{class:'r'});d.appendChild(h('span',null,a));d.appendChild(h('span',null,b));tip.appendChild(d)}
   {const s0=SRC[r.src];if(s0)tip.appendChild(h('div',{class:'srcl'},(r.pe?'Speed: ':'Source: ')+s0.name))}
-  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':r.gen===0?'Solid lines: other '+r.tier+' chips.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
+  const rel=relatives(r);if(mode==='hover'&&(rel.gen.length||rel.tier.length))tip.appendChild(h('div',{class:'hint'},S.hmode==='bench'?'Lines join every other point on the same '+bname(r)+'.':S.hmode==='chip'?'Lines join every other point for the same chip, in any machine.':S.hmode==='machine'?'Lines join every other point for the same chip in the same machine.':r.ow?'Lines join the same chip on its other workloads.':r.gen===0?'Solid lines: other '+r.tier+' chips.':'Solid lines: same generation. Dashed lines: same tier in other generations.'));
   if(S.front&&S.fset&&S.fset.has(r))tip.appendChild(h('div',{class:'hint'},'On the efficiency frontier: no point shown is both faster and more efficient.'));
   tip.appendChild(h('div',{class:'hint'},mode==='touch'?'Tap empty plot space to close. Full details are under the chart.':mode==='key'?(S.pin===r?'Pinned: full details are under the chart. Esc clears.':'Enter or Space pins it. Esc clears.'):'Click to pin.'));
   tip.hidden=false;const wrap=$('wrap'),wb=wrap.getBoundingClientRect(),svg=$('chart'),sb=svg.getBoundingClientRect(),k=sb.width/svg.viewBox.baseVal.width,ox=sb.left-wb.left+wrap.scrollLeft,oy=sb.top-wb.top+wrap.scrollTop,tw=tip.offsetWidth,th=tip.offsetHeight,{m,W,H}=G;
@@ -763,7 +766,7 @@ function readout(){const R=$('readout');R.textContent='';const r=inTab(S.pin)?S.
   const relList=(title,list)=>{if(!list.length)return;const d=h('div',{class:'rel'});d.appendChild(h('span',{class:'rh'},title));
     for(const q of list){const bt=h('button',{type:'button'},shortName(q.r)+' '+(q.r.e/r.e).toFixed(2)+'×');
       bt.addEventListener('click',()=>pin(q.r));bt.addEventListener('mouseenter',()=>{S.hover=q.r;drawFocus()});bt.addEventListener('mouseleave',()=>{S.hover=null;drawFocus()});d.appendChild(bt)}R.appendChild(d)};
-  if(S.hmode!=='rel')relList(S.hmode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',rel.gen);else if(r.ow)relList('Same chip, other work:',rel.gen);else{relList(r.gen===0?'Other '+r.tier+' chips:':'Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}
+  if(S.hmode!=='rel')relList(S.hmode==='bench'?'Same '+bname(r)+':':S.hmode==='chip'?'Same chip elsewhere:':'Same chip and machine elsewhere:',rel.gen);else if(r.ow)relList('Same chip, other work:',rel.gen);else{relList(r.gen===0?'Other '+r.tier+' chips:':'Same generation:',rel.gen);relList((r.tier==='base'?'Base':r.tier)+' in other generations:',rel.tier)}
   const acts=h('div',{class:'acts'});const isB=b&&ck(b.chip)===r.ck&&(!b.dev||b.dev===devName(r));
   const bb=h('button',{type:'button',class:'btn'},isB?'This is the baseline':'Use as baseline');if(isB)bb.disabled=true;
   bb.addEventListener('click',()=>{S.base={chip:r.ck,dev:r.est&&!(r.pe&&r.game)?null:devName(r)};DER.clear();S.pin=null;S.preview=null;syncBaseSel();all()});acts.appendChild(bb);

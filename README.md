@@ -83,7 +83,7 @@ Units are chosen so that x / e = wall power in watts. That is why the constant-p
 - **Tabs and baseline:** one tab per workload plus All workloads; Blender CPU and GPU share one tab. The baseline menu switches to ratios; None gives absolute units.
 - **Blender tab:** CPU renders are dashed rings, GPU renders are filled, and a thin line joins each chip's pair. A **Scene** menu shows the three-scene sum (the default, as in the matrix) or one scene; a **Device** menu shows CPU, GPU or both. Frontiers are per device; baselines compare the same scene on the same device. Old `#bl-cpu` and `#bl-gpu` links open the tab on that device.
 - **All workloads with None:** stacked per-workload scales.
-- **Hover:** shows relatives and the exact power line. Click a point to pin it.
+- **Hover:** shows relatives and the exact power line. Click a point to pin it. Hover highlights: related chips, same chip, same chip and machine, or same benchmark (same model, game, scene and device, set and library, or workload).
 - **Chart navigation:** zoom, pan and pinch; full screen.
 - **Efficiency frontier:** straight Pareto segments with fitted ends (exponential by default; also power law, log or linear). It is drawn separately for each workload, each LLM model, each game and each Blender device.
 - **Matrix:** chip × workload, with estimates and ratio ± uncertainty.
