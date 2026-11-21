@@ -1,0 +1,218 @@
+{
+ "source": "Notebookcheck review benchmark tables (Geekbench 6.7, Geekbench 5.5) and per-review Cinebench 2026 results, read 2026-11-21, for the non-Apple review units whose Cinebench wall power is on the page. Lists hold every run Notebookcheck shows for that unit. gb55 values are kept for reference; they are used only where a unit has no Geekbench 6.7 run.",
+ "rows": [
+  {
+   "chip": "AMD Ryzen 7 8845HS",
+   "device": "Schenker VIA 14 Pro (M24)",
+   "nbc_unit": "Schenker VIA 14 Pro (M24)",
+   "source_url": "https://www.notebookcheck.net/Schenker-VIA-14-Pro-M24-review-Compact-AMD-subnotebook-now-with-Ryzen-8000-and-brighter-display.862062.0.html",
+   "gb67_multi": [
+    12940,
+    12700
+   ],
+   "gb67_single": [
+    2612,
+    2555
+   ],
+   "gb55_multi": 11754,
+   "gb55_single": 1965,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit, Performance profile (54 W), which the review used for all benchmarks. Notebookcheck lists two Geekbench 6.7 runs of this unit; both are kept."
+  },
+  {
+   "chip": "AMD Ryzen AI 9 HX 370",
+   "device": "Asus ProArt P16 (RTX 5090 Laptop)",
+   "nbc_unit": "Asus ProArt P16 H7606WI",
+   "source_url": "https://www.notebookcheck.net/Analysis-of-the-Apple-M5-SoC-Apple-silicon-extends-its-lead-over-AMD-Intel-and-Qualcomm.1144213.0.html",
+   "gb67_multi": [
+    15221
+   ],
+   "gb67_single": [
+    2857
+   ],
+   "gb55_multi": null,
+   "gb55_single": null,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "The ProArt P16 H7606WI that Notebookcheck used for its Strix Point CPU analysis (the source of this machine's Cinebench 2024 wall power; Cinebench 2024 1,213 / 116 match). Its Geekbench 6.7 scores are listed in the M5 SoC analysis, linked to that unit. Not the later RTX 5090 ProArt P16 (15,567 / 2,919), which is a different unit."
+  },
+  {
+   "chip": "AMD Ryzen AI 9 HX 370",
+   "device": "Asus Zenbook S 16 UM5606",
+   "nbc_unit": "Asus Zenbook S 16 UM5606-RK333W",
+   "source_url": "https://www.notebookcheck.net/Asus-Zenbook-S-16-laptop-review-The-first-Copilot-laptop-with-AMD-Zen-5-inside-a-1-3-cm-thick-case.868219.0.html",
+   "gb67_multi": [
+    13648
+   ],
+   "gb67_single": [
+    2785
+   ],
+   "gb55_multi": 12487,
+   "gb55_single": 2078,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit (Cinebench 2024 921 / 113.6 match the page)."
+  },
+  {
+   "chip": "AMD Ryzen AI Max+ 395",
+   "device": "Asus ROG Flow Z13 (2025)",
+   "nbc_unit": "Asus ROG Flow Z13 GZ302EA-RU073W",
+   "source_url": "https://www.notebookcheck.net/Asus-ROG-Flow-Z13-GZ302EA-Convertible-Review-AMD-s-Strix-Halo-GPU-is-neck-and-neck-with-the-RTX-4070-Laptop.963266.0.html",
+   "gb67_multi": [
+    21269
+   ],
+   "gb67_single": [
+    2978
+   ],
+   "gb55_multi": 22023,
+   "gb55_single": 2275,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit (Cinebench 2024 1,648 / 116.8 match the page)."
+  },
+  {
+   "chip": "AMD Ryzen AI Max+ 395",
+   "device": "Framework Desktop",
+   "nbc_unit": "Framework Desktop Ryzen AI Max",
+   "source_url": "https://www.notebookcheck.net/Framework-Desktop-review-Mini-PC-wrapped-in-a-mini-ITX-body.1115803.0.html",
+   "gb67_multi": [
+    17464
+   ],
+   "gb67_single": [
+    2965
+   ],
+   "gb55_multi": 16632,
+   "gb55_single": 2194,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit. The page has only all-core wall power for it, so the single-core score is not used."
+  },
+  {
+   "chip": "Intel Core Ultra 7 155H",
+   "device": "Schenker XMG Evo 15 (M24)",
+   "nbc_unit": "Schenker XMG Evo 15 (M24)",
+   "source_url": "https://www.notebookcheck.net/Schenker-XMG-Evo-15-M24-laptop-review-German-Ultrabook-with-bright-display-and-excellent-maintenance-options.870555.0.html",
+   "gb67_multi": [
+    12343
+   ],
+   "gb67_single": [
+    2473
+   ],
+   "gb55_multi": 11579,
+   "gb55_single": 1819,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit."
+  },
+  {
+   "chip": "Intel Core Ultra 7 258V",
+   "device": "Asus Zenbook S 14 UX5406",
+   "nbc_unit": "Asus Zenbook S 14 UX5406",
+   "source_url": "https://www.notebookcheck.net/Asus-Zenbook-S-14-UX5406-laptop-review-Excellent-everyday-laptop-with-Intel-Lunar-Lake.892978.0.html",
+   "gb67_multi": [
+    10730
+   ],
+   "gb67_single": [
+    2679
+   ],
+   "gb55_multi": null,
+   "gb55_single": null,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit (Cinebench 2024 497 / 120 match the page)."
+  },
+  {
+   "chip": "Intel Core Ultra 9 275HX",
+   "device": "Schenker XMG Neo 16 E25",
+   "nbc_unit": "Schenker XMG Neo 16 E25 RTX 5090 Laptop",
+   "source_url": "https://www.notebookcheck.net/The-fastest-gaming-laptop-is-now-even-better-thanks-to-300-Hz-mini-LED-XMG-Neo-16-E25-RTX-5090-laptop-review.1016705.0.html",
+   "gb67_multi": [
+    20890
+   ],
+   "gb67_single": [
+    3109
+   ],
+   "gb55_multi": 25599,
+   "gb55_single": 2264,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit (Cinebench 2024 2,254 / 138.2 match the page). Notebookcheck also lists the same laptop with the Oasis liquid cooler (21,156 / 3,160); that configuration is not used."
+  },
+  {
+   "chip": "Intel Core Ultra X7 358H",
+   "device": "Minisforum M2 Pro mini PC",
+   "nbc_unit": "Minisforum M2 Pro",
+   "source_url": "https://www.notebookcheck.net/Minisforum-M2-Pro-mini-PC-review-Plenty-of-performance-a-fair-price-and-a-well-rounded-package.1398885.0.html",
+   "gb67_multi": [
+    16338
+   ],
+   "gb67_single": [
+    2848
+   ],
+   "gb55_multi": 16305,
+   "gb55_single": 2098,
+   "cb26_multi": 4406,
+   "cb26_single": 506,
+   "notes": "Review unit, Balanced (default) mode, PL2/PL1 65/45 W, the mode of the page's Cinebench 2024 row (1,093 multi-core in Balanced; 1,222 in Manual 80/80). Cinebench 2026 is the review's Balanced result (4,406 / 506)."
+  },
+  {
+   "chip": "NVIDIA N1X (RTX Spark)",
+   "device": "Asus ProArt P16 H7607 (RTX Spark)",
+   "nbc_unit": "Asus ProArt P16 H7607",
+   "source_url": "https://www.notebookcheck.net/Asus-ProArt-P16-RTX-Spark-Laptop-Review-The-future-of-multimedia-laptops.1422366.0.html",
+   "gb67_multi": [
+    20296
+   ],
+   "gb67_single": [
+    3092
+   ],
+   "gb55_multi": null,
+   "gb55_single": null,
+   "cb26_multi": 7187,
+   "cb26_single": 551,
+   "notes": "Review unit (Cinebench 2024 1,726 / 130 match the page)."
+  },
+  {
+   "chip": "NVIDIA N1X (RTX Spark)",
+   "device": "Microsoft Surface Laptop Ultra (2026)",
+   "nbc_unit": "Microsoft Surface Laptop Ultra 2026",
+   "source_url": "https://www.notebookcheck.net/Microsoft-Surface-Laptop-Ultra-RTX-Spark-Review-The-2000-nits-Mini-LED-panel-is-a-problem.1426103.0.html",
+   "gb67_multi": [
+    20031
+   ],
+   "gb67_single": [
+    3096
+   ],
+   "gb55_multi": null,
+   "gb55_single": null,
+   "cb26_multi": 6877,
+   "cb26_single": 549,
+   "notes": "Review unit (Cinebench 2024 1,682 / 131 match the page)."
+  },
+  {
+   "chip": "Qualcomm Snapdragon X Elite X1E-84-100",
+   "device": "Samsung Galaxy Book4 Edge 16",
+   "nbc_unit": "Samsung Galaxy Book4 Edge 16 X1E-84-100",
+   "source_url": "https://www.notebookcheck.net/Samsung-Galaxy-Book4-Edge-16-laptop-review-The-fastest-Snapdragon-X-Elite-challenges-AMD-s-Zen-5.882507.0.html",
+   "gb67_multi": [
+    15665
+   ],
+   "gb67_single": [
+    2834
+   ],
+   "gb55_multi": null,
+   "gb55_single": null,
+   "cb26_multi": null,
+   "cb26_single": null,
+   "notes": "Review unit (Cinebench 2024 866 / 127 match the page)."
+  }
+ ],
+ "skipped": [
+  {
+   "chip": "Intel i9-9880H",
+   "device": "MacBook Pro 16 (2019)",
+   "reason": "The 2019 review (and its i9-9880H data) has no Geekbench or Cinebench 2026 results; Geekbench 5.5 and 6 postdate it, and no other Notebookcheck review of this machine with that chip was found. Its single-thread power on the page is itself an assumption, not a wall reading."
+  }
+ ]
+}

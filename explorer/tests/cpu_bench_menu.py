@@ -19,7 +19,7 @@ async def main():
             if not await pg.is_visible('#lbmw'): errs.append(tab+': benchmark menu hidden')
             n0=await pg.evaluate("S.pts.length")
             if await pg.evaluate("S.pts.some(p=>p.r.bm)"): errs.append(tab+': Cinebench 2024 view shows another benchmark')
-            for bm,n in (('Geekbench 6',32),('Cinebench 2026',5),('Cinebench 2024',n0)):
+            for bm,n in (('Geekbench 6',{'cpu-all':44,'cpu-one':43}[tab]),('Cinebench 2026',8),('Cinebench 2024',n0)):   # 32 Macs + 12/11 comparison machines; 5 Macs + 3
                 await pg.select_option('#lbm',bm); await pg.select_option('#base','M4|Mac mini' if bm!='Cinebench 2026' else 'M5 Max|MacBook Pro 16'); await pg.wait_for_timeout(250)
                 r=await pg.evaluate("""()=>({n:S.pts.length,bms:[...new Set(S.pts.map(p=>p.r.bm||'Cinebench 2024'))],pe:S.pts.every(p=>!p.r.bm||(p.r.pe&&p.r.plo&&/No wall power was published/.test(p.r.note))),
                   hollow:S.pts.filter(p=>p.r.bm&&p.r.resc).every(p=>p.g.querySelector('.mk.hollow')),nres:S.pts.filter(p=>p.r.bm&&p.r.resc).length,

@@ -13,7 +13,9 @@ async def main():
         pg=await b.new_page(viewport={'width':1360,'height':1100}); errs=[]
         pg.on('pageerror',lambda e:errs.append(str(e)))
         await pg.goto(INDEX); await pg.wait_for_timeout(400)
-        n1=await pg.evaluate(f"ALL.filter(r=>r.chip==='{N1}').map(r=>[r.w,r.tier,r.form,r.gen,!!r.pe,r.q])"); print('N1X rows',n1)
+        n1=await pg.evaluate(f"ALL.filter(r=>r.chip==='{N1}'&&!r.bm).map(r=>[r.w,r.tier,r.form,r.gen,!!r.pe,r.q])"); print('N1X rows',n1)
+        nb=await pg.evaluate(f"ALL.filter(r=>r.chip==='{N1}'&&r.bm).map(r=>r.w+' '+r.bm).sort()"); print('N1X Benchmark-menu rows',nb)   # cpubench2.py: Geekbench 6 and Cinebench 2026, two laptops x two CPU tabs
+        if nb!=sorted([w+' '+bm for w in ('cpu-all','cpu-one') for bm in ('Cinebench 2026','Geekbench 6') for _ in (0,1)]): errs.append('N1X Benchmark-menu rows wrong')
         if sorted(r[0] for r in n1)!=['cpu-all','cpu-all','cpu-one','cpu-one','gpu','gpu','llm'] or any(r[1]!='NVIDIA' or r[2]!='laptop' or r[3]!=0 for r in n1): errs.append('N1X rows wrong')
         if not await pg.evaluate("ALL.some(r=>r.chip==='NVIDIA GB10'&&r.model==='Llama 3.3 70B'&&!r.est&&r.p===156)"): errs.append('GB10 Llama 3.3 70B row missing')
         sp=await pg.evaluate("ALL.filter(r=>r.dev==='NVIDIA DGX Spark').map(r=>[r.model,r.p,r.plo,r.phi,!!r.pe])"); print('DGX Spark',sp)
