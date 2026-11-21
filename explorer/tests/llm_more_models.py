@@ -21,7 +21,7 @@ async def main():
         await pg.goto(INDEX); await pg.wait_for_timeout(400); await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         if await pg.evaluate("S.w")!='llm': errs.append('default tab is not LLM')
         names=list(MODELS)
-        if await pg.evaluate("names=>S.pts.some(p=>names.includes(p.r.model))",names): errs.append('new oMLX sets leaked into the every-model view')
+        if not await pg.evaluate("names=>names.every(n=>S.pts.some(p=>p.r.model===n))",names): errs.append('every-model view should include every new oMLX model')
         r=await pg.evaluate("""names=>{const o=ALL.filter(r=>r.w==='llm'&&names.includes(r.model));
           const ll={};for(const r of ALL)if(r.w==='llm'&&r.model==='Llama 2 7B Q4_0'&&r.src==='llamacpp')ll[r.chip]=r.p;
           const by={};for(const r of o)(by[r.model]=by[r.model]||[]).push(r);

@@ -1,4 +1,5 @@
-"""With the frontier drawn, every benchmark/model group of two or more points gets a frontier line and (on wide screens) a name,
+"""With the frontier drawn, every benchmark/model group of two or more points gets a frontier line and (on wide screens) a name
+(the left column holds as many as fit, the rest go beside their own frontier where there is room),
 names never overlap each other, and hovering a name highlights its own frontier."""
 import asyncio, os, pathlib
 HERE=pathlib.Path(__file__).resolve().parent
@@ -7,9 +8,9 @@ CHROME=os.environ.get('CHROME','/usr/bin/google-chrome')
 from playwright.async_api import async_playwright
 CHECK="""()=>{const g=new Map();for(const p of S.pts){if(!S.fest&&(p.r.est||p.r.pe))continue;const k=(p.r.ow||p.r.w)+'|'+String(vk(p.r)||'').replace(' (oMLX)','');g.set(k,(g.get(k)||0)+1)}
   const want=[...g].filter(x=>x[1]>=2).map(x=>x[0]),lines=new Set([...document.querySelectorAll('#chart path.front')].map(p=>p.dataset.fk)),
-  labs=[...document.querySelectorAll('#chart .flab')],bx=labs.map(t=>t.getBBox());let ov=0;
+  labs=[...document.querySelectorAll('#chart .flab')],bx=labs.map(t=>t.getBBox());let ov=0,out=0;for(const a of bx)if(a.y<G.m.t-2||a.y+a.height>G.H-G.m.b+2)out++;
   for(let i=0;i<bx.length;i++)for(let j=i+1;j<bx.length;j++){const a=bx[i],b=bx[j];if(a.x<b.x+b.width-1&&b.x<a.x+a.width-1&&a.y<b.y+b.height-2&&b.y<a.y+a.height-2)ov++}
-  return {want:want.length,missingLines:want.filter(k=>!lines.has(k)),labels:labs.length,overlaps:ov,sw:document.documentElement.scrollWidth}}"""
+  return {out,want:want.length,missingLines:want.filter(k=>!lines.has(k)),labels:labs.length,overlaps:ov,sw:document.documentElement.scrollWidth}}"""
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path=CHROME if os.path.exists(CHROME) else None,args=['--no-sandbox']); errs=[]
@@ -19,7 +20,8 @@ async def main():
             r=await pg.evaluate(CHECK); print(vw,r)
             if r['missingLines']: errs.append(f'{vw} missing lines {r["missingLines"][:3]}')
             if r['overlaps']: errs.append(f'{vw} {r["overlaps"]} overlapping names')
-            if vw>700 and r['labels']<r['want']: errs.append(f'{vw} only {r["labels"]} names for {r["want"]} frontiers')
+            if vw>700 and r['labels']<min(r['want'],40): errs.append(f'{vw} only {r["labels"]} names for {r["want"]} frontiers')
+            if r['out']: errs.append(f'{vw} {r["out"]} names outside the plot')
             if vw<700 and r['sw']>vw: errs.append(f'overflow {r["sw"]}')
             if vw>700:
                 await pg.locator('#chart .flab').first.hover(); await pg.wait_for_timeout(250)

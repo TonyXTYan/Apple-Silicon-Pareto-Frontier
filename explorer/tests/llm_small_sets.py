@@ -12,7 +12,7 @@ async def main():
         pg.on('pageerror',lambda e:errs.append(str(e)))
         await pg.goto(INDEX); await pg.wait_for_timeout(400); await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         if await pg.evaluate("S.w")!='llm': errs.append('default tab is not LLM')
-        if await pg.evaluate("S.pts.some(p=>p.r.set==='omlxq')"): errs.append('Qwen oMLX sets leaked into the every-model view')
+        if not await pg.evaluate("S.pts.some(p=>p.r.set==='omlxq')"): errs.append('every-model view should include the small oMLX sets')
         await pg.select_option('#base','M4|Mac mini')
         for v,n in (('Llama 3.2 3B 4-bit (oMLX)',18),('Llama 3.2 1B 4-bit (oMLX)',17),('set:omlxq',208)):
             await pg.select_option('#lmod',v); await pg.wait_for_timeout(250)

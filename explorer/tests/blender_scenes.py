@@ -12,7 +12,7 @@ async def main():
         await pg.goto(INDEX+'#blender'); await pg.wait_for_timeout(500)
         await pg.select_option('#base','M4 Max|')
         for sc in ['','monster','junkshop','classroom']:
-            await pg.select_option('#lscene',sc); await pg.wait_for_timeout(250)
+            await pg.select_option('#lscene',sc); await pg.wait_for_timeout(1000)  # let the filter animation finish
             r=await pg.evaluate("""()=>({n:S.pts.length,scenes:[...new Set(S.pts.map(p=>p.r.scene||''))],ws:[...new Set(S.pts.map(p=>p.r.w))].sort(),
               lines:document.querySelectorAll('#chart .pairl').length,weak:S.pts.filter(p=>weak(p.r)).length,rings:document.querySelectorAll('#chart .flag').length,
               bad:S.pts.filter(p=>{const v=relOf(p.r);return !v||v.b.w!==p.r.w||(v.b.scene||'')!==(p.r.scene||'')}).length,base:document.querySelectorAll('#chart .baseline-ring').length})""")

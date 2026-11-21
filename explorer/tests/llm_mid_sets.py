@@ -13,7 +13,7 @@ async def main():
         pg.on('pageerror',lambda e:errs.append(str(e)))
         await pg.goto(INDEX); await pg.wait_for_timeout(400); await pg.evaluate("document.querySelector('.tab[data-w=\"llm\"]').click()"); await pg.wait_for_timeout(200)
         if await pg.evaluate("S.w")!='llm': errs.append('default tab is not LLM')
-        if await pg.evaluate("S.pts.some(p=>p.r.set==='omlxl')"): errs.append('other mid-size oMLX sets leaked into the every-model view')
+        if not await pg.evaluate("S.pts.some(p=>p.r.set==='omlxl')"): errs.append('every-model view should include the mid-size oMLX sets')
         if not await pg.evaluate("S.pts.some(p=>p.r.set==='omlx'&&p.r.model==='gpt-oss 20B (oMLX)')"): errs.append('oMLX gpt-oss 20B missing from the every-model view')
         m=await pg.evaluate("""ALL.filter(r=>r.w==='llm'&&!r.est&&(r.src==='geer_ai42'||r.src==='archy')).map(r=>[r.chip,r.model,r.p,r.q])""")
         print('metered',m)

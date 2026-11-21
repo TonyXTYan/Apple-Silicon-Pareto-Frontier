@@ -65,7 +65,7 @@ async def main():
         if 'system-level' not in await pg.evaluate("document.getElementById('legend').textContent"): errs.append('legend lacks the system-level entry')
         # SPECpower: server-only Benchmark entry, rendered points, server baseline, restored on the way out
         await pg.click('.tab[data-w="cpu-all"]'); await pg.wait_for_timeout(250)
-        await pg.select_option('#lbm',SPEC); await pg.wait_for_timeout(300)
+        await pg.select_option('#lbm',SPEC); await pg.wait_for_timeout(1000)  # let the filter animation finish
         r=await pg.evaluate("""()=>({n:S.pts.length,bms:[...new Set(S.pts.map(p=>p.r.bm))],forms:[...new Set(S.pts.map(p=>p.r.form))],meas:S.pts.every(p=>!p.r.est&&p.r.q==='A'),
           drawn:document.querySelectorAll('#chart g.m .mk').length,b:JSON.stringify(S.base),tb:tabBase(curBase()).map(r=>r.dev),k:G.k,x:WL[S.w].x,eu:WL[S.w].eu,
           bad:S.pts.filter(p=>{const v=relOf(p.r);return !v||v.b.bm!==p.r.bm}).length,ring:document.querySelectorAll('#chart .baseline-ring').length,

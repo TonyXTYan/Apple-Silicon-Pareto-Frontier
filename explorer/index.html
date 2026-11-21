@@ -110,7 +110,13 @@ header.top{display:flex;flex-direction:column;gap:8px}
 .zhint .tch{display:none}
 @media (max-width:560px){.zhint .ptr{display:none}}
 @media (hover:none) and (pointer:coarse){.zhint .ptr{display:none}.zhint .tch{display:inline}}
-.ztools{display:flex;gap:4px;flex:none}
+.ztools{display:flex;gap:4px;flex:none;align-items:center}
+.pvsw{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;line-height:1;min-height:28px;padding:4px 9px 4px 5px;margin-right:4px;border:0;background:none;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.pvsw:disabled{opacity:.45;cursor:default}
+.pvtrack{position:relative;width:30px;height:17px;border-radius:9px;background:var(--rule);transition:background .2s;flex:none}
+.pvknob{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
+.pvsw[aria-checked="true"] .pvtrack{background:var(--focus,#2a6fdb)}.pvsw[aria-checked="true"] .pvknob{transform:translateX(13px)}
+.pvsw:focus-visible{outline:2px solid var(--focus,#2a6fdb);outline-offset:2px;border-radius:6px}
 .zb{font-size:12.5px;line-height:1;min-height:28px;min-width:30px;padding:5px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--field);color:var(--ink2);cursor:pointer}
 .zb:hover:not(:disabled){color:var(--ink);border-color:var(--ink3)} .zb:disabled{opacity:.45;cursor:default}
 #chart{display:block;width:100%;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:crosshair;border-radius:4px}
@@ -127,7 +133,8 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .axis{stroke:var(--rule);stroke-width:1}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
-#chart.pvanim .trails,#chart.pvanim #under,#chart.pvanim .front,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim #labels,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .fring,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
+#chart .afade{animation:pvfade .9s ease both}
+#chart.pvanim .trails,#chart.pvanim #under,#chart.pvanim .front,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .fring,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
 @keyframes pvfade{0%,45%{opacity:0}}
 #chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
 #chart .flab{pointer-events:auto;cursor:default}
@@ -378,7 +385,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     <div class="chartwrap" id="wrap" aria-label="Chart">
       <div class="ctop">
         <p class="zhint"><span class="ptr">Scroll to zoom, drag to pan, arrow keys step through points</span><span class="tch">Tap a point for details; once zoomed, drag sideways to pan</span></p>
-        <div class="ztools" role="group" aria-label="Chart view"><button type="button" class="zb" id="pvb" aria-pressed="false" title="Switch between work per joule against speed (this page's default) and speed against wall power (the chart Apple usually shows: up and to the left is better). Points slide between the two.">Speed vs power</button><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
+        <div class="ztools" role="group" aria-label="Chart view"><button type="button" class="pvsw" id="pvb" role="switch" aria-checked="false" title="Switch between work per joule against speed (this page's default) and speed against wall power (the chart Apple usually shows: up and to the left is better). Points slide between the two."><span class="pvtrack" aria-hidden="true"><span class="pvknob"></span></span>Speed vs power</button><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
       </div>
       <svg id="chart" tabindex="0" role="application" aria-roledescription="scatter plot" aria-labelledby="charttitle" aria-describedby="charthelp"><title id="charttitle"></title></svg>
       <div class="tip" id="tip" hidden></div>
@@ -587,7 +594,7 @@ const SIZES=[['XS',0,2,'under 2B'],['S',2,5,'2–5B'],['M',5,12,'5–12B'],['L',
 function pcount(r){const m=/(\d+(?:\.\d+)?)\s*([BT])\b/.exec(r.model||'');return m?+m[1]*(m[2]==='T'?1000:1):null}
 function psize(r){const b=pcount(r);if(b==null)return null;const z=SIZES.find(z=>b>=z[1]&&b<z[2]);return z?z[0]:null}
 function sizeOK(r){if(S.w!=='llm')return true;const z=psize(r);return !z||S.lsize.has(z)}
-function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||(!S.lmod?r.set!=='omlxq'&&r.set!=='omlxl':S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('model:')?String(r.model||'').replace(' (oMLX)','')===S.lmod.slice(6)&&r.set!=='cluster':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):(r.model===S.lmod||S.lmod.endsWith(' (oMLX)')&&r.model===S.lmod.slice(0,-7))&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='gpu'||!S.lgame||r.game===S.lgame)&&(!isCpu(S.w)||(r.bm||CB24)===S.lbm)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&(!S.ldev||r.w===S.ldev)))&&(S.w!=='hpl'||!S.lset||(S.lset==='hpl'?r.w==='hpl':r.set===S.lset)))}
+function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||(!S.lmod?true:S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('model:')?String(r.model||'').replace(' (oMLX)','')===S.lmod.slice(6)&&r.set!=='cluster':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):(r.model===S.lmod||S.lmod.endsWith(' (oMLX)')&&r.model===S.lmod.slice(0,-7))&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='gpu'||!S.lgame||r.game===S.lgame)&&(!isCpu(S.w)||(r.bm||CB24)===S.lbm)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&(!S.ldev||r.w===S.ldev)))&&(S.w!=='hpl'||!S.lset||(S.lset==='hpl'?r.w==='hpl':r.set===S.lset)))}
 function curBase(){return S.preview||S.base}
 // baseline value for workload w (and LLM model)
 function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S.est:allowEst;let c=ALL.filter(r=>r.w===w&&r.ck===ck(b.chip)&&!r.ex&&!r.mode&&(!r.est||ae||r.pe));
@@ -634,7 +641,31 @@ function frontFit(P,type){if(P.length<2)return null;const n=P.length,L=Math.log;
   if(type==='log')return {mul:false,g:x=>a+b*L(x),label:`Frontier fit: y = ${f2(a)}${sg(b)}·ln x`};
   if(type==='lin')return {mul:false,g:x=>a+b*x,label:`Frontier fit: y = ${f2(a)}${sg(b)}·x`};
   return {mul:true,g:x=>Math.exp(a)*Math.pow(x,b),label:`Frontier fit: work per joule ∝ x^${f2(b)}, so power ∝ x^${f2(1-b)}`}}
+/* animated redraw for filter changes and the axes switch: kept points (and their labels) slide to their new places as the
+   axes rescale, new points fade in, removed points fade out while sliding to where the new axes would put them */
+function animRender(){S.anim=true;render();readout()}
+function snapChart(){const svg=$('chart');return {pos:new Map((S.pts||[]).map(p=>[p.r,[p.px,p.py]])),g:new Map((S.pts||[]).filter(p=>p.g).map(p=>[p.r,p.g])),
+  labs:[...svg.querySelectorAll('#labels text')].filter(t=>t._r)}}
+function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const ghost=el('g',{class:'aghost'});svg.insertBefore(ghost,lab);
+  const np=new Map(S.pts.map(p=>[p.r,p])),{X,Y,PV,kr}=G,where=r=>{const x=X(PV?r.p:r.x),y=Y(PV?r.x:r.e*(kr?kr(r):1));return isFinite(x)&&isFinite(y)?[x,y]:null};
+  const ins=[],outs=[];
+  for(const p of S.pts){const o=A.pos.get(p.r);if(o)ins.push([p.g,o[0]-p.px,o[1]-p.py]);else p.g.classList.add('afade')}
+  for(const [r,g] of A.g){if(np.has(r))continue;const o=A.pos.get(r),n=where(r);g.classList.remove('dim');ghost.appendChild(g);outs.push([g,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
+  /* a label on a point that stays slides with it; labels that appear fade in, labels that go fade out on their way */
+  const had=new Set(A.labs.map(t=>t._r)),has=new Set();
+  for(const t of lab.querySelectorAll('text')){const o=t._r&&A.pos.get(t._r),p=t._r&&np.get(t._r);if(t._r)has.add(t._r);if(o&&p)ins.push([t,o[0]-p.px,o[1]-p.py]);if(!t._r||!had.has(t._r))t.classList.add('afade')}
+  for(const t of A.labs){if(has.has(t._r))continue;const o=A.pos.get(t._r),p=np.get(t._r),n=p?[p.px,p.py]:where(t._r);ghost.appendChild(t);outs.push([t,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
+  for(const [e,dx,dy] of ins){e.style.transition='none';e.style.transform=`translate(${dx}px,${dy}px)`}
+  for(const [e] of outs){e.style.transition='none';e.style.transform='';e.style.opacity=1}
+  svg.classList.add('pvanim');void svg.getBoundingClientRect();
+  requestAnimationFrame(()=>{const tr='transform .75s cubic-bezier(.4,0,.2,1),opacity .5s ease';
+    for(const [e] of ins){e.style.transition=tr;e.style.transform=''}
+    for(const [e,dx,dy] of outs){e.style.transition=tr;e.style.transform=`translate(${dx}px,${dy}px)`;e.style.opacity=0}
+    clearTimeout(S.animT);S.animT=setTimeout(()=>{ghost.remove();svg.classList.remove('pvanim');for(const [e] of ins){e.style.transition='';e.style.transform=''}
+      svg.querySelectorAll('.afade').forEach(e=>e.classList.remove('afade'))},900)})}
 function render(){
+  const A=S.anim&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&S.pts&&S.pts.length?snapChart():null;S.anim=false;
+  {const og=$('chart').querySelector('.aghost');if(og)og.remove()}
   const w=WL[S.w], kg=perGame(), rows=visible().filter(r=>!kg||kg[r.game]), ax=axisRel(), svg=$('chart');baseTitle();
   while(svg.childNodes.length>1)svg.removeChild(svg.lastChild);
   $('charttitle').textContent=w.tab+(S.pv==='pow'&&!absAll()&&!w.combined?': speed against wall power for ':': work per joule against throughput for ')+rows.length+' machines'+(rows.length?'. Highest work per joule: '+name(rows.reduce((a,b)=>b.e>a.e?b:a))+'.':'');
@@ -644,7 +675,7 @@ function render(){
   if(!rows.length){$('empty').textContent='No machines match these filters. Turn a chip tier or machine type back on.';return}
   const AB=absAll(),AW0=AB?WS5.filter(k=>rows.some(r=>r.ow===k)):[],AW=AB&&(!S.allScales||W-(24+AW0.length*(W<560?46:62))<520)?[AW0.includes(S.scaleHover)?S.scaleHover:AW0.includes(S.scaleW)?S.scaleW:AW0[0]].filter(Boolean):AW0,colW=W<560?46:62,rowH=17;
   svg.classList.toggle('nar',W<560);
-  const PV=S.pv==='pow'&&!AB&&!w.combined;svg.classList.toggle('pv',PV);{const b=$('pvb');if(b){b.disabled=AB||!!w.combined;b.setAttribute('aria-pressed',PV);b.textContent=PV?'Work per joule vs speed':'Speed vs power'}}
+  const PV=S.pv==='pow'&&!AB&&!w.combined;svg.classList.toggle('pv',PV);{const b=$('pvb');if(b){b.disabled=AB||!!w.combined;b.setAttribute('aria-checked',PV)}}
   const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=PV?1:ax?ax.k:1, kr=r=>PV?1:kg?kg[r.game]:k, narrow=narrow0;
   /* PV: power on x, speed on y (top left is better); otherwise speed on x, work per joule on y */
   const FX=r=>PV?r.p:r.x, FY=r=>PV?r.x:r.e*kr(r), FXl=r=>PV?(r.plo||r.p):(r.xlo||r.x), FXh=r=>PV?(r.phi||r.p):(r.xhi||r.x), FYl=r=>PV?(r.xlo||r.x):(r.elo?r.elo*kr(r):FY(r)), FYh=r=>PV?(r.xhi||r.x):(r.ehi?r.ehi*kr(r):FY(r));
@@ -719,7 +750,9 @@ function render(){
       const mk=q=>{const t=el('text',{x:q.x,y:q.y,'text-anchor':q.an,class:'isot flab','data-fk':q.k,style:'fill:var(--ink);font-size:'+fs+'px;font-style:italic;font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},q.lab);fg.appendChild(t);return t};
       const bx=t=>{const b=t.getBBox();return[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]};
       const NMAX=narrow0?8:99,keep=new Set(FL.filter(q=>q.lab).sort((a,b)=>b.n-a.n).slice(0,NMAX));   /* phones: every line, but names only for the 8 biggest groups */
-      const L=FL.filter(q=>keep.has(q)&&q.an==='start'&&q.x<m.l+10).sort((a,b)=>a.y-b.y),R=FL.filter(q=>keep.has(q)&&!L.includes(q)).sort((a,b)=>b.n-a.n);
+      const L0=FL.filter(q=>keep.has(q)&&q.an==='start'&&q.x<m.l+10),cap=Math.max(1,Math.floor((H-m.b-4-m.t-LH)/LH)+1);
+      /* the left column holds as many names as fit, biggest groups first; the rest go beside their own frontier if there is room */
+      const L=[...L0].sort((a,b)=>b.n-a.n).slice(0,cap).sort((a,b)=>a.y-b.y),R=FL.filter(q=>keep.has(q)&&!L.includes(q)).map(q=>L0.includes(q)&&q.p0?{...q,x:q.p0.px-12,y:q.p0.py+4,an:'end',fx:q.p0,spare:1}:q).sort((a,b)=>b.n-a.n);
       if(L.length){const top=m.t+LH,bot=H-m.b-4,ys=L.map(q=>Math.min(bot,Math.max(top,q.y)));
         for(let i=1;i<ys.length;i++)ys[i]=Math.max(ys[i],ys[i-1]+LH);           /* push down to clear the one above */
         if(ys[ys.length-1]>bot){ys[ys.length-1]=bot;for(let i=ys.length-2;i>=0;i--)ys[i]=Math.min(ys[i],ys[i+1]-LH)}   /* then up from the bottom */
@@ -730,8 +763,8 @@ function render(){
           const inside=b=>b[0]>=m.l&&b[2]<=W-m.r&&b[1]>=m.t&&b[3]<=H-m.b;let ok=null,first=null;
           for(const [x,y,an] of cand){t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor',an);const b=bx(t);if(inside(b)&&!first)first=[x,y,an,b];
             if(inside(b)&&!used.some(o=>hit(o,b))&&!pb.some(o=>hit(o,b))){ok=b;break}}
-          if(!ok&&first){t.setAttribute('x',first[0]);t.setAttribute('y',first[1]);t.setAttribute('text-anchor',first[2]);ok=first[3]}
-          if(ok)used.push(ok)}catch(_){}}
+          if(!ok&&first&&!q.spare){t.setAttribute('x',first[0]);t.setAttribute('y',first[1]);t.setAttribute('text-anchor',first[2]);ok=first[3]}
+          if(ok)used.push(ok);else t.remove()}catch(_){}}
       for(const t of fg.querySelectorAll('.flab')){const on=v=>{fg.classList.toggle('fhov',v);for(const e of fg.querySelectorAll('[data-fk]'))e.classList.toggle('fon',v&&e.dataset.fk===t.dataset.fk)};
         t.addEventListener('mouseenter',()=>on(true));t.addEventListener('mouseleave',()=>on(false))}}}
   {const tg=el('g',{'clip-path':'url(#cp)',class:'trails'});svg.insertBefore(tg,under);const tr=new Map();for(const p of pts)if(p.r.grp){const key=p.r.grp;if(!tr.has(key))tr.set(key,[]);tr.get(key).push(p)}
@@ -750,7 +783,7 @@ function render(){
   const bRows=tabBase(curBase());let bps=pts.filter(p=>bRows.includes(p.r));if(w.combined&&1>x0&&1<x1&&1>y0&&1<y1)bps=[{px:X(1),py:Y(1)}];
   for(const bp of bps)gm.appendChild(el('circle',{cx:bp.px,cy:bp.py,r:13,class:'baseline-ring'}));
   svg.appendChild(el('g',{id:'labels'}));svg.appendChild(el('g',{id:'over'}));
-  drawFocus();
+  drawFocus();if(A)runAnim(A);
 }
 function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
   const bb=e=>{try{const b=e.getBBox();return b.width?[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]:null}catch(_){return null}};
@@ -759,14 +792,14 @@ function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;con
     for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
       const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
       if(bx[0]<m.l+2||bx[2]>W-m.r+8||bx[1]<m.t-6||bx[3]>H-m.b-2)continue;if(boxes.some(b=>hit(b,bx)))continue;
-      boxes.push(bx);lg.appendChild(el('text',{x:cx,y:cy,'text-anchor':an,class:'lbl '+(cls||'')},t));n++;p._lab=1;break}
+      boxes.push(bx);{const te=el('text',{x:cx,y:cy,'text-anchor':an,class:'lbl '+(cls||'')},t);te._r=p.r;lg.appendChild(te)}n++;p._lab=1;break}
     if(p===force&&!p._lab){/* no free spot: take the in-bounds spot that covers the fewest neighbours, and keep other labels off it */
       let best=null;for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
         const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
         if(bx[0]<m.l+2||bx[2]>W-m.r+8||bx[1]<m.t-6||bx[3]>H-m.b-2)continue;const c=boxes.filter(b=>hit(b,bx)).length;if(!best||c<best.c)best={cx,cy,an,bx,c}}
       if(!best){/* too long for any spot beside the point: slide it inside the plot, above the point or below near the top */
         const x0=Math.max(m.l+2,Math.min(W-m.r-tw,p.px-tw/2)),cy=p.py-12-11<m.t-6?p.py+20:p.py-12;best={cx:x0,cy,an:'start',bx:[x0,cy-11,x0+tw,cy+3]}}
-      boxes.push(best.bx);lg.appendChild(el('text',{x:best.cx,y:best.cy,'text-anchor':best.an,class:'lbl front '+(cls||'')},t));n++}
+      boxes.push(best.bx);{const te=el('text',{x:best.cx,y:best.cy,'text-anchor':best.an,class:'lbl front '+(cls||'')},t);te._r=p.r;lg.appendChild(te)}n++}
     delete p._lab}}
 function defaultLabels(cls,skip){const pts=S.pts,k=G.k;const by=f=>[...pts].sort(f);
   const order=by((a,b)=>b.r.e-a.r.e),fast=by((a,b)=>b.r.x-a.r.x),slow=by((a,b)=>a.r.e-b.r.e);const pri=[];const push=p=>{if(p&&!pri.includes(p))pri.push(p)};
@@ -977,7 +1010,7 @@ function baseTitle(){const s=$('base'),o=s.options[s.selectedIndex],w=WL[S.w],x=
   const br=S.base&&tabBase(S.base).find(r=>visible().includes(r))||S.base&&tabBase(S.base)[0],rel=!!S.base&&(w.combined||!!perGame()||(!w.absAxis&&!!br));
   $('basel').textContent=rel?'Relative to':'Baseline';x.hidden=!S.base||rel;if(x.hidden)return;
   x.textContent=!br?(S.w==='llm'&&tsub()?'no reading in this model set':isCpu(S.w)&&S.lbm!==CB24?'no reading in this benchmark':'no reading on this workload')+'; axes in absolute units':!visible().includes(br)?(S.w==='llm'&&S.lmod?'not in this model set':S.w==='gpu'&&S.lgame?'not in this game':isCpu(S.w)&&S.lbm!==CB24?'not in this benchmark':S.w==='blender'&&S.ldev?'not on this device':S.w==='hpl'?'not in this set':'hidden by the current filters')+'; axes in absolute units':'ringed on the plot; these axes stay in absolute units'}
-$('base').addEventListener('change',e=>{const v=e.target.value;S.userBase=true;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;all()});
+$('base').addEventListener('change',e=>{const v=e.target.value;S.userBase=true;if(!v)S.base=null;else{const [c,d]=v.split('|');S.base={chip:c,dev:d||null}}S.preview=null;S.anim=true;all()});
 
 /* ---------- matrix ---------- */
 const MWS=['cpu-all','cpu-one','hpl','bl-cpu','gpu','bl-gpu','llm'];let MROWS=[];
@@ -1188,8 +1221,8 @@ for(const k in WL){if(WL[k].notab)continue;const b=h('button',{class:'tab',role:
   b.addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tab')],i=ts.indexOf(b);const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i-1+ts.length)%ts.length:e.key==='Home'?0:e.key==='End'?ts.length-1:null;if(j==null)return;e.preventDefault();ts[j].focus();ts[j].click()});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
   b.addEventListener('click',()=>{S.w=k;autoBase();S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
 function syncOpts(id,set,all){const box=$(id);box.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',set.has(b.dataset.opt)));const sa=box.querySelector('.showall');if(sa)sa.classList.toggle('on',set.size<all.length)}
-function soloToggle(set,all,v,id){if(set.size===all.length){set.clear();set.add(v)}else if(set.has(v)){set.delete(v);if(!set.size)all.forEach(x=>set.add(x))}else set.add(v);syncOpts(id,set,all);hideTip();render();table();legend()}
-function addShowAll(id,set,all){const b=h('button',{type:'button',class:'showall'},'Show all');b.addEventListener('click',()=>{all.forEach(x=>set.add(x));syncOpts(id,set,all);hideTip();render();table();legend();const f=$(id).querySelector('[data-opt]');if(f)f.focus()});$(id).querySelector('.gl').appendChild(b);syncOpts(id,set,all)}
+function soloToggle(set,all,v,id){if(set.size===all.length){set.clear();set.add(v)}else if(set.has(v)){set.delete(v);if(!set.size)all.forEach(x=>set.add(x))}else set.add(v);syncOpts(id,set,all);hideTip();S.anim=true;render();table();legend()}
+function addShowAll(id,set,all){const b=h('button',{type:'button',class:'showall'},'Show all');b.addEventListener('click',()=>{all.forEach(x=>set.add(x));syncOpts(id,set,all);hideTip();S.anim=true;render();table();legend();const f=$(id).querySelector('[data-opt]');if(f)f.focus()});$(id).querySelector('.gl').appendChild(b);syncOpts(id,set,all)}
 function optHL(b,k,v){const on=()=>{S.hl={k,v};drawFocus()},off=()=>{if(S.hl&&S.hl.v===v){S.hl=null;drawFocus()}};b.addEventListener('mouseenter',on);b.addEventListener('focus',on);b.addEventListener('mouseleave',off);b.addEventListener('blur',off)}
 for(const t of TIERS){const b=h('button',{class:'chip',type:'button','aria-pressed':'true'});b.appendChild(glyph('laptop',t,'solid'));b.appendChild(document.createTextNode(t==='base'?'Base':t));
   b.dataset.opt=t;b.addEventListener('click',()=>soloToggle(S.tiers,TIERS,t,'tiers'));optHL(b,'tier',t);$('tiers').appendChild(b)}
@@ -1201,28 +1234,23 @@ document.querySelectorAll('[data-hmode]').forEach(b=>b.addEventListener('click',
 $('err').addEventListener('change',e=>{S.err=e.target.checked;render();looPlot()});
 $('flg').addEventListener('change',e=>{S.flg=e.target.checked;all()});
 $('front').addEventListener('change',e=>{S.front=e.target.checked;render();readout()});
-$('pvb').addEventListener('click',()=>{const old=new Map((S.pts||[]).map(p=>[p.r,[p.px,p.py]]));S.pv=S.pv==='pow'?'eff':'pow';S.zoom=null;render();readout();
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const svg=$('chart');
-  for(const p of S.pts){const o=old.get(p.r);if(!o||!p.g)continue;p.g.style.transition='none';p.g.style.transform=`translate(${o[0]-p.px}px,${o[1]-p.py}px)`}
-  svg.classList.add('pvanim');void svg.getBoundingClientRect();
-  requestAnimationFrame(()=>{for(const p of S.pts){if(!p.g)continue;p.g.style.transition='transform .75s cubic-bezier(.4,0,.2,1)';p.g.style.transform=''}
-    setTimeout(()=>{svg.classList.remove('pvanim');for(const p of S.pts)if(p.g){p.g.style.transition='';p.g.style.transform=''}},900)})});
-$('fest').addEventListener('change',e=>{S.fest=e.target.checked;if(!S.front){S.front=true;$('front').checked=true}render();readout()});
+$('pvb').addEventListener('click',()=>{S.pv=S.pv==='pow'?'eff':'pow';S.zoom=null;animRender()});
+$('fest').addEventListener('change',e=>{S.fest=e.target.checked;if(!S.front){S.front=true;$('front').checked=true}S.anim=true;render();readout()});
 {/* every model on its own, grouped by size, so no model hides inside a collection */
   const sel=$('lmod'),col=document.createElement('optgroup');col.label='Collections';[...sel.options].forEach(o=>col.appendChild(o));sel.appendChild(col);
   const by=new Map();for(const r of ALL){if(r.w!=='llm'||!r.model||r.set==='cluster')continue;const m=r.model.replace(' (oMLX)','');if(!by.has(m))by.set(m,new Set());by.get(m).add(r.ck)}
   for(const [z,,,t] of SIZES){const ms=[...by.keys()].filter(m=>psize({model:m})===z).sort((a,b)=>pcount({model:a})-pcount({model:b})||a.localeCompare(b));if(!ms.length)continue;
     const g=document.createElement('optgroup');g.label='One model, '+z+' ('+t+')';for(const m of ms){const n=by.get(m).size;const o=document.createElement('option');o.value='model:'+m;o.textContent=m+' ('+n+(n===1?' chip)':' chips)');g.appendChild(o)}sel.appendChild(g)}
   sel.value=S.lmod||''}
-$('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;all()});
-$('lgame').addEventListener('change',e=>{S.lgame=e.target.value;S.pin=null;all()});
-$('lbm').addEventListener('change',e=>{S.lbm=e.target.value;S.pin=null;all()});
-$('lscene').addEventListener('change',e=>{S.lscene=e.target.value;S.pin=null;all()});
-$('ldev').addEventListener('change',e=>{S.ldev=e.target.value;S.pin=null;all()});
-$('lset').addEventListener('change',e=>{S.lset=e.target.value;S.pin=null;all()});
+$('lmod').addEventListener('change',e=>{S.lmod=e.target.value;S.pin=null;S.anim=true;all()});
+$('lgame').addEventListener('change',e=>{S.lgame=e.target.value;S.pin=null;S.anim=true;all()});
+$('lbm').addEventListener('change',e=>{S.lbm=e.target.value;S.pin=null;S.anim=true;all()});
+$('lscene').addEventListener('change',e=>{S.lscene=e.target.value;S.pin=null;S.anim=true;all()});
+$('ldev').addEventListener('change',e=>{S.ldev=e.target.value;S.pin=null;S.anim=true;all()});
+$('lset').addEventListener('change',e=>{S.lset=e.target.value;S.pin=null;S.anim=true;all()});
 {const ab=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':'all',title:'Show every size'},'All');ab.addEventListener('click',()=>{S.lsize=new Set(SIZES.map(z=>z[0]));S.pin=null;all()});$('lsizew').appendChild(ab)}
 for(const [z,,,t] of SIZES){const b=h('button',{type:'button',class:'chip','aria-pressed':'true','data-size':z,title:t+' parameters (total, so mixture-of-experts models count all experts). With every size shown, a click shows only this size; after that, clicks add or remove sizes.'},z);b.appendChild(h('small',null,t));
-  b.addEventListener('click',()=>{const allOn=S.lsize.size===SIZES.length;if(allOn)S.lsize=new Set([z]);else if(S.lsize.has(z)){S.lsize.delete(z);if(!S.lsize.size)S.lsize=new Set(SIZES.map(z=>z[0]))}else S.lsize.add(z);S.pin=null;all()});$('lsizew').appendChild(b)}
+  b.addEventListener('click',()=>{const allOn=S.lsize.size===SIZES.length;if(allOn)S.lsize=new Set([z]);else if(S.lsize.has(z)){S.lsize.delete(z);if(!S.lsize.size)S.lsize=new Set(SIZES.map(z=>z[0]))}else S.lsize.add(z);S.pin=null;S.anim=true;all()});$('lsizew').appendChild(b)}
 function syncSizes(){const all7=new Set(SIZES.map(z=>z[0])),keep=S.lsize;S.lsize=all7;const n={};for(const r of visible()){const z=psize(r);if(z)n[z]=(n[z]||0)+1}S.lsize=keep;
   const allOn=S.lsize.size===SIZES.length;document.querySelector('#lsizew [data-size=all]').setAttribute('aria-pressed',allOn);
   document.querySelectorAll('#lsizew [data-size]:not([data-size=all])').forEach(b=>{const z=b.dataset.size;b.setAttribute('aria-pressed',S.lsize.has(z));b.disabled=!n[z];b.setAttribute('aria-label',z+', '+(SIZES.find(x=>x[0]===z)[3])+', '+(n[z]||0)+' points')})}
