@@ -163,8 +163,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
 #chart .afade{animation:pvfade .9s ease both}
-#chart.pvanim.ykeep .ytk,#chart.pvanim.ykeep .yt,#chart.pvanim.xkeep .tk:not(.ytk),#chart.pvanim.xkeep .axt:not(.yt){animation:none}
-#chart.pvanim.xkeep .tk.afade:not(.ytk),#chart.pvanim.ykeep .ytk.afade,#chart.pvanim .tk.afade{animation:pvfade .9s ease both}
+#chart.pvanim.tkjs .tk,#chart.pvanim.tkjs .grid,#chart.pvanim.ykeep .yt,#chart.pvanim.xkeep .axt:not(.yt){animation:none}   /* ticks are moved by the frame loop; titles fade only when the unit changes */
 #chart.pvanim .trails,#chart.pvanim .ftail,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
 @keyframes pvfade{0%,45%{opacity:0}}
 #chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
@@ -715,23 +714,27 @@ function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const gh
   const had=new Set(A.labs.map(t=>t._r)),has=new Set();
   for(const t of lab.querySelectorAll('text')){const o=t._r&&oldOf(t._r),p=t._r&&np.get(t._r),src=t._r&&(A.pos.has(t._r)?t._r:alias.get(t._r));if(src)has.add(src);if(o&&p&&!focus)ins.push([t,o[0]-p.px,o[1]-p.py]);if(!src||!had.has(src))t.classList.add('afade')}
   for(const t of A.labs){if(has.has(t._r))continue;const o=A.pos.get(t._r),p=np.get(t._r),n=p?[p.px,p.py]:where(t._r);ghost.appendChild(t);outs.push([t,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
-  /* axis ticks: when an axis keeps its title (same unit), its ticks and grid lines slide with the rescale; old ones fade out on the way */
-  const nax=axSnap(),oa=A.ax,slide={x:!!(oa&&nax&&oa.xt===nax.xt),y:!!(oa&&nax&&oa.yt===nax.yt)};
-  if(oa&&nax){const Xo=v=>oa.m.l+Math.log(v/oa.x0)/Math.log(oa.x1/oa.x0)*(oa.W-oa.m.l-oa.m.r),Yo=v=>oa.H-oa.m.b-Math.log(v/oa.y0)/Math.log(oa.y1/oa.y0)*(oa.H-oa.m.t-oa.m.b);
-    const Xn=v=>X(v),Yn=v=>Y(v),gax=svg.querySelector('g');
-    for(const [axn,nl,ol,P,Q] of [['x',nax.xs,oa.xs,Xo,Xn],['y',nax.ys,oa.ys,Yo,Yn]]){if(!slide[axn])continue;
-      for(const [e,v] of nl){const d=P(v)-Q(v);ins.push([e,axn==='x'?d:0,axn==='y'?d:0]);if(v<(axn==='x'?oa.x0:oa.y0)*0.999||v>(axn==='x'?oa.x1:oa.y1)*1.001)e.classList.add('afade')}
-      for(const [e,v] of ol){const d=Q(v)-P(v);if(!isFinite(d))continue;gax.appendChild(e);e.classList.add('aold');outs.push([e,axn==='x'?d:0,axn==='y'?d:0])}}}
+  /* axis ticks roll: each axis's range is interpolated (geometrically) from the old view to the new one, and every tick and grid line,
+     old and new, rides that moving scale; old ones fade out, new ones fade in (a tick the old view already had stays solid when the unit is unchanged) */
+  const nax=axSnap(),oa=A.ax,same={x:!!(oa&&nax&&oa.xt===nax.xt),y:!!(oa&&nax&&oa.yt===nax.yt)},axi=[];
+  if(oa&&nax){const gax=svg.querySelector('g');
+    for(const [axn,nl,ol] of [['x',nax.xs,oa.xs],['y',nax.ys,oa.ys]]){const isX=axn==='x',lo0=isX?oa.x0:oa.y0,hi0=isX?oa.x1:oa.y1,lo1=isX?nax.x0:nax.y0,hi1=isX?nax.x1:nax.y1;
+      const P=(v,e)=>{const a=lo0*Math.pow(lo1/lo0,e),b=hi0*Math.pow(hi1/hi0,e),f=Math.log(v/a)/Math.log(b/a);return isX?nax.m.l+f*(nax.W-nax.m.l-nax.m.r):nax.H-nax.m.b-f*(nax.H-nax.m.t-nax.m.b)};
+      const fin=v=>isX?X(v):Y(v),lim=isX?[nax.m.l-1,nax.W-nax.m.r+1]:[nax.m.t-1,nax.H-nax.m.b+1];
+      for(const [e,v] of nl){const keep=same[axn]&&v>=lo0*0.999&&v<=hi0*1.001;axi.push({e,v,isX,P,base:fin(v),fade:keep?0:1,lim})}
+      for(const [e,v] of ol){if(!isFinite(v))continue;gax.appendChild(e);e.classList.add('aold');axi.push({e,v,isX,P,base:+(isX?(e.getAttribute('x1')||e.getAttribute('x')):(e.getAttribute('y1')||(+e.getAttribute('y')-4))),fade:-1,lim})}}}
+  const axStep=e=>{for(const a of axi){const p=a.P(a.v,e),d=p-a.base;a.e.style.transform=e>=1&&a.fade>=0?'':a.isX?`translate(${d}px,0)`:`translate(0,${d}px)`;
+    const inside=p>=a.lim[0]&&p<=a.lim[1];a.e.style.opacity=!inside?0:a.fade<0?Math.max(0,1-e*1.6):a.fade?Math.min(1,e*1.6):''}};
   const polys=[...svg.querySelectorAll('path.front')].filter(e=>e._pts);
   const pos=(k,fn)=>{for(const [e,dx,dy] of ins)e.style.transform=k?`translate(${dx*k}px,${dy*k}px)`:'';
     for(const pa of polys)pa.setAttribute('d','M'+pa._pts.map(p=>{const o=off.get(p)||[0,0];return (p.px+o[0]*k).toFixed(1)+','+(p.py+o[1]*k).toFixed(1)}).join('L'));
     if(focus){const keep=S.pts.map(p=>[p.px,p.py]);for(const p of S.pts){const o=off.get(p);p.px+=o[0]*k;p.py+=o[1]*k}try{drawFocus()}finally{S.pts.forEach((p,i)=>{p.px=keep[i][0];p.py=keep[i][1]})}}};
-  if(S.animRun)cancelAnimationFrame(S.animRun);svg.classList.add('pvanim');svg.classList.toggle('xkeep',slide.x);svg.classList.toggle('ykeep',slide.y);pos(1);
+  if(S.animRun)cancelAnimationFrame(S.animRun);svg.classList.add('pvanim');svg.classList.add('tkjs');svg.classList.toggle('xkeep',same.x);svg.classList.toggle('ykeep',same.y);pos(1);axStep(0);
   const t0=performance.now(),D=750,ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-  const step=now=>{if(!svg.contains(ghost))return;const t=Math.min(1,(now-t0)/D),e=ease(t);pos(1-e);
+  const step=now=>{if(!svg.contains(ghost))return;const t=Math.min(1,(now-t0)/D),e=ease(t);pos(1-e);axStep(e);
     for(const [g,dx,dy] of outs){g.style.transform=`translate(${dx*e}px,${dy*e}px)`;g.style.opacity=Math.max(0,1-t*1.6)}
     if(t<1){S.animRun=requestAnimationFrame(step);return}
-    S.animRun=0;ghost.remove();svg.querySelectorAll('.aold').forEach(x=>x.remove());svg.classList.remove('pvanim','xkeep','ykeep');pos(0);svg.querySelectorAll('.afade').forEach(x=>x.classList.remove('afade'));if(focus)drawFocus()};
+    S.animRun=0;ghost.remove();svg.querySelectorAll('.aold').forEach(x=>x.remove());svg.classList.remove('pvanim','xkeep','ykeep','tkjs');pos(0);svg.querySelectorAll('.afade').forEach(x=>x.classList.remove('afade'));for(const a of axi){a.e.style.transform='';a.e.style.opacity=''}if(focus)drawFocus()};
   S.animRun=requestAnimationFrame(step)}
 /* 'pts/J' -> 'J/pt': the unit of energy per unit of work */
 const invU=u=>{const m=/^(.*)\/J$/.exec(String(u||''));if(!m)return 'J per unit';const w={pts:'pt',samples:'sample',frames:'frame'}[m[1]]||m[1];return 'J/'+w};
