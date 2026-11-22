@@ -5,6 +5,6 @@ The site at https://tonyxtyan.github.io/Apple-Silicon-Pareto-Frontier/ is `explo
 ## After any change to the page or data
 
 1. Edit `explorer/template.html` (or the data scripts), never `explorer/index.html` directly.
-2. `pip install -r requirements.txt`, then `python3 explorer/build.py`. CI (`explorer/check_build.py`) fails if `index.html` is stale or the data chain no longer reproduces the final data file (`data22.json`).
+2. `pip install -r requirements.txt`, then `python3 explorer/build.py`. CI (`explorer/check_build.py`) fails if `index.html` is stale or the data chain no longer reproduces the final data file (`data23.json`).
 3. Run the smoke tests in `explorer/tests/` (each prints `errors []`).
 4. Commit and push.
