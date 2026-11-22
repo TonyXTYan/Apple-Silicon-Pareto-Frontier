@@ -167,6 +167,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 @keyframes pvfade{0%,45%{opacity:0}}
 #chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
 #chart .flab{pointer-events:auto;cursor:default}
+#chart path.front:not(.ftail){pointer-events:stroke}
 #chart .fhov .front,#chart .fhov .flab,#chart .fhov .fleader{opacity:.12;transition:opacity .15s}
 #chart .fhov .fon{opacity:1!important}
 #chart .fhov path.fon{stroke-width:2.4}
@@ -788,7 +789,7 @@ function render(){
       else{/* faster and more efficient: walk down the x axis keeping each point higher than all to its right, then put them in x order */
         const by=[...g].sort((a,b)=>FX(b.r)-FX(a.r)||FY(b.r)-FY(a.r));for(const p of by){if(FY(p.r)>best*1.0000001){f.push(p);best=FY(p.r)}}f.reverse()}for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
-      {const pl=el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op});pl._pts=f;fg.appendChild(pl)}
+      {const pl=el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op});pl._pts=f;if(grp.size>1)pl.appendChild(el('title',{},glab(f[0].r)+' frontier'));fg.appendChild(pl)}
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
         const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:a.py-5,an:'start',p0:a});fg.appendChild(el('path',{d:'M'+X(PV?x1:x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),...fk,class:'front ftail',style:op}));
         if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+(PV?' point is both fastest and lowest-power':' point is both fastest and most efficient')+', so the frontier is its corner'));continue}
