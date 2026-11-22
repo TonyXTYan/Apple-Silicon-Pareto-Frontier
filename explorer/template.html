@@ -163,7 +163,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
 #chart .afade{animation:pvfade .9s ease both}
-#chart.pvanim.tkjs .tk,#chart.pvanim.tkjs .grid,#chart.pvanim.ykeep .yt,#chart.pvanim.xkeep .axt:not(.yt){animation:none}   /* ticks are moved by the frame loop; titles fade only when the unit changes */
+#chart.pvanim.dlm .iso,#chart.pvanim.tkjs .tk,#chart.pvanim.tkjs .grid,#chart.pvanim.ykeep .yt,#chart.pvanim.xkeep .axt:not(.yt){animation:none}   /* ticks are moved by the frame loop; titles fade only when the unit changes */
 #chart.pvanim .trails,#chart.pvanim .ftail,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
 @keyframes pvfade{0%,45%{opacity:0}}
 #chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
@@ -696,7 +696,7 @@ function axSnap(){const svg=$('chart'),{x0,x1,y0,y1,m,W,H}=G;if(!m)return null;c
   const xs=[],ys=[];for(const e of svg.querySelectorAll('line.grid')){const a=+e.getAttribute('x1'),b=+e.getAttribute('x2');if(Math.abs(a-b)<.01)xs.push([e,ix(a)]);else ys.push([e,iy(+e.getAttribute('y1'))])}
   for(const e of svg.querySelectorAll('text.tk')){if(e.closest('g.scale'))continue;if(e.classList.contains('ytk'))ys.push([e,iy(+e.getAttribute('y')-4)]);else xs.push([e,ix(+e.getAttribute('x'))])}
   return {x0,x1,y0,y1,m,W,H,xt:(svg.querySelector('.axt:not(.yt)')||{}).textContent||'',yt:(svg.querySelector('.axt.yt')||{}).textContent||'',xs,ys}}
-function snapChart(){const svg=$('chart');return {ax:axSnap(),ya:G.y0+'|'+G.y1+'|'+((svg.querySelector('.axt.yt')||{}).textContent||''),pos:new Map((S.pts||[]).map(p=>[p.r,[p.px,p.py]])),g:new Map((S.pts||[]).filter(p=>p.g).map(p=>[p.r,p.g])),
+function snapChart(){const svg=$('chart');return {vm:G.m?{X:G.X,Y:G.Y,k:G.k,PV:G.PV,SW:G.SW}:null,dl:[...svg.querySelectorAll('line.iso,line.grid')].filter(e=>e._dp),ax:axSnap(),ya:G.y0+'|'+G.y1+'|'+((svg.querySelector('.axt.yt')||{}).textContent||''),pos:new Map((S.pts||[]).map(p=>[p.r,[p.px,p.py]])),g:new Map((S.pts||[]).filter(p=>p.g).map(p=>[p.r,p.g])),
   labs:[...svg.querySelectorAll('#labels text')].filter(t=>t._r)}}
 function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const ghost=el('g',{class:'aghost'});svg.insertBefore(ghost,lab);
   /* one frame loop moves everything together: points, their labels, frontier lines (redrawn through the moving points),
@@ -724,6 +724,18 @@ function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const gh
   /* axis ticks roll: each axis's range is interpolated (geometrically) from the old view to the new one, and every tick and grid line,
      old and new, rides that moving scale; old ones fade out, new ones fade in (a tick the old view already had stays solid when the unit is unchanged) */
   const nax=axSnap(),oa=A.ax,same={x:!!(oa&&nax&&oa.xt===nax.xt),y:!!(oa&&nax&&oa.yt===nax.yt)},axi=[];
+  /* guide lines and x grid lines between the two speed-up views: each is a line of equal power or equal energy per unit of work, so it is carried
+     into the other view by its data endpoints (a vertical grid line in one view becomes a diagonal guide in the other) */
+  const ov=A.vm,nv={X:G.X,Y:G.Y,k:G.k,PV:G.PV,SW:G.SW},dlines=[];
+  if(ov&&(ov.PV||ov.SW)&&(nv.PV||nv.SW)&&(ov.PV!==nv.PV)){
+    const scr=(v,[s2,jw])=>v.PV?[v.X(s2*jw),v.Y(s2)]:[v.X(jw/v.k),v.Y(s2)],ok=a=>a.every(isFinite);
+    const lg=el('g',{'clip-path':'url(#cp)'});ghost.appendChild(lg);
+    for(const e of svg.querySelectorAll('line.iso,line.grid'))if(e._dp){const a=scr(ov,e._dp[0]),b=scr(ov,e._dp[1]);const to=[+e.getAttribute('x1'),+e.getAttribute('y1'),+e.getAttribute('x2'),+e.getAttribute('y2')];
+      if(ok(a)&&ok(b)){e.setAttribute('clip-path','url(#cp)');dlines.push({e,from:[a[0],a[1],b[0],b[1]],to,o:''})}}
+    for(const e of A.dl){const a=scr(nv,e._dp[0]),b=scr(nv,e._dp[1]);const from=[+e.getAttribute('x1'),+e.getAttribute('y1'),+e.getAttribute('x2'),+e.getAttribute('y2')];
+      if(ok(a)&&ok(b)){lg.appendChild(e);dlines.push({e,from,to:[a[0],a[1],b[0],b[1]],o:'out'})}}
+    if(nax)nax.xs=nax.xs.filter(([e])=>!e._dp);if(oa)oa.xs=oa.xs.filter(([e])=>!e._dp)}
+  const dlStep=e=>{for(const d of dlines){const q=d.from.map((v,i)=>v+(d.to[i]-v)*e);d.e.setAttribute('x1',q[0]);d.e.setAttribute('y1',q[1]);d.e.setAttribute('x2',q[2]);d.e.setAttribute('y2',q[3]);if(d.o)d.e.style.opacity=Math.max(0,1-e*1.4)}};
   if(oa&&nax){const gax=svg.querySelector('g');
     for(const [axn,nl,ol] of [['x',nax.xs,oa.xs],['y',nax.ys,oa.ys]]){const isX=axn==='x',lo0=isX?oa.x0:oa.y0,hi0=isX?oa.x1:oa.y1,lo1=isX?nax.x0:nax.y0,hi1=isX?nax.x1:nax.y1;
       const P=(v,e)=>{const a=lo0*Math.pow(lo1/lo0,e),b=hi0*Math.pow(hi1/hi0,e),f=Math.log(v/a)/Math.log(b/a);return isX?nax.m.l+f*(nax.W-nax.m.l-nax.m.r):nax.H-nax.m.b-f*(nax.H-nax.m.t-nax.m.b)};
@@ -736,12 +748,12 @@ function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const gh
   const pos=(k,fn)=>{for(const [e,dx,dy] of ins)e.style.transform=k?`translate(${dx*k}px,${dy*k}px)`:'';
     for(const pa of polys)pa.setAttribute('d','M'+pa._pts.map(p=>{const o=off.get(p)||[0,0];return (p.px+o[0]*k).toFixed(1)+','+(p.py+o[1]*k).toFixed(1)}).join('L'));
     if(focus){const keep=S.pts.map(p=>[p.px,p.py]);for(const p of S.pts){const o=off.get(p);p.px+=o[0]*k;p.py+=o[1]*k}try{drawFocus()}finally{S.pts.forEach((p,i)=>{p.px=keep[i][0];p.py=keep[i][1]})}}};
-  if(S.animRun)cancelAnimationFrame(S.animRun);svg.classList.add('pvanim');svg.classList.add('tkjs');svg.classList.toggle('xkeep',same.x);svg.classList.toggle('ykeep',same.y);pos(1);axStep(0);
+  if(S.animRun)cancelAnimationFrame(S.animRun);svg.classList.add('pvanim');svg.classList.add('tkjs');svg.classList.toggle('xkeep',same.x);svg.classList.toggle('ykeep',same.y);svg.classList.toggle('dlm',dlines.length>0);pos(1);axStep(0);dlStep(0);
   const t0=performance.now(),D=750,ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-  const step=now=>{if(!svg.contains(ghost))return;const t=Math.min(1,(now-t0)/D),e=ease(t);pos(1-e);axStep(e);
+  const step=now=>{if(!svg.contains(ghost))return;const t=Math.min(1,(now-t0)/D),e=ease(t);pos(1-e);axStep(e);dlStep(e);
     for(const [g,dx,dy] of outs){g.style.transform=`translate(${dx*e}px,${dy*e}px)`;g.style.opacity=Math.max(0,1-t*1.6)}
     if(t<1){S.animRun=requestAnimationFrame(step);return}
-    S.animRun=0;ghost.remove();svg.querySelectorAll('.aold').forEach(x=>x.remove());svg.classList.remove('pvanim','xkeep','ykeep','tkjs');pos(0);svg.querySelectorAll('.afade').forEach(x=>x.classList.remove('afade'));for(const a of axi){a.e.style.transform='';a.e.style.opacity=''}if(focus)drawFocus()};
+    S.animRun=0;ghost.remove();svg.querySelectorAll('.aold').forEach(x=>x.remove());svg.classList.remove('pvanim','xkeep','ykeep','tkjs','dlm');pos(0);svg.querySelectorAll('.afade').forEach(x=>x.classList.remove('afade'));for(const a of axi){a.e.style.transform='';a.e.style.opacity=''}if(focus)drawFocus()};
   S.animRun=requestAnimationFrame(step)}
 /* 'pts/J' -> 'J/pt': the unit of energy per unit of work */
 const invU=u=>{const m=/^(.*)\/J$/.exec(String(u||''));if(!m)return 'J per unit';const w={pts:'pt',samples:'sample',frames:'frame'}[m[1]]||m[1];return 'J/'+w};
@@ -785,7 +797,7 @@ function render(){
       if(AW.length===AW0.length){mini(g,k2,cx-14,m.t-40);g.appendChild(el('text',{x:cx,y:m.t-22,'text-anchor':'end',style:'font-size:10.5px'},wl.hs||wl.short));g.appendChild(el('text',{x:cx,y:m.t-9,'text-anchor':'end',style:'font-size:10.5px'},wl.eu))}});
 }
   else{
-  let lastR=-1e9;for(const t of ticks(x0,x1)){g.appendChild(el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'}));lastR=xTick(g,X(t),H-m.b+16,fmtT(t)+(w.combined||(SW&&(ax||kg))?'×':''),lastR)}
+  let lastR=-1e9;for(const t of ticks(x0,x1)){{const gl=el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'});if(SW)gl._dp=[[y1,t*k],[y0,t*k]];else if(PV)gl._dp=[[y1,t/y1],[y0,t/y0]];g.appendChild(gl)}lastR=xTick(g,X(t),H-m.b+16,fmtT(t)+(w.combined||(SW&&(ax||kg))?'×':''),lastR)}
   for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end',class:'tk ytk'},fmtT(t)+(!PV&&!SW&&(ax||kg||w.combined)?'×':'')))}}
   g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axis'}));g.appendChild(el('line',{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:'axis'}));
   const bN=w.combined?(()=>{const b=curBase()||DEFBASE;return b.chip+(b.dev?' '+b.dev:'')})():'';
@@ -804,16 +816,18 @@ function render(){
    const yt=el('text',{x:15,y:cy,'text-anchor':'middle',class:'axt yt',transform:`rotate(-90 15 ${cy})`});g.appendChild(yt);fitT(yt,yc,2*Math.min(cy,H-cy)-8)}
   const clip=el('clipPath',{id:'cp'});clip.appendChild(el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b}));svg.appendChild(clip);
   const iso=el('g',{'clip-path':'url(#cp)'});svg.appendChild(iso);
-  const pmin=PV?y0/x1:SW?y0*x0*k:x0/(y1/k), pmax=PV?y1/x0:SW?y1*x1*k:x1/(y0/k);let pw=[];   /* PV: lines of equal work per joule (speed = e × power); otherwise equal power */
+  const pmin=PV?x0/y1:SW?y0*x0*k:x0/(y1/k), pmax=PV?x1/y0:SW?y1*x1*k:x1/(y0/k);let pw=[];   /* PV: nice values of J per unit of work */   /* PV: lines of equal work per joule (speed = e × power); otherwise equal power */
   for(let p=Math.floor(Math.log10(pmin));p<=Math.ceil(Math.log10(pmax));p++)for(const s of [1,2,5]){const v=s*Math.pow(10,p);if(v>pmin*1.15&&v<pmax/1.15)pw.push(v)}
   if(pw.length>6)pw=pw.filter((_,i)=>i%2===0);
-  if(!kg||PV)for(const P of pw){const c=PV?P:null,f=SW?x=>P/(k*x):c?x=>x*c:x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
+  if(!kg||PV)for(const P of pw){const c=PV?1/P:null,f=SW?x=>P/(k*x):c?x=>x*c:x=>x/P*k;{const ln=el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'});
+      /* data endpoints (speed, J per unit of work) so the switch can carry each guide into the other view */
+      if(SW)ln._dp=[[f(x0),x0*k],[f(x1),x1*k]];else if(PV)ln._dp=[[f(x0),P],[f(x1),P]];iso.appendChild(ln)}
     /* label each guide near its lower end (bottom left or bottom right of the plot), along the line, just above it */
     const seg=clipSeg(X(x0),Y(f(x0)),X(x1),Y(f(x1)),m.l,m.t,W-m.r,H-m.b);if(!seg)continue;
     let [ax_,ay_,bx_,by_]=seg;if(ay_<by_)[ax_,ay_,bx_,by_]=[bx_,by_,ax_,ay_];const L=Math.hypot(bx_-ax_,by_-ay_);if(L<90)continue;
     const ux=(bx_-ax_)/L,uy=(by_-ay_)/L,flip=ux<0,th=Math.atan2(uy,ux)+(flip?Math.PI:0),dg=th*180/Math.PI,sn=Math.sin(th),cs=Math.cos(th);
     const tx=ax_+ux*18+3*sn,ty=ay_+uy*18-3*cs;
-    const lt=el('text',{x:tx,y:ty,'text-anchor':flip?'end':'start',transform:`rotate(${dg.toFixed(2)} ${tx.toFixed(1)} ${ty.toFixed(1)})`,class:'isot isol'},PV?fmtT(P)+' '+w.eu:fmtT(P)+(w.combined&&!AB?'× power':' W'));iso.appendChild(lt);
+    const lt=el('text',{x:tx,y:ty,'text-anchor':flip?'end':'start',transform:`rotate(${dg.toFixed(2)} ${tx.toFixed(1)} ${ty.toFixed(1)})`,class:'isot isol'},PV?fmtT(P)+' '+invU(w.eu):fmtT(P)+(w.combined&&!AB?'× power':' W'));iso.appendChild(lt);
     {let tl=40;try{tl=lt.getComputedTextLength()}catch(_){}const dir=flip?-1:1;lt._samp=[0,.25,.5,.75,1].map(q=>[tx+dir*cs*tl*q+5*sn,ty+dir*sn*tl*q-5*cs])}}
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(FX(r)),py:Y(FY(r))}));S.pts=pts;
@@ -931,7 +945,7 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   // exact iso-power line through the point
   if(G.PV){/* speed against power: the line through the point is equal work per joule */const E=r.x/r.p,f2=x=>x*E;un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
     let lx=Math.min(x1/1.04,y1/E/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
-    un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},fmt(r.e)+' '+WL[r.w].eu+(r.est?' (estimated)':'')))}else{
+    un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},fmt(1/r.e)+' '+invU(WL[r.w].eu)+(r.est?' (estimated)':'')))}else{
   const P=r.x/r.e,kp=G.kr?G.kr(r):k,f2=G.SW?x=>P/(kp*x):x=>x/P*kp;   /* the equal-power line through the point (SW: speed = power ÷ energy per unit of work) */   /* the equal-power line through the point (SW: speed = work per joule × power) */un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
   let lx=G.SW?Math.min(x1/1.3,Math.max(x0*1.04,P/(kp*y1)*1.1)):Math.min(x1/1.04,y1*P/kp/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
   un.appendChild(el('text',{x:G.SW?X(lx)+6:X(lx)-4,y:lyy-7,'text-anchor':G.SW?'start':'end',class:'isoxt'},(r.ow&&r.br?fmt(P)+'× baseline power ('+fmt(r.o.p)+' W)':fmt(r.ow?r.o.p:P)+' W')+(r.est?' (estimated)':'')))}
