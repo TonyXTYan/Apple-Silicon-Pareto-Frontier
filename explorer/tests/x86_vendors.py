@@ -30,7 +30,7 @@ async def main():
             bad=await pg.evaluate("S.pts.filter(p=>{const v=relOf(p.r);return v&&(v.b.model||'Llama 2 7B Q4_0')!==(p.r.model||'Llama 2 7B Q4_0')}).length"); n=await pg.evaluate("S.pts.filter(p=>relOf(p.r)).length")
             print('llm vs Z13 chip: points with a same-model baseline',n,'wrong model',bad)
             if bad or not n: errs.append('LLM baseline not like-for-like')
-            rows=await pg.evaluate("[...document.querySelectorAll('#matrix tbody tr')].map(t=>t.className==='msep'?'|':t.textContent.split(/[0-9~–]/)[0].trim())")
+            rows=await pg.evaluate("[...document.querySelectorAll('#matrix tbody tr')].map(t=>t.className==='msep'?'|':t._k)")  # full chip name (the cell shows it without the vendor)
             i=rows.index('|') if '|' in rows else -1; print('matrix comparison rows',len(rows)-i-1)
             if i<0 or any(not x.startswith(tuple(V)) for x in rows[i+1:]) or any(x.startswith(tuple(V)) for x in rows[:i]): errs.append('matrix order or divider wrong')
             await pg.close()
