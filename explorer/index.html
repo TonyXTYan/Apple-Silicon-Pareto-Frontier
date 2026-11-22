@@ -706,10 +706,17 @@ function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const gh
   const gone=new Map(),fresh=new Map();for(const r of A.pos.keys())if(!np.has(r)){const k=mKey(r);gone.set(k,gone.has(k)?null:r)}
   for(const p of S.pts)if(!A.pos.has(p.r)){const k=mKey(p.r);fresh.set(k,fresh.has(k)?null:p)}
   const alias=new Map(),used=new Set();for(const [k,p] of fresh){const r=gone.get(k);if(p&&r){alias.set(p.r,r);used.add(r)}}
+  const merge=new Map();   /* old row -> new point it folds into */
+  {/* then by machine alone (another tab, or a game or model list): a machine's new points all start from one of its old points
+      (one splits into several), and its other old points fold into its first new point */
+    for(const mk2 of [r=>(r.ck||r.chip)+'|'+devName(r),r=>r.ck||r.chip]){const g2=new Map(),f2=new Map(),add=(m,k,v)=>{if(!m.has(k))m.set(k,[]);m.get(k).push(v)};   /* same machine first, then same chip */
+    for(const r of A.pos.keys())if(!np.has(r)&&!used.has(r))add(g2,mk2(r),r);
+    for(const p of S.pts)if(!A.pos.has(p.r)&&!alias.has(p.r))add(f2,mk2(p.r),p);
+    for(const [k,ps] of f2){const rs=g2.get(k);if(!rs)continue;ps.forEach((p,i)=>alias.set(p.r,rs[i%rs.length]));rs.forEach((r,i)=>{used.add(r);if(i>=ps.length)merge.set(r,ps[0])})}}}
   const oldOf=r=>A.pos.get(r)||A.pos.get(alias.get(r));
   const off=new Map(),ins=[],outs=[],focus=!!(S.pin||S.hover);
   for(const p of S.pts){const o=oldOf(p.r);off.set(p,o?[o[0]-p.px,o[1]-p.py]:[0,0]);if(o)ins.push([p.g,o[0]-p.px,o[1]-p.py]);else p.g.classList.add('afade')}
-  for(const [r,g] of A.g){if(np.has(r)||used.has(r))continue;const o=A.pos.get(r),n=where(r);g.classList.remove('dim');ghost.appendChild(g);outs.push([g,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
+  for(const [r,g] of A.g){if(np.has(r)||(used.has(r)&&!merge.has(r)))continue;const o=A.pos.get(r),mp=merge.get(r),n=mp?[mp.px,mp.py]:where(r);g.classList.remove('dim');ghost.appendChild(g);outs.push([g,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
   /* a label on a point that stays slides with it; labels that appear fade in, labels that go fade out on their way */
   const had=new Set(A.labs.map(t=>t._r)),has=new Set();
   for(const t of lab.querySelectorAll('text')){const o=t._r&&oldOf(t._r),p=t._r&&np.get(t._r),src=t._r&&(A.pos.has(t._r)?t._r:alias.get(t._r));if(src)has.add(src);if(o&&p&&!focus)ins.push([t,o[0]-p.px,o[1]-p.py]);if(!src||!had.has(src))t.classList.add('afade')}
@@ -1325,7 +1332,7 @@ function all(){if(S.w==='cpu-one'&&S.lbm===SPEC)S.lbm=CB24;srvBase();const w=WL[
   if(S.pin&&(!inTab(S.pin)||(!S.est&&S.pin.est&&!S.pin.pe)))S.pin=null;render();readout();table();legend();matrix()}
 for(const k in WL){if(WL[k].notab)continue;const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k,id:'tab-'+k,'aria-controls':'panel'});
   b.addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tab')],i=ts.indexOf(b);const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i-1+ts.length)%ts.length:e.key==='Home'?0:e.key==='End'?ts.length-1:null;if(j==null)return;e.preventDefault();ts[j].focus();ts[j].click()});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
-  b.addEventListener('click',()=>{S.w=k;autoBase();S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
+  b.addEventListener('click',()=>{if(S.w!==k)S.anim=true;S.w=k;autoBase();S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
 function syncOpts(id,set,all){const box=$(id);box.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',set.has(b.dataset.opt)));const sa=box.querySelector('.showall');if(sa)sa.classList.toggle('on',set.size<all.length)}
 function soloToggle(set,all,v,id){if(set.size===all.length){set.clear();set.add(v)}else if(set.has(v)){set.delete(v);if(!set.size)all.forEach(x=>set.add(x))}else set.add(v);syncOpts(id,set,all);hideTip();S.anim=true;render();table();legend()}
 function addShowAll(id,set,all){const b=h('button',{type:'button',class:'showall'},'Show all');b.addEventListener('click',()=>{all.forEach(x=>set.add(x));syncOpts(id,set,all);hideTip();S.anim=true;render();table();legend();const f=$(id).querySelector('[data-opt]');if(f)f.focus()});$(id).querySelector('.gl').appendChild(b);syncOpts(id,set,all)}
@@ -1405,7 +1412,7 @@ $('est').addEventListener('change',e=>{S.est=e.target.checked;syncBaseSel();all(
 $('st1').textContent=DATA.stitch.all;$('st2').textContent=DATA.stitch.one;
 /* old links to the separate Blender tabs open the Blender tab on that device; #blas (the old Numerical libraries tab) opens Linear algebra on its default GEMM set */
 function fromHash(){const k=location.hash.slice(1);if(k==='blas'){S.lset='julia-sgemm';return 'hpl'}if(k==='hpl')S.lset='hpl';if(WL[k]&&WL[k].notab){S.ldev=k;return 'blender'}return WL[k]?k:null}
-window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.w=k;autoBase();all()}});
+window.addEventListener('hashchange',()=>{const k=fromHash();if(k&&k!==S.w){S.anim=true;S.w=k;autoBase();all()}});
 {const k=fromHash();if(k){S.w=k;autoBase()}}
 {const mq=matchMedia('(min-width:1000px)');if(mq.matches)$('opts').open=true;const f=e=>{if(e.matches)$('opts').open=true};mq.addEventListener?mq.addEventListener('change',f):mq.addListener(f)}
 {const sb=()=>document.documentElement.style.setProperty('--sbw',(innerWidth-document.documentElement.clientWidth)+'px');sb();addEventListener('resize',sb)}
