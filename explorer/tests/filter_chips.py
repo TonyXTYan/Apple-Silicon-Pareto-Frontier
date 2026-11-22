@@ -97,7 +97,7 @@ async def main():
         await pg.locator('#lmodsw').screenshot(path=OUT+'fc_llm.png')
         # ---------- Gaming ----------
         await pg.click('.tab[data-w="gpu"]'); await pg.wait_for_timeout(300); await pg.mouse.move(5,5)
-        G3="({g:[...new Set(S.pts.map(p=>p.r.game))].sort(),kg:!!perGame(),ax:!!axisRel(),iso:document.querySelectorAll('#chart .iso').length,lg:S.lgame,bad:S.pts.filter(p=>{const v=relOf(p.r);return v&&v.b.game!==p.r.game}).length,y:document.querySelectorAll('#chart .axt')[1].textContent})"
+        G3="({g:[...new Set(S.pts.map(p=>p.r.game))].sort(),kg:!!perGame(),ax:!!axisRel(),iso:document.querySelectorAll('#chart .iso').length,lg:S.lgame,bad:S.pts.filter(p=>{const v=relOf(p.r);return v&&v.b.game!==p.r.game}).length,y:[...document.querySelectorAll('#chart .axt')].map(t=>t.textContent).join(' | ')})"
         r=await E(G3); print('every game, no baseline',r); need(r['g']==sorted([BG,CP,AC]) and not r['kg'] and not r['ax'] and r['iso']>0,'every game without a baseline')
         await pg.select_option('#base','M4 Max|MacBook Pro 16'); await pg.wait_for_timeout(250)
         r=await E(G3); print('every game, baseline',r); need(r['kg'] and r['iso']==0 and not r['bad'] and 'same game' in r['y'],'every game with a baseline: per-game ratio, no power lines')

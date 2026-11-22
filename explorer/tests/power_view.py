@@ -5,7 +5,7 @@ HERE=pathlib.Path(__file__).resolve().parent
 INDEX=(HERE.parent/'index.html').as_uri()
 CHROME=os.environ.get('CHROME','/usr/bin/google-chrome')
 from playwright.async_api import async_playwright
-CHECK="""()=>{const {X,Y}=G;let bad=0;for(const p of S.pts){const r=p.r;if(Math.abs(p.px-X(G.PV?r.p:r.x))>.5||Math.abs(p.py-Y(G.PV?r.x:r.e*G.kr(r)))>.5)bad++}
+CHECK="""()=>{const {X,Y}=G;let bad=0;for(const p of S.pts){const r=p.r;if(Math.abs(p.px-X(G.FX(r)))>.5||Math.abs(p.py-Y(G.FY(r)))>.5||Math.abs(p.py-Y(r.x))>.5)bad++}
   /* PV frontier: no point in the same group has less (or equal) power and more speed */
   let dom=0;if(G.PV)for(const p of S.pts.filter(p=>p.front))for(const q of S.pts){if(q===p||q.r.w!==p.r.w||String(vk(q.r)||'').replace(' (oMLX)','')!==String(vk(p.r)||'').replace(' (oMLX)',''))continue;
     if((!S.fest&&(q.r.est||q.r.pe)))continue;if(q.r.p<=p.r.p&&q.r.x>p.r.x*1.000001)dom++}

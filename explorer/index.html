@@ -163,7 +163,7 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart .front{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;opacity:.75}
 #chart .ftail{stroke-dasharray:5 4;stroke-width:1.3}
 #chart .afade{animation:pvfade .9s ease both}
-#chart.pvanim .trails,#chart.pvanim #under,#chart.pvanim .front,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .fring,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
+#chart.pvanim .trails,#chart.pvanim .ftail,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
 @keyframes pvfade{0%,45%{opacity:0}}
 #chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
 #chart .flab{pointer-events:auto;cursor:default}
@@ -541,7 +541,7 @@ const WL={
  'cpu-all':{tab:'CPU, all cores',short:'CPU all',sub:'Cinebench render',get x(){return isSpec()?'Throughput (SPECpower_ssj2008, thousand ssj_ops at 100% load)':'Throughput ('+S.lbm+' points)'},get xu(){return isSpec()?'k ssj_ops':'pts'},get e(){return isSpec()?'Thousand ssj_ops per joule':'Points per joule'},get eu(){return isSpec()?'k ssj_ops/J':'pts/J'},eu0:'pts/J',get finding(){return bmText(this,0)},get note(){return bmText(this,1)},
    bm:{'Geekbench 6':['Geekbench 6 scores that Notebookcheck measured on the same review units, with wall power estimated from each machine\'s Cinebench reading, because none was published for Geekbench, so every point is speed measured, power estimated. The order follows Cinebench: fanless Airs lead (the M4 MacBook Air 13 at about 820 points per joule, the M5 Air 15 at 710), the M6 Mac mini leads the machines with a fan at about 540, and Pro and Max chips sit near 290 to 400, because Geekbench 6 multi-core gains little from more cores while power still grows. Hollow points ran Geekbench 5.5 and are converted to 6.7 (Pro and Max chips gain less from that step than base chips, so treat their converted points with care). Of the comparison machines, the Snapdragon X Elite Galaxy Book4 Edge 16 (460) and the Lunar Lake Zenbook S 14 (440) come closest, above the Pro and Max chips but below the M6 Mac mini; the Zenbook S 16 and the Minisforum M2 Pro reach about 300 to 340, the Ryzen AI Max+ 395 Z13 and both NVIDIA N1X laptops about 180 to 220, and the XMG Neo 16 gaming laptop is lowest at 94. The Zenbook S 14, Galaxy Book4 Edge 16 and Minisforum M2 Pro boost well above their sustained power, which Geekbench\'s bursts may catch, so their points may sit too high (see each point).',
      'Power is 0.8 to 0.95 times the machine\'s Cinebench all-core wall power: Geekbench 6 multi-core is short and bursty and does not keep every core busy the whole time. The range sits in the error bars. Geekbench 5.5 scores are converted with the ratio of the six machines Notebookcheck ran in both versions, whose scatter (about 8%) is added to the error bars. Intel, AMD, Qualcomm and NVIDIA machines use the same method; every one of them ran Geekbench 6.7, so none is converted. Where a machine\'s Cinebench run peaks well above its average (a high short-term power limit), Geekbench may draw nearer that peak than the factor assumes; no Geekbench power reading exists to check it, so the factor is kept and the point\'s note says so. Scores differ from Cinebench in units, so compare points only within one benchmark; a baseline divides each point by the baseline machine in the same benchmark. The matrix and All workloads keep Cinebench 2024.'],
-    'SPECpower_ssj2008':['Servers only: no Mac, Snapdragon or desktop Ryzen has a SPECpower result, so this view ranks servers against each other, not against the Macs. Each point is an official SPECpower_ssj2008 result: the Java transactions per second the server sustains at its 100% target load, in thousands, against the average AC power of the whole server at that load, so the height is thousands of transactions per joule. The 256-core EPYC 9996 leads at 59 (37 million ssj_ops at 631 W), the dense Zen 5c EPYC 9965 and 9845 follow at 47 to 52, the Zen 5 EPYC 9655 and 9755 at 41 to 43, Zen 4 EPYC at 33 to 39 and the small AM5 EPYC 4004 and 4005 parts at 27 to 28; Xeon 6 sits at 24 to 33, the older Xeon Platinum at 15 to 22, NVIDIA Grace at 20 and Ampere Altra at 17 to 19; the Core Ultra 7 255H edge box, the one laptop chip here, reaches 22 at 46 W. Two-socket servers sit far to the right at about the efficiency of their one-socket siblings.','SPECpower_ssj2008 is a server-side Java workload (integer, cache and memory heavy, no vector floating point), so it is not a proxy for Cinebench and its points cannot be compared with the other benchmarks. Power is measured at the server\'s AC input by a SPEC-accepted analyser and covers power-supply losses, fans, BMC, disks and network cards; submissions are vendor-tuned (BIOS, JVM, few DIMMs, one power supply), so deployed servers draw more. One load level is plotted, like every other point on the page; SPEC\'s official metric averages ten load levels and active idle and rewards low idle power (each point\'s details give it, and idle runs from 16% to 52% of full-load power). A baseline divides by the baseline server in this benchmark; switching to it without a baseline of your own picks the EPYC 9654 Lenovo ThinkSystem SR655 V3. The matrix and All workloads keep Cinebench 2024.'],
+    'SPECpower_ssj2008':['Servers only: no Mac, Snapdragon or desktop Ryzen has a SPECpower result, so this view ranks servers against each other, not against the Macs. Each point is an official SPECpower_ssj2008 result: the Java transactions per second the server sustains at its 100% target load, in thousands, against the average AC power of the whole server at that load, so the height is thousands of transactions per joule. The 256-core EPYC 9996 leads at 59 (37 million ssj_ops at 631 W), the dense Zen 5c EPYC 9965 and 9845 follow at 47 to 52, the Zen 5 EPYC 9655 and 9755 at 41 to 43, Zen 4 EPYC at 33 to 39 and the small AM5 EPYC 4004 and 4005 parts at 27 to 28; Xeon 6 sits at 24 to 33, the older Xeon Platinum at 15 to 22, NVIDIA Grace at 20 and Ampere Altra at 17 to 19; the Core Ultra 7 255H edge box, the one laptop chip here, reaches 22 at 46 W. Two-socket servers sit far higher (about twice the throughput) at about the efficiency of their one-socket siblings.','SPECpower_ssj2008 is a server-side Java workload (integer, cache and memory heavy, no vector floating point), so it is not a proxy for Cinebench and its points cannot be compared with the other benchmarks. Power is measured at the server\'s AC input by a SPEC-accepted analyser and covers power-supply losses, fans, BMC, disks and network cards; submissions are vendor-tuned (BIOS, JVM, few DIMMs, one power supply), so deployed servers draw more. One load level is plotted, like every other point on the page; SPEC\'s official metric averages ten load levels and active idle and rewards low idle power (each point\'s details give it, and idle runs from 16% to 52% of full-load power). A baseline divides by the baseline server in this benchmark; switching to it without a baseline of your own picks the EPYC 9654 Lenovo ThinkSystem SR655 V3. The matrix and All workloads keep Cinebench 2024.'],
     'Cinebench 2026':['Cinebench 2026 on the eight machines Notebookcheck has run it on so far that have a Cinebench wall reading here, with each machine\'s Cinebench 2024 wall power (none was published for this run), so every point is speed measured, power estimated. The fanless M5 MacBook Air 15 leads at 134 points per joule, then the M5 Max MacBook Pro 14 (98) and M5 Pro MacBook Pro 16 (93); the M5 Max MacBook Pro 16 and the 12-core M4 Pro MacBook Pro 14 are near 79. Unlike in Cinebench 2024, the M5 Pro 16 outscores the M5 Max 16 here (9,481 against 9,270). The three comparison machines trail every Mac: the Panther Lake Minisforum M2 Pro mini PC at 72, the NVIDIA N1X Surface Laptop Ultra at 61 and Asus ProArt P16 at 57.',
      'Power is the same machine\'s Cinebench 2024 all-core wall power, with the range widened by 10%: both are sustained all-core renders. Cinebench 2026 points are not on the Cinebench 2024 scale, so compare them only with each other. The matrix and All workloads keep Cinebench 2024.']},
    f0:'Fanless MacBook Airs do the most all-core work per joule, led by the M4 Air 13 at 39 points per joule. The M6 Mac mini is the one machine that is both fast and efficient. Turn on estimates to see the Ultra chips and the M4 Pro Mac mini in its three power modes, where Low Power gives about a fifth more work per joule at less than half the speed. Of the comparison machines, the Snapdragon X Elite Galaxy Book4 Edge 16 comes closest at 22 points per joule, about the M2 MacBook Air; the Ryzen AI Max+ 395 in the ROG Flow Z13 matches M3 Max speed at 15, and the big Intel and AMD gaming and desktop machines fall to 9 to 11 (their power figures are weaker: see each point). NVIDIA\'s Arm laptop chip, the N1X (RTX Spark), reaches 14 and 15 in the Asus ProArt P16 and the Surface Laptop Ultra, at about 14-core M4 Pro speed.',
@@ -692,22 +692,27 @@ function animRender(){S.anim=true;render();readout()}
 function snapChart(){const svg=$('chart');return {pos:new Map((S.pts||[]).map(p=>[p.r,[p.px,p.py]])),g:new Map((S.pts||[]).filter(p=>p.g).map(p=>[p.r,p.g])),
   labs:[...svg.querySelectorAll('#labels text')].filter(t=>t._r)}}
 function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const ghost=el('g',{class:'aghost'});svg.insertBefore(ghost,lab);
-  const np=new Map(S.pts.map(p=>[p.r,p])),{X,Y,PV,kr}=G,where=r=>{const x=X(PV?r.p:r.x),y=Y(PV?r.x:r.e*(kr?kr(r):1));return isFinite(x)&&isFinite(y)?[x,y]:null};
-  const ins=[],outs=[];
-  for(const p of S.pts){const o=A.pos.get(p.r);if(o)ins.push([p.g,o[0]-p.px,o[1]-p.py]);else p.g.classList.add('afade')}
+  /* one frame loop moves everything together: points, their labels, frontier lines (redrawn through the moving points) and,
+     when a point is pinned or hovered, its crosshair, axis chips and spokes (redrawn each frame) */
+  const np=new Map(S.pts.map(p=>[p.r,p])),{X,Y}=G,where=r=>{const x=X(G.FX(r)),y=Y(G.FY(r));return isFinite(x)&&isFinite(y)?[x,y]:null};
+  const off=new Map(),ins=[],outs=[],focus=!!(S.pin||S.hover);
+  for(const p of S.pts){const o=A.pos.get(p.r);off.set(p,o?[o[0]-p.px,o[1]-p.py]:[0,0]);if(o)ins.push([p.g,o[0]-p.px,o[1]-p.py]);else p.g.classList.add('afade')}
   for(const [r,g] of A.g){if(np.has(r))continue;const o=A.pos.get(r),n=where(r);g.classList.remove('dim');ghost.appendChild(g);outs.push([g,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
   /* a label on a point that stays slides with it; labels that appear fade in, labels that go fade out on their way */
   const had=new Set(A.labs.map(t=>t._r)),has=new Set();
-  for(const t of lab.querySelectorAll('text')){const o=t._r&&A.pos.get(t._r),p=t._r&&np.get(t._r);if(t._r)has.add(t._r);if(o&&p)ins.push([t,o[0]-p.px,o[1]-p.py]);if(!t._r||!had.has(t._r))t.classList.add('afade')}
+  for(const t of lab.querySelectorAll('text')){const o=t._r&&A.pos.get(t._r),p=t._r&&np.get(t._r);if(t._r)has.add(t._r);if(o&&p&&!focus)ins.push([t,o[0]-p.px,o[1]-p.py]);if(!t._r||!had.has(t._r))t.classList.add('afade')}
   for(const t of A.labs){if(has.has(t._r))continue;const o=A.pos.get(t._r),p=np.get(t._r),n=p?[p.px,p.py]:where(t._r);ghost.appendChild(t);outs.push([t,n?n[0]-o[0]:0,n?n[1]-o[1]:0])}
-  for(const [e,dx,dy] of ins){e.style.transition='none';e.style.transform=`translate(${dx}px,${dy}px)`}
-  for(const [e] of outs){e.style.transition='none';e.style.transform='';e.style.opacity=1}
-  svg.classList.add('pvanim');void svg.getBoundingClientRect();
-  requestAnimationFrame(()=>{const tr='transform .75s cubic-bezier(.4,0,.2,1),opacity .5s ease';
-    for(const [e] of ins){e.style.transition=tr;e.style.transform=''}
-    for(const [e,dx,dy] of outs){e.style.transition=tr;e.style.transform=`translate(${dx}px,${dy}px)`;e.style.opacity=0}
-    clearTimeout(S.animT);S.animT=setTimeout(()=>{ghost.remove();svg.classList.remove('pvanim');for(const [e] of ins){e.style.transition='';e.style.transform=''}
-      svg.querySelectorAll('.afade').forEach(e=>e.classList.remove('afade'))},900)})}
+  const polys=[...svg.querySelectorAll('path.front')].filter(e=>e._pts);
+  const pos=(k,fn)=>{for(const [e,dx,dy] of ins)e.style.transform=k?`translate(${dx*k}px,${dy*k}px)`:'';
+    for(const pa of polys)pa.setAttribute('d','M'+pa._pts.map(p=>{const o=off.get(p)||[0,0];return (p.px+o[0]*k).toFixed(1)+','+(p.py+o[1]*k).toFixed(1)}).join('L'));
+    if(focus){const keep=S.pts.map(p=>[p.px,p.py]);for(const p of S.pts){const o=off.get(p);p.px+=o[0]*k;p.py+=o[1]*k}try{drawFocus()}finally{S.pts.forEach((p,i)=>{p.px=keep[i][0];p.py=keep[i][1]})}}};
+  if(S.animRun)cancelAnimationFrame(S.animRun);svg.classList.add('pvanim');pos(1);
+  const t0=performance.now(),D=750,ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const step=now=>{if(!svg.contains(ghost))return;const t=Math.min(1,(now-t0)/D),e=ease(t);pos(1-e);
+    for(const [g,dx,dy] of outs){g.style.transform=`translate(${dx*e}px,${dy*e}px)`;g.style.opacity=Math.max(0,1-t*1.6)}
+    if(t<1){S.animRun=requestAnimationFrame(step);return}
+    S.animRun=0;ghost.remove();svg.classList.remove('pvanim');pos(0);svg.querySelectorAll('.afade').forEach(x=>x.classList.remove('afade'));if(focus)drawFocus()};
+  S.animRun=requestAnimationFrame(step)}
 function render(){
   const A=S.anim&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&S.pts&&S.pts.length?snapChart():null;S.anim=false;
   {const og=$('chart').querySelector('.aghost');if(og)og.remove()}
@@ -723,7 +728,9 @@ function render(){
   const PV=S.pv==='pow'&&!AB&&!w.combined;svg.classList.toggle('pv',PV);{const b=$('pvb');if(b){const off=AB||!!w.combined;b.classList.toggle('off',off);b.querySelectorAll('[data-pv]').forEach(x=>{x.disabled=off;x.setAttribute('aria-checked',(x.dataset.pv==='pow')===PV)})}}
   const narrow0=W<560, m={l:AB?(AW.length<AW0.length?(narrow0?50:66):24+AW.length*colW):(narrow0?50:66),r:narrow0?14:24,t:AB?(AW.length<AW0.length?20:56):20,b:AB?(AW.length<AW0.length?40:34+AW.length*rowH):(narrow0?42:48)}, k=PV?1:ax?ax.k:1, kr=r=>PV?1:kg?kg[r.game]:k, narrow=narrow0;
   /* PV: power on x, speed on y (top left is better); otherwise speed on x, work per joule on y */
-  const FX=r=>PV?r.p:r.x, FY=r=>PV?r.x:r.e*kr(r), FXl=r=>PV?(r.plo||r.p):(r.xlo||r.x), FXh=r=>PV?(r.phi||r.p):(r.xhi||r.x), FYl=r=>PV?(r.xlo||r.x):(r.elo?r.elo*kr(r):FY(r)), FYh=r=>PV?(r.xhi||r.x):(r.ehi?r.ehi*kr(r):FY(r));
+  /* speed is always up (y) outside All workloads: SW puts work per joule across, PV wall power across */
+  const SW=!PV&&!AB&&!w.combined,E=r=>r.e*kr(r),El=r=>r.elo?r.elo*kr(r):E(r),Eh=r=>r.ehi?r.ehi*kr(r):E(r),Sl=r=>r.xlo||r.x,Sh=r=>r.xhi||r.x;
+  const FX=r=>PV?r.p:SW?E(r):r.x, FY=r=>PV||SW?r.x:E(r), FXl=r=>PV?(r.plo||r.p):SW?El(r):Sl(r), FXh=r=>PV?(r.phi||r.p):SW?Eh(r):Sh(r), FYl=r=>PV||SW?Sl(r):El(r), FYh=r=>PV||SW?Sh(r):Eh(r);
   let x0=Infinity,x1=0,y0=Infinity,y1=0;
   for(const r of rows){x0=Math.min(x0,S.err?FXl(r):FX(r));x1=Math.max(x1,S.err?FXh(r):FX(r));
     y0=Math.min(y0,S.err?FYl(r):FY(r));y1=Math.max(y1,S.err?FYh(r):FY(r))}
@@ -731,7 +738,7 @@ function render(){
   [x0,x1]=pad(x0,x1,.08);[y0,y1]=pad(y0,y1,.09);S.auto={x0,x1,y0,y1};
   if(S.zoom&&S.zoom.key===viewKey()){({x0,x1,y0,y1}=S.zoom)}else S.zoom=null;$('zreset').disabled=!S.zoom;
   const X=v=>m.l+(Math.log(v/x0)/Math.log(x1/x0))*(W-m.l-m.r), Y=v=>H-m.b-(Math.log(v/y0)/Math.log(y1/y0))*(H-m.t-m.b);
-  G={X,Y,x0,x1,y0,y1,m,W,H,k,kr,kg,narrow,PV};
+  G={X,Y,x0,x1,y0,y1,m,W,H,k,kr,kg,narrow,PV,SW,FX,FY};
   const g=el('g',{});svg.appendChild(g);
   if(AB){const mini=(gg,k2,x,y)=>{const s2=shape(WSHAPE[k2],'',x,y,.72);s2.setAttribute('style','fill:var(--ink2)');gg.appendChild(s2)};const g0=g;
     AW.forEach((k2,i)=>{const g=el('g',{class:'scale','data-w':k2});g0.appendChild(g);const xr=xref(k2),wl=WL[k2],yy=H-m.b+14+i*rowH;
@@ -746,27 +753,28 @@ function render(){
       if(AW.length===AW0.length){mini(g,k2,cx-14,m.t-40);g.appendChild(el('text',{x:cx,y:m.t-22,'text-anchor':'end',style:'font-size:10.5px'},wl.hs||wl.short));g.appendChild(el('text',{x:cx,y:m.t-9,'text-anchor':'end',style:'font-size:10.5px'},wl.eu))}});
 }
   else{
-  let lastR=-1e9;for(const t of ticks(x0,x1)){g.appendChild(el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'}));lastR=xTick(g,X(t),H-m.b+16,fmtT(t)+(w.combined?'×':''),lastR)}
-  for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end',class:'tk'},fmtT(t)+(!PV&&(ax||kg||w.combined)?'×':'')))}}
+  let lastR=-1e9;for(const t of ticks(x0,x1)){g.appendChild(el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,class:'grid'}));lastR=xTick(g,X(t),H-m.b+16,fmtT(t)+(w.combined||(SW&&(ax||kg))?'×':''),lastR)}
+  for(const t of ticks(y0,y1)){g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:'grid'}));g.appendChild(el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end',class:'tk'},fmtT(t)+(!PV&&!SW&&(ax||kg||w.combined)?'×':'')))}}
   g.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axis'}));g.appendChild(el('line',{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:'axis'}));
   const bN=w.combined?(()=>{const b=curBase()||DEFBASE;return b.chip+(b.dev?' '+b.dev:'')})():'';
   const sc=AW.length<AW0.length&&AW[0]?WL[AW[0]]:null,bL=ax?ax.b.chip+' '+devName(ax.b):'';
-  const xc=PV?['Wall power (W), less power to the left','Wall power (W)','Power (W)']:AB?(sc?[sc.short+' throughput ('+sc.xu+'), tap a point to switch scale',sc.short+' throughput ('+sc.xu+')']:['Throughput, one scale per workload (shape), faster to the right','Throughput, one scale per workload','Throughput'])
+  let xc=PV?['Wall power (W), less power to the left','Wall power (W)','Power (W)']:AB?(sc?[sc.short+' throughput ('+sc.xu+'), tap a point to switch scale',sc.short+' throughput ('+sc.xu+')']:['Throughput, one scale per workload (shape), faster to the right','Throughput, one scale per workload','Throughput'])
     :w.combined?['Throughput relative to '+bN+' on the same workload, faster to the right','Throughput relative to the baseline, faster to the right','Throughput vs baseline']:[w.x+', faster to the right',w.x,'Throughput ('+w.xu+')'];
-  const yc=PV?[w.x+', faster upward',w.x,'Speed ('+w.xu+')']:AB?(sc?[sc.short+' work per joule ('+sc.eu+')',sc.short+' ('+sc.eu+')']:['Work per joule, one scale per workload, more efficient upward','Work per joule, one scale per workload','Work per joule'])
+  let yc=PV?[w.x+', faster upward',w.x,'Speed ('+w.xu+')']:AB?(sc?[sc.short+' work per joule ('+sc.eu+')',sc.short+' ('+sc.eu+')']:['Work per joule, one scale per workload, more efficient upward','Work per joule, one scale per workload','Work per joule'])
     :w.combined?['Work per joule relative to '+bN+', more efficient upward','Work per joule relative to the baseline','Work per joule vs baseline']
     :kg?['Frames per joule relative to '+(curBase().chip)+' in the same game, more efficient upward','Frames per joule relative to the baseline, same game','Frames/J vs baseline']
     :ax?['Work per joule relative to '+bL+', more efficient upward','Work per joule relative to '+bL,'Work per joule vs '+ax.b.chip,'Work per joule vs baseline']:[w.e+' ('+w.eu+'), more efficient upward',w.e+' ('+w.eu+')'];
+  if(SW){xc=yc.map(t=>t.replace(', more efficient upward',', more efficient to the right'));yc=[w.x+', faster upward',w.x,'Speed ('+w.xu+')']}
   const fitT=(t,c,av)=>{for(const s of c){t.textContent=s;let n=0;try{n=t.getComputedTextLength()}catch(_){}if(n<=av)return}};
   {const cx=(m.l+W-m.r)/2,cy=(m.t+H-m.b)/2;const xt=el('text',{x:cx,y:H-9,'text-anchor':'middle',class:'axt'});g.appendChild(xt);fitT(xt,xc,2*Math.min(cx,W-cx)-8);
    const yt=el('text',{x:15,y:cy,'text-anchor':'middle',class:'axt',transform:`rotate(-90 15 ${cy})`});g.appendChild(yt);fitT(yt,yc,2*Math.min(cy,H-cy)-8)}
   const clip=el('clipPath',{id:'cp'});clip.appendChild(el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b}));svg.appendChild(clip);
   const iso=el('g',{'clip-path':'url(#cp)'});svg.appendChild(iso);
-  const pmin=PV?y0/x1:x0/(y1/k), pmax=PV?y1/x0:x1/(y0/k);let pw=[];   /* PV: lines of equal work per joule (speed = e × power); otherwise equal power */
+  const pmin=PV?y0/x1:SW?y0*k/x1:x0/(y1/k), pmax=PV?y1/x0:SW?y1*k/x0:x1/(y0/k);let pw=[];   /* PV: lines of equal work per joule (speed = e × power); otherwise equal power */
   for(let p=Math.floor(Math.log10(pmin));p<=Math.ceil(Math.log10(pmax));p++)for(const s of [1,2,5]){const v=s*Math.pow(10,p);if(v>pmin*1.15&&v<pmax/1.15)pw.push(v)}
   if(pw.length>6)pw=pw.filter((_,i)=>i%2===0);
-  if(!kg||PV)for(const P of pw){const f=PV?x=>x*P:x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
-    const lx=Math.min(x1,PV?y1/P:y1*P/k), px=X(lx)-6, py=Y(f(lx))+13;
+  if(!kg||PV)for(const P of pw){const c=PV?P:SW?P/k:null,f=c?x=>x*c:x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
+    const lx=Math.min(x1,c?y1/c:y1*P/k), px=X(lx)-6, py=Y(f(lx))+13;
     if(px>m.l+40&&py<H-m.b-6)iso.appendChild(el('text',{x:px,y:py,'text-anchor':'end',class:'isot isol'},PV?fmtT(P)+' '+w.eu:fmtT(P)+(w.combined&&!AB?'× power':' W')))}
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(FX(r)),py:Y(FY(r))}));S.pts=pts;
@@ -777,13 +785,14 @@ function render(){
     for(const [gk,g] of [...grp].sort((a,b)=>b[1].length-a[1].length)){if(g.length<2)continue;const fk={'data-fk':gk};let best=-1;const f=[];
       if(PV){/* less power and more speed: walk up in power, keep each point faster than all cheaper ones */
         for(const p of [...g].sort((a,b)=>FX(a.r)-FX(b.r)||FY(b.r)-FY(a.r)))if(FY(p.r)>best*1.0000001){f.push(p);best=FY(p.r)}}
-      else{const by=[...g].sort((a,b)=>b.r.x-a.r.x||b.r.e-a.r.e);for(const p of by){if(p.r.e>best*1.0000001){f.push(p);best=p.r.e}}f.reverse()}for(const p of f){p.front=true;S.fset.add(p.r)}
+      else{/* faster and more efficient: walk down the x axis keeping each point higher than all to its right, then put them in x order */
+        const by=[...g].sort((a,b)=>FX(b.r)-FX(a.r)||FY(b.r)-FY(a.r));for(const p of by){if(FY(p.r)>best*1.0000001){f.push(p);best=FY(p.r)}}f.reverse()}for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
-      fg.appendChild(el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op}));
+      {const pl=el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op});pl._pts=f;fg.appendChild(pl)}
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
         const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:a.py-5,an:'start',p0:a});fg.appendChild(el('path',{d:'M'+X(PV?x1:x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),...fk,class:'front ftail',style:op}));
         if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+(PV?' point is both fastest and lowest-power':' point is both fastest and most efficient')+', so the frontier is its corner'));continue}
-      const fit=S.w==='all'?null:frontFit(f.map(p=>[FX(p.r),FY(p.r)]),S.ffit);if(fit&&PV)fit.label=fit.label.replace(/work per joule ∝ x\^([^,]+), so power ∝ x\^.*/,'speed ∝ power^$1').replace(/y ∝ exp\(([^)]*)·x\)/,'speed ∝ exp($1·power)');if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),k:gk,n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
+      const fit=S.w==='all'?null:frontFit(f.map(p=>[FX(p.r),FY(p.r)]),S.ffit);if(fit&&(PV||SW)){const xn=PV?'power':'work per joule';fit.label=fit.label.replace(/work per joule ∝ x\^([^,]+), so power ∝ x\^.*/,'speed ∝ '+(PV?'power':'(work per joule)')+'^$1').replace(/y ∝ exp\(([^)]*)·x\)/,'speed ∝ exp($1·'+xn+')').replace(/y = /,'speed = ').replace(/·ln x/,'·ln('+xn+')').replace(/·x$/,'·'+xn)}if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),k:gk,n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{...fk,d:'M'+pts2.join('L'),class:'front ftail',style:op}));return pts2.length>1?pts2[pts2.length-1].split(',').map(Number):null};
       const a=f[0],z=f[f.length-1];const le=tail(FX(a.r),x0,[FX(a.r),FY(a.r)]);tail(FX(z.r),x1,[FX(z.r),FY(z.r)]);
@@ -808,7 +817,6 @@ function render(){
           const inside=b=>b[0]>=m.l&&b[2]<=W-m.r&&b[1]>=m.t&&b[3]<=H-m.b;let ok=null,first=null;
           for(const [x,y,an] of cand){t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor',an);const b=bx(t);if(inside(b)&&!first)first=[x,y,an,b];
             if(inside(b)&&!used.some(o=>hit(o,b))&&!pb.some(o=>hit(o,b))){ok=b;break}}
-          if(!ok&&first&&!q.spare){t.setAttribute('x',first[0]);t.setAttribute('y',first[1]);t.setAttribute('text-anchor',first[2]);ok=first[3]}
           if(ok)used.push(ok);else t.remove()}catch(_){}}
       for(const t of fg.querySelectorAll('.flab')){const on=v=>{fg.classList.toggle('fhov',v);for(const e of fg.querySelectorAll('[data-fk]'))e.classList.toggle('fon',v&&e.dataset.fk===t.dataset.fk)};
         t.addEventListener('mouseenter',()=>on(true));t.addEventListener('mouseleave',()=>on(false))}}}
@@ -874,8 +882,8 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   if(G.PV){/* speed against power: the line through the point is equal work per joule */const E=r.x/r.p,f2=x=>x*E;un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
     let lx=Math.min(x1/1.04,y1/E/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
     un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},fmt(r.e)+' '+WL[r.w].eu+(r.est?' (estimated)':'')))}else{
-  const P=r.x/r.e,kp=G.kr?G.kr(r):k,f2=x=>x/P*kp;un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
-  let lx=Math.min(x1/1.04,y1*P/kp/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
+  const P=r.x/r.e,kp=G.kr?G.kr(r):k,f2=G.SW?x=>x*P/kp:x=>x/P*kp;   /* the equal-power line through the point (SW: speed = work per joule × power) */un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
+  let lx=Math.min(x1/1.04,(G.SW?y1*kp/P:y1*P/kp)/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
   un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},(r.ow&&r.br?fmt(P)+'× baseline power ('+fmt(r.o.p)+' W)':fmt(r.ow?r.o.p:P)+' W')+(r.est?' (estimated)':'')))}
   // crosshair to axes with value chips
   un.appendChild(el('line',{x1:p.px,x2:p.px,y1:p.py,y2:H-m.b,class:'cross'}));un.appendChild(el('line',{x1:m.l,x2:p.px,y1:p.py,y2:p.py,class:'cross'}));
@@ -883,7 +891,7 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
     c.appendChild(el('rect',{x:rx,y:y-9,width:tw,height:18,rx:4}));c.appendChild(el('text',{x:rx+tw/2,y:y+4,'text-anchor':'middle'},t));ov.appendChild(c)};
   // the y chip sits in the left margin, right-aligned to the axis; the unit is dropped when the margin is too narrow for it
   const ychip=(n,u)=>{const cw=t=>t.length*(G.narrow?6.9:6.6)+10,t=cw(n+u)<=m.l-5?n+u:n;chipAt(Math.max(m.l-3,cw(t)+2),p.py,t,'end')};
-  const wl=WL[r.ow||S.w];if(G.PV){chipAt(p.px,H-m.b+12,fmt(r.p)+' W','middle');ychip(fmt(r.x),' '+WL[r.w].xu)}else if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');(G.kg||k!==1)||r.ow?ychip(fmt(r.e*(G.kr?G.kr(r):k))+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
+  const wl=WL[r.ow||S.w];if(G.PV){chipAt(p.px,H-m.b+12,fmt(r.p)+' W','middle');ychip(fmt(r.x),' '+WL[r.w].xu)}else if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else if(G.SW){const ev=(G.kg||k!==1)?fmt(r.e*(G.kr?G.kr(r):k))+'×':fmt(r.e)+' '+wl.eu;chipAt(p.px,H-m.b+12,ev,'middle');ychip(fmt(r.x),' '+wl.xu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');(G.kg||k!==1)||r.ow?ychip(fmt(r.e*(G.kr?G.kr(r):k))+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
   // spokes
   for(const gq of relGroups(r)){const c={rel:'spoke-gen',chip:'spoke-chip',machine:'spoke-mach',bench:'spoke-bench'}[gq.mode];
     for(const q of gq.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:c}));
@@ -1020,10 +1028,10 @@ $('chart').addEventListener('click',e=>{if(S.dragged)return;const n=nearest(e);c
   if(n){const r=n.p.r;pin(r);if(tch){const p=S.pts.find(q=>q.r===r);if(p)showTip(p,'touch')}}else{hideTip();if(S.pin){S.pin=null;drawFocus();readout();table()}}});
 /* keyboard: the plot is one tab stop; arrow keys move through the visible points */
 function kInView(p){const {m,W,H}=G;return p.px>=m.l-1&&p.px<=W-m.r+1&&p.py>=m.t-1&&p.py<=H-m.b+1}
-function kOrder(ax){return S.pts.slice().sort(ax==='x'?(a,b)=>a.r.x-b.r.x||a.r.e-b.r.e:(a,b)=>a.r.e-b.r.e||a.r.x-b.r.x)}
+function kOrder(ax){return S.pts.slice().sort(ax==='x'?(a,b)=>a.px-b.px||b.py-a.py:(a,b)=>b.py-a.py||a.px-b.px)}
 function kSay(p,i,n){const r=p.r,w=WL[S.w],v=r.ow&&!r.br?fmt(r.o.e)+' '+WL[r.ow].eu:fmt(r.e)+(r.ow?' times the baseline':' '+w.eu);const t=detailRows(r).find(d=>d[0]==='Throughput');
   return name(r)+(r.est&&!r.mode?' (estimate)':'')+': '+v+(t?', throughput '+t[1]:'')+(n?'. Point '+(i+1)+' of '+n+'.':'.')}
-function kGo(p,i,n){if(S.zoom&&!kInView(p)){const {x0,x1,y0,y1,k}=G,r=p.r,fx=Math.sqrt(x1/x0),fy=Math.sqrt(y1/y0),cy=r.e*(G.kr?G.kr(r):k);S.zoom={key:viewKey(),x0:r.x/fx,x1:r.x*fx,y0:cy/fy,y1:cy*fy};render();readout();p=S.pts.find(q=>q.r===r)||p}
+function kGo(p,i,n){if(S.zoom&&!kInView(p)){const {x0,x1,y0,y1}=G,r=p.r,fx=Math.sqrt(x1/x0),fy=Math.sqrt(y1/y0),cx=G.FX(r),cy=G.FY(r);S.zoom={key:viewKey(),x0:cx/fx,x1:cx*fx,y0:cy/fy,y1:cy*fy};render();readout();p=S.pts.find(q=>q.r===r)||p}
   S.kbd=true;S.kf=p.r;S.hover=p.r;drawFocus();showTip(p,'key');live(kSay(p,i,n))}
 $('chart').addEventListener('focus',()=>{const c=$('chart');if(!c.matches(':focus-visible'))return;const list=kOrder('x');if(!list.length)return;
   let p=S.kf&&list.find(q=>q.r===S.kf);if(!p&&S.pin)p=list.find(q=>q.r===S.pin);if(!p)p=list[0];kGo(p,list.indexOf(p),list.length)});
