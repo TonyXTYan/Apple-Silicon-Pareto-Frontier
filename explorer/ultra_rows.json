@@ -1,0 +1,28 @@
+{
+ "source": "Research for ultra.py, 2026-11-22. Searched for M5 Ultra and M3 Ultra Mac Studio results with wall power: Notebookcheck (processor and GPU pages, news), Tom's Hardware, Ars Technica, Gearlive, Macworld/Macwelt/Macworld Sweden, Tom's Guide, Japanese reviews, Jeff Geerling, the Julia Discourse GEMM thread, Blender Open Data. No source publishes a wall-power reading of either machine in a named benchmark, so every row here keeps an estimated power (est + pe).",
+ "sources": {
+  "nbc_m5u": {"name": "Notebookcheck, Apple M5 Ultra processor benchmarks (Mac Studio Mac17,15, 36-core CPU, 80-core GPU, 256 GB)", "url": "https://www.notebookcheck.net/Apple-M5-Ultra-Processor-Benchmarks-and-Specs.1445843.0.html"},
+  "gearlive_m5u": {"name": "Gearlive, M5 Ultra Mac Studio review (M3 Ultra comparison figures)", "url": "https://www.gearlive.com/news/article/m5-ultra-mac-studio-review"}
+ },
+ "cinebench2024": [
+  {"chip": "M5 Ultra", "w": "cpu-all", "value": 4630, "src": "nbc_m5u", "unit": "Mac Studio (Mac17,15), 36-core CPU, 80-core GPU, 256 GB", "test": "Cinebench 2024 CPU Multi Core", "note": "One entry in Notebookcheck's database for this unit; no Notebookcheck review text or wall power published."},
+  {"chip": "M5 Ultra", "w": "cpu-one", "value": 204, "src": "nbc_m5u", "unit": "Mac Studio (Mac17,15), 36-core CPU, 80-core GPU, 256 GB", "test": "Cinebench 2024 CPU Single Core", "note": "One entry in Notebookcheck's database for this unit."}
+ ],
+ "cpubench": [
+  {"chip": "M5 Ultra", "w": "cpu-all", "bm": "Geekbench 6", "version": "6.7.1", "runs": [38414, 38697], "src": "nbc_m5u", "unit": "Mac Studio (Mac17,15), 36-core CPU, 80-core GPU, 256 GB", "test": "Geekbench 6.7.1 Multi-Core",
+   "note": "Notebookcheck lists two runs on this configuration; their mean is used. Cross-check: Gearlive's own Geekbench 6 multi-core run on a 36-core, 256 GB unit was 37,870 (version not stated)."},
+  {"chip": "M5 Ultra", "w": "cpu-one", "bm": "Geekbench 6", "version": "6.7.1", "runs": [4330, 4341], "src": "nbc_m5u", "unit": "Mac Studio (Mac17,15), 36-core CPU, 80-core GPU, 256 GB", "test": "Geekbench 6.7.1 Single-Core",
+   "note": "Notebookcheck lists two runs on this configuration; their mean is used."},
+  {"chip": "M5 Ultra", "w": "cpu-all", "bm": "Cinebench 2026", "version": "2026", "runs": [16900], "src": "nbc_m5u", "unit": "Mac Studio (Mac17,15), 36-core CPU, 80-core GPU, 256 GB", "test": "Cinebench 2026 CPU Multi",
+   "note": "Other reviews of the same configuration scored higher: Tom's Hardware 17,825 to 18,069 over ten runs (https://www.tomshardware.com/desktops/mini-pcs/apple-mac-studio-m5-ultra-review), Gearlive 17,960, Macworld Sweden 17,819 and Macwelt 16,934 (https://www.macworld.com/article/2973459/2026-mac-studio-m5-release-date-specs-price-rumors.html). Notebookcheck's run is used because it is the same unit as the Cinebench 2024 and Geekbench 6 rows."},
+  {"chip": "M3 Ultra", "w": "cpu-all", "bm": "Geekbench 6", "version": null, "runs": [28376], "src": "gearlive_m5u", "unit": "M3 Ultra Mac Studio (configuration not stated)", "test": "Geekbench 6 multi-core",
+   "note": "Gearlive gives 28,376 as the M3 Ultra's Geekbench 6 multi-core score beside its M5 Ultra run (37,870); the Geekbench 6 minor version and the M3 Ultra configuration are not stated."}
+ ],
+ "not_found": [
+  {"item": "M5 Ultra and M3 Ultra wall power in Cinebench, games or Blender", "why": "No review found publishes a wall reading in a named test. Apple's support page gives only idle and maximum (M5 Ultra 9 W / 385 W, M3 Ultra 9 W / 270 W). Ars Technica gives powermetrics chip power (about 75 W in HandBrake), not wall power; Notebookcheck's GPU page cites about 155 W GPU power in an MLX load; a Japanese review says only 'over 250 W under full load'."},
+  {"item": "M5 Ultra Cinebench 2026 single-core, M3 Ultra Geekbench 6 single-core and Cinebench 2026", "why": "Not published by any source found; Gearlive says only that its M5 Ultra Cinebench 2026 multi-core run was 47% ahead of the M3 Ultra, without the M3 Ultra score."},
+  {"item": "M5 Ultra and M3 Ultra Cyberpunk 2077 (1080p Ultra), Baldur's Gate 3 (1080p Ultra) and AC Shadows (1080p Ultra High)", "why": "Notebookcheck has no game results for either. Tom's Hardware and Gearlive ran Cyberpunk at 1080p with the Ray Tracing Ultra preset (66 fps) and Gearlive ran Baldur's Gate 3 at 4K Ultra (over 80 fps): other settings than this page's, and with no wall power, so the Cyberpunk model estimate stays and no BG3 or ACS point is added."},
+  {"item": "M5 Ultra Blender Open Data", "why": "The Blender 4.5.0 medians on this page already come from the 2026-11-21 Open Data snapshot (one run each for the 30-core CPU and 64-core GPU); Notebookcheck's 80-core GPU figure (about 15,350) is from a later Blender version, which this page does not mix. Only the CPU rows' borrowed power changes here, following the new Cinebench 2024 row."},
+  {"item": "M5 Ultra HPL, M5 Ultra Julia GEMM, M3 Ultra Hubner et al. SGEMM", "why": "No HPL run published (Geerling has only the M3 Ultra); the Julia Discourse AppleNeuralEngine.jl thread has no M5 Ultra post as of 2026-11-22; Hubner et al. test base chips only."}
+ ]
+}
