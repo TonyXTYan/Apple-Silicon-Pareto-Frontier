@@ -417,7 +417,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     <div class="chartwrap" id="wrap" aria-label="Chart">
       <div class="ctop">
         <p class="zhint"><span class="ptr">Scroll to zoom, drag to pan, arrow keys step through points</span><span class="tch">Tap a point for details; once zoomed, drag sideways to pan</span></p>
-        <div class="ztools" role="group" aria-label="Chart view"><div class="pvseg" id="pvb" role="radiogroup" aria-label="Chart axes" title="Work per joule against speed is this page's default. Speed vs power is the chart Apple usually shows: wall power across, speed up, so up and to the left is better. Points slide between the two."><button type="button" class="chip seg" role="radio" data-pv="eff" aria-checked="true">Speed vs work/J</button><button type="button" class="chip seg" role="radio" data-pv="pow" aria-checked="false">Speed vs power</button></div><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
+        <div class="ztools" role="group" aria-label="Chart view"><div class="pvseg" id="pvb" role="radiogroup" aria-label="Chart axes" title="Work per joule against speed is this page's default. Speed vs power is the chart Apple usually shows: wall power across, speed up, so up and to the left is better. Points slide between the two."><button type="button" class="chip seg" role="radio" data-pv="eff" aria-checked="true">Speed vs J/work</button><button type="button" class="chip seg" role="radio" data-pv="pow" aria-checked="false">Speed vs power</button></div><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
       </div>
       <svg id="chart" tabindex="0" role="application" aria-roledescription="scatter plot" aria-labelledby="charttitle" aria-describedby="charthelp"><title id="charttitle"></title></svg>
       <div class="tip" id="tip" hidden></div>
@@ -715,6 +715,8 @@ function runAnim(A){const svg=$('chart'),lab=$('labels');if(!lab)return;const gh
     if(t<1){S.animRun=requestAnimationFrame(step);return}
     S.animRun=0;ghost.remove();svg.classList.remove('pvanim');pos(0);svg.querySelectorAll('.afade').forEach(x=>x.classList.remove('afade'));if(focus)drawFocus()};
   S.animRun=requestAnimationFrame(step)}
+/* 'pts/J' -> 'J/pt': the unit of energy per unit of work */
+const invU=u=>{const m=/^(.*)\/J$/.exec(String(u||''));if(!m)return 'J per unit';const w={pts:'pt',samples:'sample',frames:'frame'}[m[1]]||m[1];return 'J/'+w};
 function render(){
   const A=S.anim&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&S.pts&&S.pts.length?snapChart():null;S.anim=false;
   {const og=$('chart').querySelector('.aghost');if(og)og.remove()}
@@ -732,7 +734,7 @@ function render(){
   /* PV: power on x, speed on y (top left is better); otherwise speed on x, work per joule on y */
   /* speed is always up (y) outside All workloads: SW puts work per joule across, PV wall power across */
   const SW=!PV&&!AB&&!w.combined,E=r=>r.e*kr(r),El=r=>r.elo?r.elo*kr(r):E(r),Eh=r=>r.ehi?r.ehi*kr(r):E(r),Sl=r=>r.xlo||r.x,Sh=r=>r.xhi||r.x;
-  const FX=r=>PV?r.p:SW?E(r):r.x, FY=r=>PV||SW?r.x:E(r), FXl=r=>PV?(r.plo||r.p):SW?El(r):Sl(r), FXh=r=>PV?(r.phi||r.p):SW?Eh(r):Sh(r), FYl=r=>PV||SW?Sl(r):El(r), FYh=r=>PV||SW?Sh(r):Eh(r);
+  const FX=r=>PV?r.p:SW?1/E(r):r.x, FY=r=>PV||SW?r.x:E(r), FXl=r=>PV?(r.plo||r.p):SW?1/Eh(r):Sl(r), FXh=r=>PV?(r.phi||r.p):SW?1/El(r):Sh(r), FYl=r=>PV||SW?Sl(r):El(r), FYh=r=>PV||SW?Sh(r):Eh(r);
   let x0=Infinity,x1=0,y0=Infinity,y1=0;
   for(const r of rows){x0=Math.min(x0,S.err?FXl(r):FX(r));x1=Math.max(x1,S.err?FXh(r):FX(r));
     y0=Math.min(y0,S.err?FYl(r):FY(r));y1=Math.max(y1,S.err?FYh(r):FY(r))}
@@ -766,18 +768,20 @@ function render(){
     :w.combined?['Work per joule relative to '+bN+', more efficient upward','Work per joule relative to the baseline','Work per joule vs baseline']
     :kg?['Frames per joule relative to '+(curBase().chip)+' in the same game, more efficient upward','Frames per joule relative to the baseline, same game','Frames/J vs baseline']
     :ax?['Work per joule relative to '+bL+', more efficient upward','Work per joule relative to '+bL,'Work per joule vs '+ax.b.chip,'Work per joule vs baseline']:[w.e+' ('+w.eu+'), more efficient upward',w.e+' ('+w.eu+')'];
-  if(SW){xc=yc.map(t=>t.replace(', more efficient upward',', more efficient to the right'));yc=[w.x+', faster upward',w.x,'Speed ('+w.xu+')']}
+  if(SW){const iu=invU(w.eu);xc=kg?['Energy per frame relative to '+(curBase().chip)+' in the same game, less to the left','Energy per frame relative to the baseline, same game','J/frame vs baseline']
+      :ax?['Energy per unit of work relative to '+bL+', less to the left','Energy per unit of work relative to '+bL,'J/work vs '+ax.b.chip]
+      :['Energy per unit of work ('+iu+'), less energy to the left','Energy per unit of work ('+iu+')','J/work ('+iu+')'];yc=[w.x+', faster upward',w.x,'Speed ('+w.xu+')']}
   const fitT=(t,c,av)=>{for(const s of c){t.textContent=s;let n=0;try{n=t.getComputedTextLength()}catch(_){}if(n<=av)return}};
   {const cx=(m.l+W-m.r)/2,cy=(m.t+H-m.b)/2;const xt=el('text',{x:cx,y:H-9,'text-anchor':'middle',class:'axt'});g.appendChild(xt);fitT(xt,xc,2*Math.min(cx,W-cx)-8);
    const yt=el('text',{x:15,y:cy,'text-anchor':'middle',class:'axt yt',transform:`rotate(-90 15 ${cy})`});g.appendChild(yt);fitT(yt,yc,2*Math.min(cy,H-cy)-8)}
   const clip=el('clipPath',{id:'cp'});clip.appendChild(el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b}));svg.appendChild(clip);
   const iso=el('g',{'clip-path':'url(#cp)'});svg.appendChild(iso);
-  const pmin=PV?y0/x1:SW?y0*k/x1:x0/(y1/k), pmax=PV?y1/x0:SW?y1*k/x0:x1/(y0/k);let pw=[];   /* PV: lines of equal work per joule (speed = e × power); otherwise equal power */
+  const pmin=PV?y0/x1:SW?y0*x0*k:x0/(y1/k), pmax=PV?y1/x0:SW?y1*x1*k:x1/(y0/k);let pw=[];   /* PV: lines of equal work per joule (speed = e × power); otherwise equal power */
   for(let p=Math.floor(Math.log10(pmin));p<=Math.ceil(Math.log10(pmax));p++)for(const s of [1,2,5]){const v=s*Math.pow(10,p);if(v>pmin*1.15&&v<pmax/1.15)pw.push(v)}
   if(pw.length>6)pw=pw.filter((_,i)=>i%2===0);
-  if(!kg||PV)for(const P of pw){const c=PV?P:SW?P/k:null,f=c?x=>x*c:x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
-    const lx=Math.min(x1,c?y1/c:y1*P/k), px=X(lx)-6, py=Y(f(lx))+13;
-    if(px>m.l+40&&py<H-m.b-6)iso.appendChild(el('text',{x:px,y:py,'text-anchor':'end',class:'isot isol'},PV?fmtT(P)+' '+w.eu:fmtT(P)+(w.combined&&!AB?'× power':' W')))}
+  if(!kg||PV)for(const P of pw){const c=PV?P:null,f=SW?x=>P/(k*x):c?x=>x*c:x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
+    const lx=SW?Math.min(x1,Math.max(x0,P/(k*y1))*1.25):Math.min(x1,c?y1/c:y1*P/k), px=SW?X(lx)+4:X(lx)-6, py=Y(f(lx))+(SW?-4:13);
+    if(px>m.l+40&&px<W-m.r-30&&py<H-m.b-6&&py>m.t+8)iso.appendChild(el('text',{x:px,y:py,'text-anchor':SW?'start':'end',class:'isot isol'},PV?fmtT(P)+' '+w.eu:fmtT(P)+(w.combined&&!AB?'× power':' W')))}
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(FX(r)),py:Y(FY(r))}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();let fi=0;
@@ -785,16 +789,16 @@ function render(){
     for(const p of pts){if(!S.fest&&(p.r.est||p.r.pe))continue;const key=(p.r.ow||p.r.w)+'|'+String(vk(p.r)||'').replace(' (oMLX)','');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
     const FL=[];/* frontier names: placed after all lines, groups with more points first */
     for(const [gk,g] of [...grp].sort((a,b)=>b[1].length-a[1].length)){if(g.length<2)continue;const fk={'data-fk':gk};let best=-1;const f=[];
-      if(PV){/* less power and more speed: walk up in power, keep each point faster than all cheaper ones */
+      if(PV||SW){/* less power (or energy per unit of work) and more speed: walk up in power, keep each point faster than all cheaper ones */
         for(const p of [...g].sort((a,b)=>FX(a.r)-FX(b.r)||FY(b.r)-FY(a.r)))if(FY(p.r)>best*1.0000001){f.push(p);best=FY(p.r)}}
       else{/* faster and more efficient: walk down the x axis keeping each point higher than all to its right, then put them in x order */
         const by=[...g].sort((a,b)=>FX(b.r)-FX(a.r)||FY(b.r)-FY(a.r));for(const p of by){if(FY(p.r)>best*1.0000001){f.push(p);best=FY(p.r)}}f.reverse()}for(const p of f){p.front=true;S.fset.add(p.r)}
       if(!f.length)continue;const op=S.w==='all'?'opacity:.45':'';
       {const pl=el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op});pl._pts=f;if(grp.size>1)pl.appendChild(el('title',{},glab(f[0].r)+' frontier'));fg.appendChild(pl)}
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
-        const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:a.py-5,an:'start',p0:a});fg.appendChild(el('path',{d:'M'+X(PV?x1:x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),...fk,class:'front ftail',style:op}));
+        const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:a.py-5,an:'start',p0:a});fg.appendChild(el('path',{d:'M'+X(PV||SW?x1:x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),...fk,class:'front ftail',style:op}));
         if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+(PV?' point is both fastest and lowest-power':' point is both fastest and most efficient')+', so the frontier is its corner'));continue}
-      const fit=S.w==='all'?null:frontFit(f.map(p=>[FX(p.r),FY(p.r)]),S.ffit);if(fit&&(PV||SW)){const xn=PV?'power':'work per joule';fit.label=fit.label.replace(/work per joule ∝ x\^([^,]+), so power ∝ x\^.*/,'speed ∝ '+(PV?'power':'(work per joule)')+'^$1').replace(/y ∝ exp\(([^)]*)·x\)/,'speed ∝ exp($1·'+xn+')').replace(/y = /,'speed = ').replace(/·ln x/,'·ln('+xn+')').replace(/·x$/,'·'+xn)}if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),k:gk,n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
+      const fit=S.w==='all'?null:frontFit(f.map(p=>[FX(p.r),FY(p.r)]),S.ffit);if(fit&&(PV||SW)){const xn=PV?'power':'J per unit of work';fit.label=fit.label.replace(/work per joule ∝ x\^([^,]+), so power ∝ x\^.*/,'speed ∝ '+(PV?'power':'(J per unit of work)')+'^$1').replace(/y ∝ exp\(([^)]*)·x\)/,'speed ∝ exp($1·'+xn+')').replace(/y = /,'speed = ').replace(/·ln x/,'·ln('+xn+')').replace(/·x$/,'·'+xn)}if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),k:gk,n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{...fk,d:'M'+pts2.join('L'),class:'front ftail',style:op}));return pts2.length>1?pts2[pts2.length-1].split(',').map(Number):null};
       const a=f[0],z=f[f.length-1];const le=tail(FX(a.r),x0,[FX(a.r),FY(a.r)]);tail(FX(z.r),x1,[FX(z.r),FY(z.r)]);
@@ -884,16 +888,16 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
   if(G.PV){/* speed against power: the line through the point is equal work per joule */const E=r.x/r.p,f2=x=>x*E;un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
     let lx=Math.min(x1/1.04,y1/E/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
     un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},fmt(r.e)+' '+WL[r.w].eu+(r.est?' (estimated)':'')))}else{
-  const P=r.x/r.e,kp=G.kr?G.kr(r):k,f2=G.SW?x=>x*P/kp:x=>x/P*kp;   /* the equal-power line through the point (SW: speed = work per joule × power) */un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
-  let lx=Math.min(x1/1.04,(G.SW?y1*kp/P:y1*P/kp)/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
-  un.appendChild(el('text',{x:X(lx)-4,y:lyy-7,'text-anchor':'end',class:'isoxt'},(r.ow&&r.br?fmt(P)+'× baseline power ('+fmt(r.o.p)+' W)':fmt(r.ow?r.o.p:P)+' W')+(r.est?' (estimated)':'')))}
+  const P=r.x/r.e,kp=G.kr?G.kr(r):k,f2=G.SW?x=>P/(kp*x):x=>x/P*kp;   /* the equal-power line through the point (SW: speed = power ÷ energy per unit of work) */   /* the equal-power line through the point (SW: speed = work per joule × power) */un.appendChild(el('line',{x1:X(x0),y1:Y(f2(x0)),x2:X(x1),y2:Y(f2(x1)),class:'isox'}));
+  let lx=G.SW?Math.min(x1/1.3,Math.max(x0*1.04,P/(kp*y1)*1.1)):Math.min(x1/1.04,y1*P/kp/1.08);let lyy=Y(f2(lx));if(lyy<m.t+14){lx=lx/1.1;lyy=Y(f2(lx))}
+  un.appendChild(el('text',{x:G.SW?X(lx)+6:X(lx)-4,y:lyy-7,'text-anchor':G.SW?'start':'end',class:'isoxt'},(r.ow&&r.br?fmt(P)+'× baseline power ('+fmt(r.o.p)+' W)':fmt(r.ow?r.o.p:P)+' W')+(r.est?' (estimated)':'')))}
   // crosshair to axes with value chips
   un.appendChild(el('line',{x1:p.px,x2:p.px,y1:p.py,y2:H-m.b,class:'cross'}));un.appendChild(el('line',{x1:m.l,x2:p.px,y1:p.py,y2:p.py,class:'cross'}));
   const chipAt=(x,y,t,an)=>{const c=el('g',{class:'axchip'}),tw=t.length*(G.narrow?6.9:6.6)+10;const rx=an==='middle'?x-tw/2:an==='start'?x:x-tw;
     c.appendChild(el('rect',{x:rx,y:y-9,width:tw,height:18,rx:4}));c.appendChild(el('text',{x:rx+tw/2,y:y+4,'text-anchor':'middle'},t));ov.appendChild(c)};
   // the y chip sits in the left margin, right-aligned to the axis; the unit is dropped when the margin is too narrow for it
   const ychip=(n,u)=>{const cw=t=>t.length*(G.narrow?6.9:6.6)+10,t=cw(n+u)<=m.l-5?n+u:n;chipAt(Math.max(m.l-3,cw(t)+2),p.py,t,'end')};
-  const wl=WL[r.ow||S.w];if(G.PV){chipAt(p.px,H-m.b+12,fmt(r.p)+' W','middle');ychip(fmt(r.x),' '+WL[r.w].xu)}else if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else if(G.SW){const ev=(G.kg||k!==1)?fmt(r.e*(G.kr?G.kr(r):k))+'×':fmt(r.e)+' '+wl.eu;chipAt(p.px,H-m.b+12,ev,'middle');ychip(fmt(r.x),' '+wl.xu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');(G.kg||k!==1)||r.ow?ychip(fmt(r.e*(G.kr?G.kr(r):k))+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
+  const wl=WL[r.ow||S.w];if(G.PV){chipAt(p.px,H-m.b+12,fmt(r.p)+' W','middle');ychip(fmt(r.x),' '+WL[r.w].xu)}else if(r.ow&&!r.br){chipAt(p.px,H-m.b+12,fmt(r.o.x)+' '+wl.xu,'middle');ychip(fmt(r.o.e),' '+wl.eu)}else if(G.SW){const ev=(G.kg||k!==1)?fmt(1/(r.e*(G.kr?G.kr(r):k)))+'×':fmt(1/r.e)+' '+invU(wl.eu);chipAt(p.px,H-m.b+12,ev,'middle');ychip(fmt(r.x),' '+wl.xu)}else{const cx_=r.ow?'×':' '+wl.xu;chipAt(p.px,H-m.b+12,fmt(r.x)+cx_,'middle');(G.kg||k!==1)||r.ow?ychip(fmt(r.e*(G.kr?G.kr(r):k))+'×',''):ychip(fmt(r.e*k),' '+wl.eu)}
   // spokes
   for(const gq of relGroups(r)){const c={rel:'spoke-gen',chip:'spoke-chip',machine:'spoke-mach',bench:'spoke-bench'}[gq.mode];
     for(const q of gq.gen)un.appendChild(el('line',{x1:p.px,y1:p.py,x2:q.px,y2:q.py,class:c}));
