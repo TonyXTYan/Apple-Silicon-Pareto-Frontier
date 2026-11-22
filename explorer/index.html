@@ -167,7 +167,8 @@ header.top{display:flex;flex-direction:column;gap:8px}
 #chart.pvanim .trails,#chart.pvanim .ftail,#chart.pvanim .iso,#chart.pvanim .isot,#chart.pvanim .flab,#chart.pvanim .fleader,#chart.pvanim .tk,#chart.pvanim .axt{animation:pvfade .9s ease both}
 @keyframes pvfade{0%,45%{opacity:0}}
 #chart .fleader{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.45}
-#chart .flab{pointer-events:auto;cursor:default}
+#chart .flab{pointer-events:auto;cursor:pointer}
+#chart .fhit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke;cursor:pointer}
 #chart path.front:not(.ftail){pointer-events:stroke}
 #chart .fhov .front,#chart .fhov .flab,#chart .fhov .fleader{opacity:.12;transition:opacity .15s}
 #chart .fhov .fon{opacity:1!important}
@@ -417,7 +418,7 @@ td .dot{display:inline-block;vertical-align:-3px;margin-right:7px}
     <div class="chartwrap" id="wrap" aria-label="Chart">
       <div class="ctop">
         <p class="zhint"><span class="ptr">Scroll to zoom, drag to pan, arrow keys step through points</span><span class="tch">Tap a point for details; once zoomed, drag sideways to pan</span></p>
-        <div class="ztools" role="group" aria-label="Chart view"><div class="pvseg" id="pvb" role="radiogroup" aria-label="Chart axes" title="Work per joule against speed is this page's default. Speed vs power is the chart Apple usually shows: wall power across, speed up, so up and to the left is better. Points slide between the two."><button type="button" class="chip seg" role="radio" data-pv="eff" aria-checked="true">Speed vs J/work</button><button type="button" class="chip seg" role="radio" data-pv="pow" aria-checked="false">Speed vs power</button></div><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
+        <div class="ztools" role="group" aria-label="Chart view"><button type="button" class="zb" id="fsoloclr" hidden title="Show every frontier again (Esc)">Show all frontiers</button><div class="pvseg" id="pvb" role="radiogroup" aria-label="Chart axes" title="Work per joule against speed is this page's default. Speed vs power is the chart Apple usually shows: wall power across, speed up, so up and to the left is better. Points slide between the two."><button type="button" class="chip seg" role="radio" data-pv="eff" aria-checked="true">Speed vs J/work</button><button type="button" class="chip seg" role="radio" data-pv="pow" aria-checked="false">Speed vs power</button></div><button type="button" class="zb" id="zin" title="Zoom in (or scroll on the plot)" aria-label="Zoom in">+</button><button type="button" class="zb" id="zout" title="Zoom out" aria-label="Zoom out">−</button><button type="button" class="zb" id="zreset" title="Reset zoom (or double-click the plot)" disabled>Reset</button><button type="button" class="zb" id="zfs" title="Full screen (Esc to leave)">Full screen</button></div>
       </div>
       <svg id="chart" tabindex="0" role="application" aria-roledescription="scatter plot" aria-labelledby="charttitle" aria-describedby="charthelp"><title id="charttitle"></title></svg>
       <div class="tip" id="tip" hidden></div>
@@ -641,7 +642,8 @@ const SIZES=[['XS',0,2,'under 2B'],['S',2,5,'2–5B'],['M',5,12,'5–12B'],['L',
 function pcount(r){const m=/(\d+(?:\.\d+)?)\s*([BT])\b/.exec(r.model||'');return m?+m[1]*(m[2]==='T'?1000:1):null}
 function psize(r){const b=pcount(r);if(b==null)return null;const z=SIZES.find(z=>b>=z[1]&&b<z[2]);return z?z[0]:null}
 function sizeOK(r){if(S.w!=='llm')return true;const z=psize(r);return !z||S.lsize.has(z)}
-function visible(){return pool(S.w).filter(r=>sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||(!S.lmod?true:S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('model:')?String(r.model||'').replace(' (oMLX)','')===S.lmod.slice(6)&&r.set!=='cluster':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):(r.model===S.lmod||S.lmod.endsWith(' (oMLX)')&&r.model===S.lmod.slice(0,-7))&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='llm'||modelsOK(r))&&(S.w!=='gpu'||S.lgames.has(r.game||CP))&&(!isCpu(S.w)||(r.bm||CB24)===S.lbm)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&S.ldevs.has(r.w)))&&(S.w!=='hpl'||S.lsets.has(r.w==='hpl'?'hpl':r.set)))}
+const fgKey=r=>(r.ow||r.w)+'|'+String(vk(r)||'').replace(' (oMLX)','');   /* one frontier per benchmark/model/game/scene */
+function visible(){return pool(S.w).filter(r=>(!S.fsolo||fgKey(r)===S.fsolo)&&sizeOK(r)&&S.tiers.has(r.tier)&&S.forms.has(r.form)&&(S.flg||!weak(r))&&(S.w!=='llm'||(!S.lmod?true:S.lmod==='other'?!r.set&&r.model!=='Llama 2 7B Q4_0':S.lmod.startsWith('model:')?String(r.model||'').replace(' (oMLX)','')===S.lmod.slice(6)&&r.set!=='cluster':S.lmod.startsWith('set:')?r.set===S.lmod.slice(4):(r.model===S.lmod||S.lmod.endsWith(' (oMLX)')&&r.model===S.lmod.slice(0,-7))&&r.set!=='mlx'&&r.set!=='cluster'))&&(S.w!=='llm'||modelsOK(r))&&(S.w!=='gpu'||S.lgames.has(r.game||CP))&&(!isCpu(S.w)||(r.bm||CB24)===S.lbm)&&(S.w!=='blender'||((r.scene||'')===S.lscene&&S.ldevs.has(r.w)))&&(S.w!=='hpl'||S.lsets.has(r.w==='hpl'?'hpl':r.set)))}
 function curBase(){return S.preview||S.base}
 // baseline value for workload w (and LLM model)
 function baseRow(w,b,model,allowEst){if(!b)return null;const ae=allowEst==null?S.est:allowEst;let c=ALL.filter(r=>r.w===w&&r.ck===ck(b.chip)&&!r.ex&&!r.mode&&(!r.est||ae||r.pe));
@@ -780,7 +782,7 @@ function render(){
     y0=Math.min(y0,S.err?FYl(r):FY(r));y1=Math.max(y1,S.err?FYh(r):FY(r))}
   const pad=(a,b,f)=>{const g=Math.max(Math.pow(b/a,f),1.12);return [a/g,b*g]};
   [x0,x1]=pad(x0,x1,.08);[y0,y1]=pad(y0,y1,.09);S.auto={x0,x1,y0,y1};
-  if(S.zoom&&S.zoom.key===viewKey()){({x0,x1,y0,y1}=S.zoom)}else S.zoom=null;$('zreset').disabled=!S.zoom;
+  if(S.zoom&&S.zoom.key===viewKey()){({x0,x1,y0,y1}=S.zoom)}else S.zoom=null;$('zreset').disabled=!S.zoom;{const fb=$('fsoloclr');fb.hidden=!S.fsolo;if(S.fsolo)fb.textContent='Show all frontiers ('+(S.fsolo.split('|')[1]||'one shown')+')'}
   const X=v=>m.l+(Math.log(v/x0)/Math.log(x1/x0))*(W-m.l-m.r), Y=v=>H-m.b-(Math.log(v/y0)/Math.log(y1/y0))*(H-m.t-m.b);
   G={X,Y,x0,x1,y0,y1,m,W,H,k,kr,kg,narrow,PV,SW,FX,FY};
   const g=el('g',{});svg.appendChild(g);
@@ -833,7 +835,7 @@ function render(){
   const pts=rows.map(r=>({r,px:X(FX(r)),py:Y(FY(r))}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();let fi=0;
     /* one frontier per benchmark; the same model from different sources (e.g. oMLX) shares it; estimates count unless switched off */
-    for(const p of pts){if(!S.fest&&(p.r.est||p.r.pe))continue;const key=(p.r.ow||p.r.w)+'|'+String(vk(p.r)||'').replace(' (oMLX)','');if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
+    for(const p of pts){if(!S.fest&&(p.r.est||p.r.pe))continue;const key=fgKey(p.r);if(!grp.has(key))grp.set(key,[]);grp.get(key).push(p)}
     const FL=[];/* frontier names: placed after all lines, groups with more points first */
     for(const [gk,g] of [...grp].sort((a,b)=>b[1].length-a[1].length)){if(g.length<2)continue;const fk={'data-fk':gk};let best=-1;const f=[];
       if(PV||SW){/* less power (or energy per unit of work) and more speed: walk up in power, keep each point faster than all cheaper ones */
@@ -882,8 +884,13 @@ function render(){
           for(const [x,y,an] of cand){t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor',an);const b=bx(t);if(inside(b)&&!first)first=[x,y,an,b];
             if(inside(b)&&!used.some(o=>hit(o,b))&&!pb.some(o=>hit(o,b))){ok=b;break}}
           if(ok)used.push(ok);else t.remove()}catch(_){}}
-      for(const t of fg.querySelectorAll('.flab')){const on=v=>{fg.classList.toggle('fhov',v);for(const e of fg.querySelectorAll('[data-fk]'))e.classList.toggle('fon',v&&e.dataset.fk===t.dataset.fk)};
-        t.addEventListener('mouseenter',()=>on(true));t.addEventListener('mouseleave',()=>on(false))}}}
+      const fon=(k2,v)=>{fg.classList.toggle('fhov',v);for(const e of fg.querySelectorAll('[data-fk]'))e.classList.toggle('fon',v&&e.dataset.fk===k2);
+          if(v)S.hl={f:r=>fgKey(r)===k2};else if(S.hl&&S.hl.fk)S.hl=null;if(S.hl)S.hl.fk=v?k2:null;if(!S.hover&&!S.pin)drawFocus()},
+        fclick=k2=>{S.fsolo=S.fsolo===k2?null:k2;S.hl=null;S.pin=null;S.hover=null;hideTip();S.anim=true;all()};
+      /* a wide invisible stroke over each frontier line makes it easy to hover and click */
+      for(const pa of [...fg.querySelectorAll('path.front[data-fk]')]){const h2=el('path',{d:pa.getAttribute('d'),class:'fhit','data-fk':pa.dataset.fk});pa._hit=h2;fg.insertBefore(h2,fg.querySelector('.fleader,.flab'))}
+      for(const t of fg.querySelectorAll('.flab,.fhit')){const k2=t.dataset.fk;t.addEventListener('mouseenter',()=>fon(k2,true));t.addEventListener('mouseleave',()=>fon(k2,false));
+        t.addEventListener('click',e=>{e.stopPropagation();fclick(k2)})}}}
   {const tg=el('g',{'clip-path':'url(#cp)',class:'trails'});svg.insertBefore(tg,under);const tr=new Map();for(const p of pts)if(p.r.grp){const key=p.r.grp;if(!tr.has(key))tr.set(key,[]);tr.get(key).push(p)}
     for(const g of tr.values()){if(g.length<2)continue;g.sort((a,b)=>a.r.ord-b.r.ord);const d='M'+g.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L');
       if(isBl(g[0].r)){tg.appendChild(el('path',{d,class:'pairl t-'+g[0].r.tier}));continue}
@@ -902,9 +909,9 @@ function render(){
   svg.appendChild(el('g',{id:'labels'}));svg.appendChild(el('g',{id:'over'}));
   drawFocus();if(A)runAnim(A);
 }
-function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
+function placeLabels(list,cls,maxL,force,obPts){const lg=$('labels');if(!lg)return;const {m,W,H}=G;
   const bb=e=>{try{const b=e.getBBox();return b.width?[b.x-2,b.y-1,b.x+b.width+2,b.y+b.height+1]:null}catch(_){return null}};
-  const boxes=S.pts.map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt,#chart #labels text,#chart .flab')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
+  const boxes=(obPts||S.pts).map(p=>[p.px-8,p.py-8,p.px+8,p.py+8]).concat([...document.querySelectorAll('#chart #over .axchip rect,#chart #under .isoxt,#chart #labels text,#chart .flab')].map(bb).filter(Boolean)),hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let n=0;
   for(const p of list){if(n>=maxL)break;const t=shortName(p.r),tw=t.length*(G.narrow?6.6:6.3)+6;
     for(const [cx,cy,an] of [[p.px+11,p.py+4,'start'],[p.px-11,p.py+4,'end'],[p.px,p.py-12,'middle'],[p.px,p.py+20,'middle']]){
       const bx=an==='start'?[cx,cy-11,cx+tw,cy+3]:an==='end'?[cx-tw,cy-11,cx,cy+3]:[cx-tw/2,cy-11,cx+tw/2,cy+3];
@@ -918,11 +925,12 @@ function placeLabels(list,cls,maxL,force){const lg=$('labels');if(!lg)return;con
         const x0=Math.max(m.l+2,Math.min(W-m.r-tw,p.px-tw/2)),cy=p.py-12-11<m.t-6?p.py+20:p.py-12;best={cx:x0,cy,an:'start',bx:[x0,cy-11,x0+tw,cy+3]}}
       boxes.push(best.bx);{const te=el('text',{x:best.cx,y:best.cy,'text-anchor':best.an,class:'lbl front '+(cls||'')},t);te._r=p.r;lg.appendChild(te)}n++}
     delete p._lab}}
-function defaultLabels(cls,skip){const pts=S.pts,k=G.k;const by=f=>[...pts].sort(f);
+/* labels follow what is shown: a highlight labels just its points; a filtered view with few points labels estimates too */
+function defaultLabels(cls,skip,only){const pts=only?S.pts.filter(p=>only.has(p)):S.pts,k=G.k,few=only||pts.length<=40;const by=f=>[...pts].sort(f);
   const order=by((a,b)=>b.r.e-a.r.e),fast=by((a,b)=>b.r.x-a.r.x),slow=by((a,b)=>a.r.e-b.r.e);const pri=[];const push=p=>{if(p&&!pri.includes(p))pri.push(p)};
   const bRows=tabBase(curBase());for(const p of pts)if(bRows.includes(p.r))push(p);push(order[0]);push(fast[0]);push(slow[0]);
   for(let i=0;i<pts.length;i++){if(!pts[i])break;push(order[i]);push(fast[i])}
-  placeLabels(pri.filter(p=>(!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&(p.r.game||p.r.bm||S.w==='blender'||p.r.lib||((S.lmod||S.lmods.size<MODELS.length)&&/^(omlx|lcpp)/.test(p.r.set||'')))))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60))}
+  placeLabels(pri.filter(p=>(few||!p.r.est||p.r.mode||p.r.tier==='Ultra'||(p.r.pe&&(p.r.game||p.r.bm||S.w==='blender'||p.r.lib||((S.lmod||S.lmods.size<MODELS.length)&&/^(omlx|lcpp)/.test(p.r.set||'')))))&&!(skip&&skip.has(p))),cls||'',G.narrow?9:(S.w==='all'?16:60),null,only?pts:null)}
 const bkey=r=>(r.ow||r.w)+'|'+(vk(r)||''),bname=r=>{const w=r.ow||r.w;return S.w==='all'?'workload':w==='llm'?'model':w==='gpu'?'game':w==='bl-cpu'||w==='bl-gpu'?'scene and device':w==='blas'?'set and library':'benchmark'};
 const HM=['rel','chip','machine','bench'];
 function relGroups(r){return HM.filter(m=>S.hm.has(m)).map(m=>Object.assign({mode:m},relMode(r,m)))}
@@ -938,7 +946,8 @@ function relMode(r,mode){if(mode==='bench'){const k=bkey(r);return {gen:S.pts.fi
 function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)return;lg.textContent='';ov.textContent='';un.textContent='';
   const f=S.hover||S.pin;const p=f&&S.pts.find(q=>q.r===f);
   for(const q of S.pts)q.g.classList.remove('dim');{const fw=(S.hover||S.pin||{}).ow||(S.hl&&S.hl.k==='ow'&&S.hl.v);document.querySelectorAll('#chart g.scale').forEach(gs=>{gs.classList.toggle('scon',!!fw&&gs.dataset.w===fw);gs.classList.toggle('scoff',!!fw&&gs.dataset.w!==fw)})}$('chart').classList.toggle('focused',!!(S.hover||S.pin));
-  if(!p&&S.hl){/* an option with no point on the plot (a radio choice not shown, a model turned off) dims nothing */const t=S.hl.f||(r=>r[S.hl.k]===S.hl.v);if(S.pts.some(q=>t(q.r)))for(const q of S.pts)if(!t(q.r))q.g.classList.add('dim')}
+  if(!p&&S.hl){/* an option with no point on the plot (a radio choice not shown, a model turned off) dims nothing */const t=S.hl.f||(r=>r[S.hl.k]===S.hl.v),on=new Set(S.pts.filter(q=>t(q.r)));
+    if(on.size){for(const q of S.pts)if(!on.has(q))q.g.classList.add('dim');defaultLabels('',null,on);declutter();return}}
   if(!p){defaultLabels();declutter();return}
   const {X,Y,x0,x1,y0,y1,m,W,H,k}=G,r=p.r,rel=relatives(r),keep=new Set([p,...rel.gen,...rel.tier]);
   for(const q of S.pts)if(!keep.has(q))q.g.classList.add('dim');
@@ -1081,6 +1090,8 @@ $('chart').addEventListener('wheel',e=>{if(e.ctrlKey&&e.deltaY===0)return;e.prev
 {let last=0,lx=0,ly=0;$('chart').addEventListener('pointerdown',e=>{const t=performance.now();if(t-last<350&&Math.hypot(e.clientX-lx,e.clientY-ly)<8&&S.zoom){S.zoom=null;render();readout();last=0;return}last=t;lx=e.clientX;ly=e.clientY})}
 $('zin').addEventListener('click',()=>zoomBy(.7));$('zout').addEventListener('click',()=>zoomBy(1/.7));
 $('zreset').addEventListener('click',()=>{S.zoom=null;render();readout()});
+$('fsoloclr').addEventListener('click',()=>{S.fsolo=null;S.anim=true;all()});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&S.fsolo&&!e.defaultPrevented){S.fsolo=null;S.anim=true;all()}});
 function setFS(on){const w=$('wrap');w.classList.toggle('fs',on);$('zfs').textContent=on?'Exit full screen':'Full screen';document.body.style.overflow=on?'hidden':'';
   if(on){w.setAttribute('role','dialog');w.setAttribute('aria-modal','true')}else{w.removeAttribute('role');w.removeAttribute('aria-modal')}hideTip();render();readout();if(!on&&w.contains(document.activeElement)&&document.activeElement!==$('zfs'))$('zfs').focus()}
 $('wrap').addEventListener('keydown',e=>{if(e.key!=='Tab'||!$('wrap').classList.contains('fs'))return;const f=[...$('wrap').querySelectorAll('button:not(:disabled),[tabindex="0"]')];const i=f.indexOf(document.activeElement);
@@ -1346,7 +1357,7 @@ function all(){if(S.w==='cpu-one'&&S.lbm===SPEC)S.lbm=CB24;srvBase();const w=WL[
   if(S.pin&&(!inTab(S.pin)||(!S.est&&S.pin.est&&!S.pin.pe)))S.pin=null;render();readout();table();legend();matrix()}
 for(const k in WL){if(WL[k].notab)continue;const b=h('button',{class:'tab',role:'tab',type:'button','data-w':k,id:'tab-'+k,'aria-controls':'panel'});
   b.addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tab')],i=ts.indexOf(b);const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i-1+ts.length)%ts.length:e.key==='Home'?0:e.key==='End'?ts.length-1:null;if(j==null)return;e.preventDefault();ts[j].focus();ts[j].click()});b.dataset.w=k;b.appendChild(h('span',null,WL[k].tab));b.appendChild(h('small',null,WL[k].sub));
-  b.addEventListener('click',()=>{if(S.w!==k)S.anim=true;S.w=k;autoBase();S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
+  b.addEventListener('click',()=>{if(S.w!==k){S.anim=true;S.fsolo=null}S.w=k;autoBase();S.sort=['e',-1];S.hover=null;try{history.replaceState(null,'','#'+k)}catch(e){location.hash=k}hideTip();all()});$('tabs').appendChild(b)}
 function syncOpts(id,set,all){const box=$(id);box.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',set.has(b.dataset.opt)));const sa=box.querySelector('.showall');if(sa)sa.classList.toggle('on',set.size<all.length)}
 function soloToggle(set,all,v,id){if(set.size===all.length){set.clear();set.add(v)}else if(set.has(v)){set.delete(v);if(!set.size)all.forEach(x=>set.add(x))}else set.add(v);syncOpts(id,set,all);hideTip();S.anim=true;render();table();legend()}
 function addShowAll(id,set,all){const b=h('button',{type:'button',class:'showall'},'Show all');b.addEventListener('click',()=>{all.forEach(x=>set.add(x));syncOpts(id,set,all);hideTip();S.anim=true;render();table();legend();const f=$(id).querySelector('[data-opt]');if(f)f.focus()});$(id).querySelector('.gl').appendChild(b);syncOpts(id,set,all)}
