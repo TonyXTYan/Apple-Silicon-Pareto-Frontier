@@ -780,8 +780,13 @@ function render(){
   for(let p=Math.floor(Math.log10(pmin));p<=Math.ceil(Math.log10(pmax));p++)for(const s of [1,2,5]){const v=s*Math.pow(10,p);if(v>pmin*1.15&&v<pmax/1.15)pw.push(v)}
   if(pw.length>6)pw=pw.filter((_,i)=>i%2===0);
   if(!kg||PV)for(const P of pw){const c=PV?P:null,f=SW?x=>P/(k*x):c?x=>x*c:x=>x/P*k;iso.appendChild(el('line',{x1:X(x0),y1:Y(f(x0)),x2:X(x1),y2:Y(f(x1)),class:'iso'}));
-    const lx=SW?Math.min(x1,Math.max(x0,P/(k*y1))*1.25):Math.min(x1,c?y1/c:y1*P/k), px=SW?X(lx)+4:X(lx)-6, py=Y(f(lx))+(SW?-4:13);
-    if(px>m.l+40&&px<W-m.r-30&&py<H-m.b-6&&py>m.t+8)iso.appendChild(el('text',{x:px,y:py,'text-anchor':SW?'start':'end',class:'isot isol'},PV?fmtT(P)+' '+w.eu:fmtT(P)+(w.combined&&!AB?'× power':' W')))}
+    /* label each guide near its lower end (bottom left or bottom right of the plot), along the line, just above it */
+    const seg=clipSeg(X(x0),Y(f(x0)),X(x1),Y(f(x1)),m.l,m.t,W-m.r,H-m.b);if(!seg)continue;
+    let [ax_,ay_,bx_,by_]=seg;if(ay_<by_)[ax_,ay_,bx_,by_]=[bx_,by_,ax_,ay_];const L=Math.hypot(bx_-ax_,by_-ay_);if(L<90)continue;
+    const ux=(bx_-ax_)/L,uy=(by_-ay_)/L,flip=ux<0,th=Math.atan2(uy,ux)+(flip?Math.PI:0),dg=th*180/Math.PI,sn=Math.sin(th),cs=Math.cos(th);
+    const tx=ax_+ux*18+3*sn,ty=ay_+uy*18-3*cs;
+    const lt=el('text',{x:tx,y:ty,'text-anchor':flip?'end':'start',transform:`rotate(${dg.toFixed(2)} ${tx.toFixed(1)} ${ty.toFixed(1)})`,class:'isot isol'},PV?fmtT(P)+' '+w.eu:fmtT(P)+(w.combined&&!AB?'× power':' W'));iso.appendChild(lt);
+    {let tl=40;try{tl=lt.getComputedTextLength()}catch(_){}const dir=flip?-1:1;lt._samp=[0,.25,.5,.75,1].map(q=>[tx+dir*cs*tl*q+5*sn,ty+dir*sn*tl*q-5*cs])}}
   const under=el('g',{id:'under','clip-path':'url(#cp)'});svg.appendChild(under);
   const pts=rows.map(r=>({r,px:X(FX(r)),py:Y(FY(r))}));S.pts=pts;
   S.fset=new Set();if(S.front){const fg=el('g',{'clip-path':'url(#cp)'});svg.insertBefore(fg,under);const grp=new Map();let fi=0;
@@ -797,7 +802,7 @@ function render(){
       {const pl=el('path',{...fk,d:'M'+f.map(p=>p.px.toFixed(1)+','+p.py.toFixed(1)).join('L'),class:'front',style:op});pl._pts=f;if(grp.size>1)pl.appendChild(el('title',{},glab(f[0].r)+' frontier'));fg.appendChild(pl)}
       if(f.length===1){/* one point beats everything: its frontier is the corner it makes, flat to the left axis and straight down to the bottom axis */
         const a=f[0];if(grp.size>1)FL.push({lab:glab(a.r),k:gk,n:g.length,x:m.l+6,y:a.py-5,an:'start',p0:a});fg.appendChild(el('path',{d:'M'+X(PV||SW?x1:x0).toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+a.py.toFixed(1)+'L'+a.px.toFixed(1)+','+Y(y0).toFixed(1),...fk,class:'front ftail',style:op}));
-        if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},(grp.size>1?glab(a.r)+': one':'One')+(PV?' point is both fastest and lowest-power':' point is both fastest and most efficient')+', so the frontier is its corner'));continue}
+        if(S.w!=='all'&&(grp.size===1||(grp.size<=4&&!narrow0)))fg.appendChild(el('text',{x:m.l+8,y:H-m.b-8-15*fi++,'text-anchor':'start',class:'isot',style:'fill:var(--ink);font-size:'+(narrow0?12:11.5)+'px;paint-order:stroke;stroke:var(--surface);stroke-width:3px'},narrow0?(grp.size>1?glab(a.r)+': ':'')+'one point beats all: frontier is its corner':(grp.size>1?glab(a.r)+': one':'One')+(PV?' point is both fastest and lowest-power':SW?' point is both fastest and least energy per unit of work':' point is both fastest and most efficient')+', so the frontier is its corner'));continue}
       const fit=S.w==='all'?null:frontFit(f.map(p=>[FX(p.r),FY(p.r)]),S.ffit);if(fit&&(PV||SW)){const xn=PV?'power':'J per unit of work';fit.label=fit.label.replace(/work per joule ∝ x\^([^,]+), so power ∝ x\^.*/,'speed ∝ '+(PV?'power':'(J per unit of work)')+'^$1').replace(/y ∝ exp\(([^)]*)·x\)/,'speed ∝ exp($1·'+xn+')').replace(/y = /,'speed = ').replace(/·ln x/,'·ln('+xn+')').replace(/·x$/,'·'+xn)}if(!fit){if(grp.size>1)FL.push({lab:glab(f[0].r),k:gk,n:g.length,x:f[0].px-12,y:f[0].py+4,an:'end',fx:f[0]});continue}
       const tail=(xa,xb,[xe,ye])=>{const sh=fit.mul?ye/fit.g(xe):ye-fit.g(xe),pts2=[];for(let i=0;i<=48;i++){const xv=xa*Math.pow(xb/xa,i/48),yv=fit.mul?fit.g(xv)*sh:fit.g(xv)+sh;if(!(yv>0)||!isFinite(yv))break;pts2.push(X(xv).toFixed(1)+','+Y(yv).toFixed(1))}
         if(pts2.length>1)fg.appendChild(el('path',{...fk,d:'M'+pts2.join('L'),class:'front ftail',style:op}));return pts2.length>1?pts2[pts2.length-1].split(',').map(Number):null};
@@ -909,11 +914,13 @@ function drawFocus(){const lg=$('labels'),ov=$('over'),un=$('under');if(!lg)retu
 function xTick(g,x,y,t,lastR){const tx=el('text',{x,y,'text-anchor':'middle',class:'tk'},t);g.appendChild(tx);let bw=t.length*6.5;try{bw=tx.getComputedTextLength()||bw}catch(_){}
   if(x-bw/2<lastR+8){tx.remove();return lastR}return x+bw/2}
 /* hide power labels that sit on a point or a point label, and tick labels under an axis chip */
+/* clip a segment to a rectangle (Liang–Barsky); null when it misses */
+function clipSeg(ax,ay,bx,by,l,t,r,b){let t0=0,t1=1;const dx=bx-ax,dy=by-ay;for(const [p,q] of [[-dx,ax-l],[dx,r-ax],[-dy,ay-t],[dy,b-ay]]){if(p===0){if(q<0)return null;continue}const v=q/p;if(p<0){if(v>t1)return null;if(v>t0)t0=v}else{if(v<t0)return null;if(v<t1)t1=v}}return [ax+t0*dx,ay+t0*dy,ax+t1*dx,ay+t1*dy]}
 function declutter(){const svg=$('chart'),{m}=G;if(!m)return;const bx=e=>{try{const b=e.getBBox();return b.width?[b.x,b.y,b.x+b.width,b.y+b.height]:null}catch(_){return null}},hit=(a,b)=>a&&b&&a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
   const chips=[...svg.querySelectorAll('#over .axchip rect')].map(bx).filter(Boolean);
   const obst=[...svg.querySelectorAll('#labels text,#under .isoxt')].map(bx).filter(Boolean).concat(chips);
   for(const p of S.pts)obst.push([p.px-7,p.py-7,p.px+7,p.py+7]);
-  for(const t of svg.querySelectorAll('.isol')){t.style.display='';const b=bx(t);if(!b||b[0]<m.l+2||obst.some(o=>hit(o,b)))t.style.display='none'}
+  for(const t of svg.querySelectorAll('.isol')){t.style.display='';if(t._samp){if(t._samp.some(([x,y])=>x<m.l+2||x>G.W-m.r-2||y<m.t+4||y>G.H-m.b-2||obst.some(o=>hit(o,[x-5,y-5,x+5,y+5]))))t.style.display='none';continue}const b=bx(t);if(!b||b[0]<m.l+2||obst.some(o=>hit(o,b)))t.style.display='none'}
   for(const t of svg.querySelectorAll('.tk')){t.style.visibility='';if(chips.length&&chips.some(c=>hit(c,bx(t))))t.style.visibility='hidden'}}
 function kRing(){const ov=$('over');if(!ov||!S.kbd||!S.kf)return;const q=S.pts.find(q=>q.r===S.kf);if(q)ov.appendChild(el('circle',{cx:q.px,cy:q.py,r:15.5,class:'kring'}))}
 
